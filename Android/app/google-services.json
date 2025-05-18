@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "896370465107",
+    "project_id": "tlu-pickleball",
+    "storage_bucket": "tlu-pickleball.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896370465107:android:42055c41a9c6d5e88069a6",
+        "android_client_info": {
+          "package_name": "com.example.tlupickleball"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbFFFD6KtqczYGu1b3a3iOdvJy9q-eMek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
