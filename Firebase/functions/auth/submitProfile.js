@@ -2,26 +2,22 @@ const { onRequest } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const { verifyToken } = require("../utils/verifyToken");
 
-const submitUserProfile = onRequest(async (req, res) => {
+const submitProfile = onRequest(async (req, res) => {
   const uid = await verifyToken(req, res);
   if (!uid) return;
 
   const { name, dob, gender } = req.body;
   if (!name || !dob || !gender) {
-    return res.status(400).send("Thiếu thông tin");
+    return res.status(400).send("Thiếu thông tin hồ sơ");
   }
 
   await admin.firestore().collection("users").doc(uid).set({
     name,
     dob,
-    gender,
-    phoneNumber: req.body.phoneNumber || "",
-    role: "member",
-    approved: false,
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
-  });
+    gender
+  }, { merge: true });
 
-  res.send("Đã ghi thông tin người dùng");
+  res.send("Hồ sơ cá nhân đã được cập nhật");
 });
 
-module.exports = { submitUserProfile };
+module.exports = { submitProfile };

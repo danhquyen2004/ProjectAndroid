@@ -8,7 +8,10 @@
  */
 
 
-const { submitUserProfile } = require("./auth/submitUserProfile");
+const { submitAccount } = require("./auth/submitAccount");
+const { submitProfile } = require("./auth/submitProfile");
 
-exports.submitUserProfile = submitUserProfile;
+exports.submitAccount = submitAccount;
+exports.submitProfile = submitProfile;
+
 
