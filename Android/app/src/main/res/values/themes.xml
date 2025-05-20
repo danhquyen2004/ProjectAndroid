@@ -1,8 +1,19 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- Base application theme. -->
     <style name="Base.Theme.TLUPickleball" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Base.Theme.Button" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">255dp</item>
+        <item name="android:layout_height">54dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#0C8CE9</item>
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">16dp</item>
     </style>
 
     <style name="Theme.TLUPickleball" parent="Base.Theme.TLUPickleball" />
