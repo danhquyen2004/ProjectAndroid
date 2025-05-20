@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingTop="20dp">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_background">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggleGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:checkedButton="@id/btn_duo"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_solo"
+                android:layout_width="190dp"
+                android:layout_height="30dp"
+                android:backgroundTint="@color/light_blue"
+                android:text="Đấu đơn"
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:gravity="center"
+                app:cornerRadius="15dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_duo"
+                android:layout_width="190dp"
+                android:layout_height="30dp"
+                android:backgroundTint="@color/blue"
+                android:gravity="center"
+                android:text="đấu đôi"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                app:cornerRadius="13dp" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    </FrameLayout>
+
+</LinearLayout>
