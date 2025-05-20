@@ -3,6 +3,7 @@ package com.example.tlupickleball.activities;
 import static com.example.tlupickleball.apis.UserApi.sendSubmitAccount;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class OtpActivity extends AppCompatActivity {
                             FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
                                     .addOnSuccessListener(result -> {
                                         String idToken = result.getToken();
+                                        Log.d("TOKEN", idToken);
                                         sendSubmitAccount(this, idToken, phone, password); // ✅ gọi API
                                     });
                         } else {

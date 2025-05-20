@@ -1,8 +1,7 @@
-const { onRequest } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const { verifyToken } = require("../utils/verifyToken");
 
-const submitProfile = onRequest(async (req, res) => {
+const submitProfile = async (req, res) => {
   const uid = await verifyToken(req, res);
   if (!uid) return;
 
@@ -18,6 +17,6 @@ const submitProfile = onRequest(async (req, res) => {
   }, { merge: true });
 
   res.send("Hồ sơ cá nhân đã được cập nhật");
-});
+};
 
 module.exports = { submitProfile };

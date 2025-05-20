@@ -3,26 +3,27 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/edtName"
-        android:hint="Họ tên"
+        android:id="@+id/edtPhone"
+        android:hint="Số điện thoại"
+        android:inputType="phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <EditText
-        android:id="@+id/edtDob"
-        android:hint="Ngày sinh (yyyy-MM-dd)"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/edtGender"
-        android:hint="Giới tính (Nam/Nữ)"
+        android:id="@+id/edtPassword"
+        android:hint="Mật khẩu"
+        android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/btnSubmit"
-        android:text="Xác nhận"
+        android:id="@+id/btnLogin"
+        android:text="Đăng nhập"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btnRegister"
+        android:text="Đăng ký"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

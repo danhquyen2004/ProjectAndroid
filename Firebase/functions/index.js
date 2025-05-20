@@ -1,17 +1,11 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 
+console.log("🔥 Firebase Admin SDK initialized");
+admin.initializeApp();
 
 const { submitAccount } = require("./auth/submitAccount");
 const { submitProfile } = require("./auth/submitProfile");
 
-exports.submitAccount = submitAccount;
-exports.submitProfile = submitProfile;
-
-
+exports.submitAccount = functions.https.onRequest(submitAccount);
+exports.submitProfile = functions.https.onRequest(submitProfile);

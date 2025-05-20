@@ -17,7 +17,7 @@ import okhttp3.*;
 public class UserApi {
 
     public static void sendSubmitAccount(Context context, String token, String phone, String password) {
-        String url = "https://<region>-<project>.cloudfunctions.net/submitAccount";
+        String url = "https://us-central1-tlu-pickleball-459716.cloudfunctions.net/submitAccount";
 
         OkHttpClient client = new OkHttpClient();
         JSONObject body = new JSONObject();
@@ -52,7 +52,7 @@ public class UserApi {
         });
     }
     public static void sendSubmitProfile(Context context, String token, String name, String dob, String gender) {
-        String url = "https://<region>-<project>.cloudfunctions.net/submitProfile";
+        String url = "https://us-central1-tlu-pickleball-459716.cloudfunctions.net/submitProfile";
 
         OkHttpClient client = new OkHttpClient();
         JSONObject body = new JSONObject();
