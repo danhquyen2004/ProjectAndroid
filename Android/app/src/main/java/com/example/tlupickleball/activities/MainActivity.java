@@ -2,6 +2,7 @@ package com.example.tlupickleball.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db;
     FirebaseAuth mAuth;
+    EditText editText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +29,10 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
+        editText = findViewById(R.id.edtHello);
         checkProfileStatus(); // ✅ kiểm tra hồ sơ ngay khi mở màn hình
+
+
     }
 
     private void checkProfileStatus() {
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                             finish();
                         } else {
                             // ✅ Đã có đầy đủ hồ sơ → tiếp tục vào MainActivity
+                            editText.setText("Chào mừng " + name);
                             Toast.makeText(this, "Chào mừng " + name, Toast.LENGTH_SHORT).show();
                         }
                     } else {
