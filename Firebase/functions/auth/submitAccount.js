@@ -6,27 +6,27 @@ const submitAccount = async (req, res) => {
     const uid = await verifyToken(req, res);
     if (!uid) return;
 
-    const { phoneNumber, password } = req.body;
+    const { email, password } = req.body;
 
-    console.log("✅ Body nhận được:", req.body);
+    console.log("✅ Received body:", req.body);
     console.log("👤 UID:", uid);
 
-    if (!phoneNumber || !password) {
-      return res.status(400).send("Thiếu số điện thoại hoặc mật khẩu");
+    if (!email || !password) {
+      return res.status(400).send("Missing email or password");
     }
 
     await admin.firestore().collection("users").doc(uid).set({
-      phoneNumber,
+      email,
       password,
       role: "member",
       approved: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    res.send("Tài khoản đã được lưu");
+    res.send("Account has been saved");
   } catch (e) {
-    console.error("❌ Lỗi khi xử lý submitAccount:", e);
-    res.status(500).send("Lỗi hệ thống");
+    console.error("❌ Error while processing submitAccount:", e);
+    res.status(500).send("Internal server error");
   }
 };
 
