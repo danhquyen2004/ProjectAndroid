@@ -2,14 +2,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Main content here -->
     <FrameLayout
         android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/footer_navigation" />
 
-    <!-- Footer at the bottom -->
     <LinearLayout
         android:id="@+id/footer_navigation"
         android:layout_width="match_parent"
@@ -34,8 +32,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp" />
             <TextView
-                android:text="Trang chủ"
-                android:textSize="12sp"
+                android:text="@string/home"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:textColor="#000000"/>
         </LinearLayout>
 
@@ -52,8 +51,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp" />
             <TextView
-                android:text="Trận đấu"
-                android:textSize="12sp"
+                android:text="@string/match"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:textColor="#000000"/>
         </LinearLayout>
 
@@ -70,8 +70,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp" />
             <TextView
-                android:text="Tài chính"
-                android:textSize="12sp"
+                android:text="@string/finance"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:textColor="#000000"/>
         </LinearLayout>
 
@@ -88,8 +89,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp" />
             <TextView
-                android:text="Xêp hạng"
-                android:textSize="12sp"
+                android:text="@string/rank"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:textColor="#000000"/>
         </LinearLayout>
 

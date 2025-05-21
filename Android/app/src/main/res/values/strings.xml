@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">TLU Pickleball</string>
+    <string name="home">Trang chủ</string>
+    <string name="match">Trận đấu</string>
+    <string name="finance">Tài chính</string>
+    <string name="rank">Xếp hạng</string>
 </resources>
