@@ -4,4 +4,9 @@
     <string name="match">Trận đấu</string>
     <string name="finance">Tài chính</string>
     <string name="rank">Xếp hạng</string>
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="phone_number">Số điện thoại</string>
+    <string name="password">Mật khẩu</string>
 </resources>
