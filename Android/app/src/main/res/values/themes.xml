@@ -2,8 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- Base application theme. -->
     <style name="Base.Theme.TLUPickleball" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="fontFamily">@font/be_vietnam_pro_semi_bold</item>
     </style>
 
     <style name="Nav_bar_top" parent="Widget.AppCompat.Toolbar">
@@ -71,4 +70,10 @@
 
 
     <style name="Theme.TLUPickleball" parent="Base.Theme.TLUPickleball" />
+
+    <style name="CircleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>
