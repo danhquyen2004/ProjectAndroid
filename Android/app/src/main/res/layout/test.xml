@@ -125,7 +125,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtPhone"
             style="@style/CustomEditTextStyle"
-            android:drawableStart="@drawable/ic_phone"
+            android:drawableStart="@drawable/ic_email"
             android:drawablePadding="12dp"
             android:inputType="phone" />
 
