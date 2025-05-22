@@ -131,6 +131,7 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+
     <LinearLayout
         android:id="@+id/footer_navigation"
         android:layout_width="match_parent"
@@ -141,7 +142,9 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:shadowColor="#72000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="16dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -157,9 +160,10 @@
                 android:src="@drawable/ic_home" />
 
             <TextView
-                android:text="Trang chủ"
-                android:textColor="#000000"
-                android:textSize="12sp" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/home"
+                android:textColor="#000000" />
         </LinearLayout>
 
         <LinearLayout
@@ -176,9 +180,10 @@
                 android:src="@drawable/ic_match" />
 
             <TextView
-                android:text="Trận đấu"
-                android:textColor="#000000"
-                android:textSize="12sp" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/match"
+                android:textColor="#000000" />
         </LinearLayout>
 
         <LinearLayout
@@ -195,9 +200,10 @@
                 android:src="@drawable/ic_finance" />
 
             <TextView
-                android:text="Tài chính"
-                android:textColor="#000000"
-                android:textSize="12sp" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/finance"
+                android:textColor="#000000" />
         </LinearLayout>
 
         <LinearLayout
@@ -214,9 +220,10 @@
                 android:src="@drawable/ic_rank" />
 
             <TextView
-                android:text="Xêp hạng"
-                android:textColor="#000000"
-                android:textSize="12sp" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rank"
+                android:textColor="#000000" />
         </LinearLayout>
 
     </LinearLayout>
