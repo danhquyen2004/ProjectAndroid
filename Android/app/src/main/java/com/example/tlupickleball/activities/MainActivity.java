@@ -2,68 +2,58 @@ package com.example.tlupickleball.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tlupickleball.R;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
-    FirebaseFirestore db;
-    FirebaseAuth mAuth;
+    private TextView welcomeText;
+    private Button logoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        welcomeText = findViewById(R.id.welcomeText);
+        logoutButton = findViewById(R.id.logoutButton);
 
-        checkProfileStatus(); // ✅ kiểm tra hồ sơ ngay khi mở màn hình
-    }
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
 
-    private void checkProfileStatus() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) return;
-
-        String uid = user.getUid();
-        db.collection("users").document(uid).get()
+        // Lấy thông tin từ Firestore
+        FirebaseFirestore.getInstance().collection("users")
+                .document(user.getUid())
+                .get()
                 .addOnSuccessListener(document -> {
                     if (document.exists()) {
                         String name = document.getString("name");
-                        String dob = document.getString("dob");
-                        String gender = document.getString("gender");
-
-                        if (name == null || name.isEmpty() ||
-                                dob == null || dob.isEmpty() ||
-                                gender == null || gender.isEmpty()) {
-                            // ✅ Thiếu thông tin → chuyển sang ProfileActivity
-                            Intent intent = new Intent(this, ProfileActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            // ✅ Đã có đầy đủ hồ sơ → tiếp tục vào MainActivity
-                            Toast.makeText(this, "Chào mừng " + name, Toast.LENGTH_SHORT).show();
-                        }
+                        welcomeText.setText("Welcome, " + (name != null ? name : "User") + "!");
                     } else {
-                        // Không tồn tại user → không hợp lệ
-                        FirebaseAuth.getInstance().signOut();
-                        startActivity(new Intent(this, LoginActivity.class));
-                        finish();
+                        welcomeText.setText("Welcome!");
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi khi kiểm tra hồ sơ", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    welcomeText.setText("Welcome!");
                 });
+
+        logoutButton.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        });
     }
 }
+

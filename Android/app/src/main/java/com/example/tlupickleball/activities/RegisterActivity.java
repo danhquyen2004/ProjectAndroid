@@ -9,69 +9,58 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tlupickleball.R;
-import com.google.firebase.FirebaseException;
+import com.example.tlupickleball.activities.base.ApiCallback;
+import com.example.tlupickleball.activities.base.BaseActivity;
+import com.example.tlupickleball.network.auth.AuthApi;
+import com.example.tlupickleball.network.core.ApiClient;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthOptions;
-import com.google.firebase.auth.PhoneAuthProvider;
 
-import java.util.concurrent.TimeUnit;
-
-public class RegisterActivity extends AppCompatActivity {
-    EditText edtPhone, edtPassword, edtConfirm;
-    Button btnSendOtp;
-    FirebaseAuth mAuth;
+public class RegisterActivity extends BaseActivity {
+    private EditText emailEditText, passwordEditText, confirmPasswordEditText;
+    private Button registerButton;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        emailEditText = findViewById(R.id.emailEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+        confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText);
+        registerButton = findViewById(R.id.registerButton);
+
         mAuth = FirebaseAuth.getInstance();
-        edtPhone = findViewById(R.id.edtPhone);
-        edtPassword = findViewById(R.id.edtPassword);
-        edtConfirm = findViewById(R.id.edtConfirm);
-        btnSendOtp = findViewById(R.id.btnSendOtp);
 
-        btnSendOtp.setOnClickListener(v -> {
-            String phone = edtPhone.getText().toString().trim();
-            String pw = edtPassword.getText().toString().trim();
-            String confirm = edtConfirm.getText().toString().trim();
+        registerButton.setOnClickListener(v -> {
+            showLoading();
+            String email = emailEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
+            String confirmPassword = confirmPasswordEditText.getText().toString().trim();
 
-            if (phone.isEmpty() || pw.isEmpty() || !pw.equals(confirm)) {
-                Toast.makeText(this, "Thông tin không hợp lệ", Toast.LENGTH_SHORT).show();
+            if (!password.equals(confirmPassword)) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
                 return;
             }
+            AuthApi.register(this, email, password, mAuth, new ApiCallback() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(RegisterActivity.this, "Verification email sent.", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(RegisterActivity.this, EmailVerificationActivity.class));
 
-            sendOtp(phone,pw);
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onComplete() {
+                    hideLoading();
+                }
+            });
         });
     }
-
-    private void sendOtp(String phone, String password) {
-        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
-                .setPhoneNumber(phone)
-                .setTimeout(60L, TimeUnit.SECONDS)
-                .setActivity(this)
-                .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                    @Override
-                    public void onVerificationCompleted(PhoneAuthCredential credential) {}
-
-                    @Override
-                    public void onVerificationFailed(FirebaseException e) {
-                        Toast.makeText(RegisterActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token) {
-                        Intent intent = new Intent(RegisterActivity.this, OtpActivity.class);
-                        intent.putExtra("phone", phone);
-                        intent.putExtra("password",password ); // ✅ truyền mật khẩu
-                        intent.putExtra("verificationId", verificationId);
-                        startActivity(intent);
-
-                    }
-                }).build();
-
-        PhoneAuthProvider.verifyPhoneNumber(options);
-    }
 }
+

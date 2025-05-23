@@ -1,86 +1,79 @@
 package com.example.tlupickleball.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.base.ApiCallback;
+import com.example.tlupickleball.activities.base.BaseActivity;
+import com.example.tlupickleball.network.auth.AuthApi;
+import com.example.tlupickleball.network.core.ApiClient;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class LoginActivity extends AppCompatActivity {
-    EditText edtPhone, edtPassword;
-    Button btnLogin, btnRegister;
-    FirebaseFirestore db;
-    FirebaseAuth mAuth;
+public class LoginActivity extends BaseActivity {
+    private EditText emailEditText, passwordEditText;
+    private Button loginButton;
+    private TextView goToRegisterText;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        edtPhone = findViewById(R.id.edtPhone);
-        edtPassword = findViewById(R.id.edtPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnRegister = findViewById(R.id.btnRegister);
+        emailEditText = findViewById(R.id.emailEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+        loginButton = findViewById(R.id.loginButton);
+        goToRegisterText = findViewById(R.id.goToRegisterText);
 
-        db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
+        loginButton.setOnClickListener(v -> {
+            showLoading();
+            String email = emailEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
+            AuthApi.login(this, email, password, mAuth, new ApiCallback() {
+                @Override
+                public void onSuccess() {
+                    checkUserProfileAndRedirect(LoginActivity.this, mAuth.getCurrentUser());
+                }
 
-        btnRegister.setOnClickListener(v -> {
-            Intent intent = new Intent(this, RegisterActivity.class);
-            startActivity(intent);
+                @Override
+                public void onFailure(String errorMessage) {
+                    Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onComplete() {
+                    hideLoading();
+                }
+            });
         });
 
-        btnLogin.setOnClickListener(v -> {
-            String phone = edtPhone.getText().toString().trim();
-            String password = edtPassword.getText().toString().trim();
-
-            if (phone.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            loginWithPhoneAndPassword(phone, password);
+        goToRegisterText.setOnClickListener(v -> {
+            startActivity(new Intent(this, RegisterActivity.class));
         });
     }
-
-    private void loginWithPhoneAndPassword(String phone, String password) {
-        db.collection("users")
-                .whereEqualTo("phoneNumber", phone)
+    private static void checkUserProfileAndRedirect(Context context, FirebaseUser user) {
+        FirebaseFirestore.getInstance().collection("users")
+                .document(user.getUid())
                 .get()
-                .addOnSuccessListener(query -> {
-                    if (query.isEmpty()) {
-                        Toast.makeText(this, "Không tìm thấy tài khoản", Toast.LENGTH_SHORT).show();
-                        return;
+                .addOnSuccessListener(document -> {
+                    if (!document.exists() || !document.contains("name") ||
+                            !document.contains("dob") || !document.contains("gender")) {
+                        context.startActivity(new Intent(context, ProfileActivity.class));
+                    } else {
+                        context.startActivity(new Intent(context, MainActivity.class));
                     }
-
-                    DocumentSnapshot userDoc = query.getDocuments().get(0);
-                    String savedPassword = userDoc.getString("password");
-
-                    if (!password.equals(savedPassword)) {
-                        Toast.makeText(this, "Sai mật khẩu", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    // ✅ Cho vào app nếu đúng mật khẩu
-                    // Có thể kiểm tra approved nếu muốn tại đây
-                    startActivity(new Intent(this, MainActivity.class));
-                    finish();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi khi truy vấn Firestore", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
                 });
     }
 }
