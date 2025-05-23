@@ -2,7 +2,10 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.TLUPickleball" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="fontFamily">@font/be_vietnam_pro_semi_bold</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/white</item>
         <item name="android:navigationBarColor">@color/white</item>
+
     </style>
 
     <style name="Nav_bar_top" parent="Widget.AppCompat.Toolbar">
@@ -126,6 +129,8 @@
     </style>
 
     <style name="Theme.TLUPickleball" parent="Base.Theme.TLUPickleball" >
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/white</item>
         <item name="android:navigationBarColor">@color/white</item>
     </style>
 

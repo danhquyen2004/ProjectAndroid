@@ -2,6 +2,9 @@ package com.example.tlupickleball.activities;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,10 +43,19 @@ public class Solo_Rank extends AppCompatActivity {
         PlayerAdapter adapter = new PlayerAdapter(sampleData);
         recyclerView.setAdapter(adapter);
 
+        LinearLayout footer = findViewById(R.id.footer_navigation);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            // Áp padding chỉ cho footer
+            footer.setPadding(
+                    footer.getPaddingLeft(),
+                    footer.getPaddingTop(),
+                    footer.getPaddingRight(),
+                    systemBars.bottom  // chỉ áp bottom
+            );
             return insets;
         });
+
     }
 }
