@@ -14,14 +14,26 @@
 
 
     //Tạo nút bấm
-    <style name="Base.Theme.Button" parent="Widget.AppCompat.Button">
+    <style name="Base.Theme.Button.Blue" parent="Widget.AppCompat.Button">
         <item name="android:layout_width">255dp</item>
         <item name="android:layout_height">54dp</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="backgroundTint">#0C8CE9</item>
         <item name="android:background">@drawable/button_background</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
+    <style name="Base.Theme.Button.White" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">255dp</item>
+        <item name="android:layout_height">54dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="backgroundTint">@color/white</item>
+        <item name="android:background">@drawable/button_white_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
     </style>
 
     // Trạng thái(Đã đóng quỹ / Chưa đóng quỹ)

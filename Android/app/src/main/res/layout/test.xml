@@ -12,7 +12,10 @@
         android:id="@+id/topAppBar"
         style="@style/Nav_bar_top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/logoText"
@@ -91,7 +94,6 @@
     <TextView
         android:id="@+id/textView"
         style="@style/StatusPending"
-        style="@style/StatusPending"
         android:text="Chưa đóng quỹ"
         app:layout_constraintBottom_toTopOf="@+id/footer_navigation"
         app:layout_constraintEnd_toEndOf="parent"
@@ -101,7 +103,6 @@
         app:layout_constraintVertical_bias="0.367" />
 
     <TextView
-        style="@style/StatusDone"
         style="@style/StatusPending"
         android:text="Đã đóng quỹ"
         app:layout_constraintBottom_toTopOf="@+id/footer_navigation"
