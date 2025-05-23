@@ -2,6 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.TLUPickleball" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="fontFamily">@font/be_vietnam_pro_semi_bold</item>
+        <item name="android:navigationBarColor">@color/white</item>
     </style>
 
     <style name="Nav_bar_top" parent="Widget.AppCompat.Toolbar">
@@ -124,7 +125,9 @@
         <item name="cornerSizeBottomRight">10dp</item>
     </style>
 
-    <style name="Theme.TLUPickleball" parent="Base.Theme.TLUPickleball" />
+    <style name="Theme.TLUPickleball" parent="Base.Theme.TLUPickleball" >
+        <item name="android:navigationBarColor">@color/white</item>
+    </style>
 
     <style name="CircleImageView" parent="">
         <item name="cornerFamily">rounded</item>
