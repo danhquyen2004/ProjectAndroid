@@ -13,22 +13,22 @@
         android:theme="@style/Theme.TLUPickleball"
         tools:targetApi="31">
         <activity
-            android:name=".activities.Test"
-            android:exported="true">
+            android:name=".activities.activity_home"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
-
         <activity
-            android:name=".activities.AllResult_End"
+            android:name=".activities.Solo_Rank"
             android:exported="false">
 
         </activity>
+        <activity
+            android:name=".activities.AllResult_End"
+            android:exported="false"></activity>
         <activity
             android:name=".activities.LoginActivity"
             android:exported="false"></activity>
