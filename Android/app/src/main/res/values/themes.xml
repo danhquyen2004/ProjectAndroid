@@ -2,6 +2,10 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.TLUPickleball" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="fontFamily">@font/be_vietnam_pro_semi_bold</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/white</item>
+
     </style>
 
     <style name="Nav_bar_top" parent="Widget.AppCompat.Toolbar">
@@ -14,14 +18,26 @@
 
 
     //Tạo nút bấm
-    <style name="Base.Theme.Button" parent="Widget.AppCompat.Button">
+    <style name="Base.Theme.Button.Blue" parent="Widget.AppCompat.Button">
         <item name="android:layout_width">255dp</item>
         <item name="android:layout_height">54dp</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="backgroundTint">#0C8CE9</item>
         <item name="android:background">@drawable/button_background</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:textSize">16dp</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
+    <style name="Base.Theme.Button.White" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">255dp</item>
+        <item name="android:layout_height">54dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="backgroundTint">@color/white</item>
+        <item name="android:background">@drawable/button_white_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
     </style>
 
     // Trạng thái(Đã đóng quỹ / Chưa đóng quỹ)
@@ -112,7 +128,11 @@
         <item name="cornerSizeBottomRight">10dp</item>
     </style>
 
-    <style name="Theme.TLUPickleball" parent="Base.Theme.TLUPickleball" />
+    <style name="Theme.TLUPickleball" parent="Base.Theme.TLUPickleball" >
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/white</item>
+    </style>
 
     <style name="CircleImageView" parent="">
         <item name="cornerFamily">rounded</item>
