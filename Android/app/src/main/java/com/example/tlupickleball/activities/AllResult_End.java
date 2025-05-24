@@ -21,7 +21,6 @@ public class AllResult_End extends AppCompatActivity implements View.OnClickList
 
     ColorStateList def;
     TextView item1, item2, select;
-
     Dialog dialog;
     Button btnDialogCancel, btnDialogConfirm;
 
