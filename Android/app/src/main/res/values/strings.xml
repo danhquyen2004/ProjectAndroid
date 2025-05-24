@@ -9,4 +9,5 @@
     <string name="forgot_password">Quên mật khẩu?</string>
     <string name="phone_number">Số điện thoại</string>
     <string name="password">Mật khẩu</string>
+    <string name="more">Khác</string>
 </resources>
