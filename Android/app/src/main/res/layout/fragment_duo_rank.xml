@@ -6,13 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1A8CFC"
-    tools:context=".activities.Rank">
+    tools:context=".fragments.Duo_Rank_Fragment">
 
     <LinearLayout
         android:id="@+id/top3Layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="0dp"
         android:gravity="bottom|center"
         android:orientation="horizontal"
         android:paddingTop="16dp"

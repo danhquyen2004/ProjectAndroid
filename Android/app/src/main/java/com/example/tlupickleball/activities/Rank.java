@@ -12,22 +12,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.adapters.PlayerAdapter;
+import com.example.tlupickleball.adapters.RankAdapter;
 import com.example.tlupickleball.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Rank extends AppCompatActivity implements View.OnClickListener {
-
-    private RecyclerView recyclerView;
-    private PlayerAdapter adapter;
-    private List<Player> topPlayer;
-    private TopThreeViewHolder topThreeViewHolder;
+    ViewPager2 viewPager;
     ColorStateList def;
     TextView item1, item2, select;
 
@@ -47,9 +47,10 @@ public class Rank extends AppCompatActivity implements View.OnClickListener {
         select = findViewById(R.id.select);
         def = item2.getTextColors();
 
-        initData();
-        setupTopThree();
-        setupRecyclerView();
+        viewPager = findViewById(R.id.viewPager);
+        FragmentManager manager = getSupportFragmentManager();
+        RankAdapter rankAdapter = new RankAdapter(manager, getLifecycle());
+        viewPager.setAdapter(rankAdapter);
 
         LinearLayout footer = findViewById(R.id.footer_navigation);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -68,28 +69,6 @@ public class Rank extends AppCompatActivity implements View.OnClickListener {
         });
 
     }
-    private void initData() {
-        topPlayer = new ArrayList<>();
-        topPlayer.add(new Player("Ahri", 2.1, R.drawable.avatar_1));
-        topPlayer.add(new Player("Lux", 1.9, R.drawable.avatar_1));
-        topPlayer.add(new Player("Jinx", 1.8, R.drawable.avatar_1));
-        topPlayer.add(new Player("Vi", 1.6, R.drawable.avatar_1));
-        topPlayer.add(new Player("Zed", 1.5, R.drawable.avatar_1));
-    }
-
-    private void setupTopThree() {
-        View top3Layout = findViewById(R.id.top3Layout);
-        topThreeViewHolder = new TopThreeViewHolder(top3Layout);
-        topThreeViewHolder.bind(topPlayer);
-    }
-
-    private void setupRecyclerView() {
-        recyclerView = findViewById(R.id.playerList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        List<Player> remainingPlayers = new ArrayList<>(topPlayer.subList(3, topPlayer.size()));
-        adapter = new PlayerAdapter(this, remainingPlayers);
-        recyclerView.setAdapter(adapter);
-    }
 
     @Override
     public void onClick(View v) {
@@ -97,11 +76,13 @@ public class Rank extends AppCompatActivity implements View.OnClickListener {
             select.animate().x(0).setDuration(100);
             item1.setTextColor(Color.WHITE);
             item2.setTextColor(def);
+            viewPager.setCurrentItem(0);
         } else if (v.getId() == R.id.item2) {
             item1.setTextColor(def);
             item2.setTextColor(Color.WHITE);
             int size = item2.getWidth();
             select.animate().x(size).setDuration(100);
+            viewPager.setCurrentItem(1);
         }
     }
 
