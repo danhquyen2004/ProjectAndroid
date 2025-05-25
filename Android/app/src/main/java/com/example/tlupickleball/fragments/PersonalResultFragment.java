@@ -77,7 +77,7 @@ public class PersonalResultFragment extends Fragment {
         Map<String, List<MatchResult>> map = new HashMap<>();
 
         map.put("2025-05-25", Arrays.asList(
-                new MatchResult("A", "Đông", "2-0"),
+                new MatchResult("A", "Đông", ""),
                 new MatchResult("ANH A", "Đông Quyên", "1-2")
         ));
 
@@ -87,6 +87,11 @@ public class PersonalResultFragment extends Fragment {
 
         map.put("2025-05-23", Arrays.asList(
                 new MatchResult("Lux", "Ahri", "2-1")
+        ));
+
+        map.put("2025-05-22", Arrays.asList(
+                new MatchResult("Zed", "Lux", "1-2"),
+                new MatchResult("Vi", "Ahri", "0-2")
         ));
 
         return map;

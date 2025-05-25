@@ -49,8 +49,15 @@ public class MatchResultAdapter extends RecyclerView.Adapter<MatchResultAdapter.
         MatchResult m = results.get(position);
         holder.tvPlayer1.setText(m.player1);
         holder.tvPlayer2.setText(m.player2);
-        holder.tvScore.setText(m.score);
+
+        if (m.score == null || m.score.trim().isEmpty()) {
+            holder.tvScore.setText("-");
+        } else {
+            holder.tvScore.setText(m.score);
+        }
+
     }
+
 
 
     @Override
