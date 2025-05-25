@@ -16,7 +16,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/user_left"
+            android:id="@+id/tvPlayer1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="A"
@@ -29,18 +29,19 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background"
+            android:src="@drawable/avatar_1"
             app:shapeAppearanceOverlay="@style/CircleImageView" />
     </LinearLayout>
 
-    <!-- Gạch ngang ở giữa -->
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/tvScore"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="-"
-        android:textSize="18sp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+        android:layout_weight="1"
+        android:text="2 - 0"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:textStyle="bold" />
 
     <!-- Cột phải -->
     <LinearLayout
@@ -55,12 +56,12 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_background"
+            android:src="@drawable/avatar_1"
             android:layout_marginEnd="4dp"
             app:shapeAppearanceOverlay="@style/CircleImageView" />
 
         <TextView
-            android:id="@+id/user_right"
+            android:id="@+id/tvPlayer2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Đông"

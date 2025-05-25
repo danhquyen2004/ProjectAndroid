@@ -161,7 +161,7 @@
 
         <include
             android:id="@+id/bottomNavigation"
-            layout="@layout/footer_navigation" />
+            layout="@layout/footer_navigation_admin" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

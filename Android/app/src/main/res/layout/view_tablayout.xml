@@ -39,7 +39,7 @@
                 android:layout_height="match_parent"
                 android:id="@+id/item1"
                 android:layout_weight="1"
-                android:text="item 1"
+                android:text="Cá nhân"
                 android:textColor="@color/white"
                 android:gravity="center"/>
 
@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="item 2"
+                android:text="Tổng quát"
                 android:gravity="center"/>
         </LinearLayout>
 
