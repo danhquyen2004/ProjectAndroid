@@ -6,49 +6,55 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.model.MatchResult;
-
+import com.google.android.material.imageview.ShapeableImageView;
 import java.util.List;
 
-public class MatchResultAdapter extends RecyclerView.Adapter<MatchResultAdapter.MatchViewHolder> {
+public class MatchResultAdapter extends RecyclerView.Adapter<MatchResultAdapter.ViewHolder> {
+    private List<MatchResult> results;
 
-    private List<MatchResult> matchList;
+    public MatchResultAdapter(List<MatchResult> results) {
+        this.results = results;
+    }
 
-    public MatchResultAdapter(List<MatchResult> matchList) {
-        this.matchList = matchList;
+    // Method để cập nhật danh sách khi chọn ngày khác
+    public void updateData(List<MatchResult> newResults) {
+        this.results = newResults;
+        notifyDataSetChanged();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvPlayer1, tvPlayer2, tvScore;
+        ShapeableImageView imageLeftAvatar, imageRightAvatar;
+
+        public ViewHolder(View view) {
+            super(view);
+            tvPlayer1 = view.findViewById(R.id.tvPlayer1);
+            tvPlayer2 = view.findViewById(R.id.tvPlayer2);
+            tvScore = view.findViewById(R.id.tvScore);
+            imageLeftAvatar = view.findViewById(R.id.image_left_avatar);
+            imageRightAvatar = view.findViewById(R.id.image_right_avatar);
+        }
     }
 
     @NonNull
     @Override
-    public MatchViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.view_user_match_card, parent, false);
-        return new MatchViewHolder(view);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_match_result, parent, false);
+        return new ViewHolder(v);
+    }
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        MatchResult m = results.get(position);
+        holder.tvPlayer1.setText(m.player1);
+        holder.tvPlayer2.setText(m.player2);
+        holder.tvScore.setText(m.score);
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull MatchViewHolder holder, int position) {
-        MatchResult match = matchList.get(position);
-        holder.player1.setText(match.getPlayer1());
-        holder.player2.setText(match.getPlayer2());
-        holder.score.setText(match.getScore());
-    }
 
     @Override
     public int getItemCount() {
-        return matchList.size();
-    }
-
-    public static class MatchViewHolder extends RecyclerView.ViewHolder {
-        TextView player1, score, player2;
-
-        public MatchViewHolder(@NonNull View itemView) {
-            super(itemView);
-            player1 = itemView.findViewById(R.id.tvPlayer1);
-            score = itemView.findViewById(R.id.tvScore);
-            player2 = itemView.findViewById(R.id.tvPlayer2);
-        }
+        return results.size();
     }
 }

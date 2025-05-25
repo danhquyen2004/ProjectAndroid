@@ -46,4 +46,5 @@ dependencies {
     implementation(libs.okhttp)
     implementation ("com.google.android.material:material:1.11.0")
     implementation ("androidx.viewpager:viewpager:1.0.0")
+    implementation ("androidx.recyclerview:recyclerview:1.3.2")
 }
