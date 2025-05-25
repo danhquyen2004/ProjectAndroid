@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class ApiClient {
-    private static final String BASE_URL = "https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/api/";
+    private static final String BASE_URL = "https://us-central1-tlu-pickleball-459716.cloudfunctions.net/api/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient(Context context) {
@@ -17,7 +17,7 @@ public class ApiClient {
                 .addInterceptor(chain -> {
                     Request original = chain.request();
                     Request.Builder builder = original.newBuilder()
-                            .header("Authorization", "Bearer " + SessionManager.getToken(context))
+                            .header("Authorization", "Bearer " + SessionManager.getIdToken(context))
                             .method(original.method(), original.body());
                     return chain.proceed(builder.build());
                 })

@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.network.core.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,16 +27,9 @@ public class MainActivity extends AppCompatActivity {
         welcomeText = findViewById(R.id.welcomeText);
         logoutButton = findViewById(R.id.logoutButton);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
-
         // Lấy thông tin từ Firestore
         FirebaseFirestore.getInstance().collection("users")
-                .document(user.getUid())
+                .document(SessionManager.getUid(this))
                 .get()
                 .addOnSuccessListener(document -> {
                     if (document.exists()) {

@@ -10,8 +10,17 @@
         "firebase-debug.*.log",
         "*.local"
       ],
-      "predeploy": [
-      ]
+      "predeploy": []
     }
-  ]
+  ],
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "ui": {
+      "enabled": true,
+      "port": 5002
+    },
+    "singleProjectMode": true
+  }
 }

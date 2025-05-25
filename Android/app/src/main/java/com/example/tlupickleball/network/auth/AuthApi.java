@@ -14,7 +14,6 @@ public class AuthApi {
                 .addOnSuccessListener(authResult -> {
                     FirebaseUser user = mAuth.getCurrentUser();
                     if (user != null && user.isEmailVerified()) {
-                        Log.d("TOKEN", "User token: " + user.getIdToken(false).getResult().getToken());
                         callback.onSuccess();
                     } else {
                         callback.onFailure("Email not verified");

@@ -6,18 +6,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.activities.base.ApiCallback;
 import com.example.tlupickleball.activities.base.BaseActivity;
-import com.example.tlupickleball.network.user.UserApi;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.example.tlupickleball.model.User;
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.service.UserService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileActivity extends BaseActivity {
     private EditText nameEditText, dobEditText, genderEditText;
     private Button submitButton;
+    UserService service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,8 @@ public class ProfileActivity extends BaseActivity {
         genderEditText = findViewById(R.id.genderEditText);
         submitButton = findViewById(R.id.submitButton);
 
+        service = ApiClient.getClient(this).create(UserService.class);
+
         submitButton.setOnClickListener(v -> {
             showLoading();
 
@@ -36,30 +40,35 @@ public class ProfileActivity extends BaseActivity {
             String dob = dobEditText.getText().toString().trim();
             String gender = genderEditText.getText().toString().trim();
 
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user == null) return;
+            saveUserProfile(name, dob,gender);
+        });
+    }
 
-            user.getIdToken(true).addOnSuccessListener(result -> {
-                String token = result.getToken();
-                UserApi.submitProfile(this, token, name, dob, gender, new ApiCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        ProfileActivity.this.startActivity(intent);
-                    }
+    private void saveUserProfile(String name, String dob, String gender)
+    {
+        User user = new User();
+        user.setName(name);
+        user.setDob(dob);
+        user.setGender(gender);
 
-                    @Override
-                    public void onFailure(String errorMessage) {
-                        Toast.makeText(ProfileActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
-                    }
+        service.submitProfile(user).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ProfileActivity.this, "Cập nhật hồ sơ thành công", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Lỗi: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+                hideLoading();
+            }
 
-                    @Override
-                    public void onComplete() {
-                        hideLoading();
-                    }
-                });
-            });
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                hideLoading();
+            }
         });
     }
 }
