@@ -52,4 +52,7 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation(libs.firebase.auth)
     implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson.v290)
+
 }

@@ -1,6 +1,7 @@
 package com.example.tlupickleball.network.auth;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.tlupickleball.activities.base.ApiCallback;
 import com.google.firebase.auth.FirebaseAuth;
@@ -13,6 +14,7 @@ public class AuthApi {
                 .addOnSuccessListener(authResult -> {
                     FirebaseUser user = mAuth.getCurrentUser();
                     if (user != null && user.isEmailVerified()) {
+                        Log.d("TOKEN", "User token: " + user.getIdToken(false).getResult().getToken());
                         callback.onSuccess();
                     } else {
                         callback.onFailure("Email not verified");

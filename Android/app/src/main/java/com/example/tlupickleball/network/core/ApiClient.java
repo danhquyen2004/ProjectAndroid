@@ -1,42 +1,37 @@
 package com.example.tlupickleball.network.core;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.widget.Toast;
 
-import org.json.JSONObject;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-import okhttp3.*;
 
 public class ApiClient {
-    public static final OkHttpClient client = new OkHttpClient();
-    public static final MediaType JSON = MediaType.get("application/json");
+    private static final String BASE_URL = "https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/api/";
+    private static Retrofit retrofit = null;
 
-    public static Request.Builder postRequest(String token, String url, JSONObject body) {
-        return new Request.Builder()
-                .url(url)
-                .addHeader("Authorization", "Bearer " + token)
-                .post(RequestBody.create(body.toString(), JSON));
-    }
-    public static Request.Builder getRequest(String token, String url) {
-        return new Request.Builder()
-                .url(url)
-                .addHeader("Authorization", "Bearer " + token)
-                .get();
-    }
+    public static Retrofit getClient(Context context) {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(chain -> {
+                    Request original = chain.request();
+                    Request.Builder builder = original.newBuilder()
+                            .header("Authorization", "Bearer " + SessionManager.getToken(context))
+                            .method(original.method(), original.body());
+                    return chain.proceed(builder.build());
+                })
+                .build();
 
-    public static Request.Builder putRequest(String token, String url, JSONObject body) {
-        return new Request.Builder()
-                .url(url)
-                .addHeader("Authorization", "Bearer " + token)
-                .put(RequestBody.create(body.toString(), JSON));
-    }
+        if (retrofit == null) {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .client(okHttpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+        }
 
-    public static Request.Builder deleteRequest(String token, String url) {
-        return new Request.Builder()
-                .url(url)
-                .addHeader("Authorization", "Bearer " + token)
-                .delete();
+        return retrofit;
     }
 }
+
