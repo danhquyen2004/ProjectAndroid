@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#1A8CFC"
-    tools:context=".activities.Rank">
+    android:background="#1A8CFC" >
 
     <include
         android:id="@+id/modeSwitch"
