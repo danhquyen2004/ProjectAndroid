@@ -37,7 +37,11 @@ exports.register = async (req, res) => {
       }
     );
 
-    return res.status(201).send({ message: "User registered. Please verify your email." });
+    return res.status(201).send({
+      message: "User registered. Please verify your email.",
+      uid: localId
+    }
+    );
   } catch (err) {
     console.error("Register error:", err.response?.data || err.message);
     return res.status(500).send("Registration failed.");
@@ -59,7 +63,7 @@ exports.login = async (req, res) => {
       }
     );
 
-    const { idToken, refreshToken , localId} = response.data;
+    const { idToken, refreshToken, localId } = response.data;
 
     // ✅ Kiểm tra lại bằng Admin SDK
     const userRecord = await admin.auth().getUser(localId);
@@ -67,7 +71,7 @@ exports.login = async (req, res) => {
       return res.status(403).send("Email is not verified (checked by Admin SDK).");
     }
 
-    return res.send({ idToken,refreshToken, uid: localId });
+    return res.send({ idToken, refreshToken, uid: localId });
   } catch (err) {
     console.error("Login error:", err.response?.data || err.message);
     return res.status(401).send("Login failed");

@@ -66,7 +66,7 @@ public class LoginActivity extends BaseActivity {
                     LoginResponse body = response.body();
 
                     SessionManager.saveTokens(LoginActivity.this, body.getIdToken(), body.getRefreshToken(), body.getUid());
-
+                    Log.d("TOKEN", "TOKEN : " + body.getIdToken());
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
 
                     checkUserProfileAndRedirect(LoginActivity.this, body.getUid());
