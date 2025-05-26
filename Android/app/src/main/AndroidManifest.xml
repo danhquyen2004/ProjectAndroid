@@ -29,9 +29,6 @@
             android:exported="false" >
         </activity>
         <activity
-            android:name=".activities.AllResult_End"
-            android:exported="false" />
-        <activity
             android:name=".activities.record_the_match"
             android:exported="false">
         </activity>
