@@ -1,5 +1,6 @@
 package com.example.tlupickleball.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +17,18 @@ import java.util.List;
 
 public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder> {
     private List<Player> playerList;
+    private Context context;
 
-    public PlayerAdapter(List<Player> playerList) {
+    public PlayerAdapter(Context context,List<Player> playerList)
+    {
+        this.context = context;
         this.playerList = playerList;
     }
 
     @NonNull
     @Override
     public PlayerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_player, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_player, parent, false);
         return new PlayerViewHolder(view);
     }
 
@@ -34,6 +38,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
         holder.txtName.setText(player.getName());
         holder.txtScore.setText(String.valueOf(player.getSoloPoint()));
         holder.imgAvatar.setImageResource(player.getAvatarResourceId());
+        holder.txtRank.setText((String.valueOf(position + 4)));
     }
 
     @Override
@@ -43,13 +48,14 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
 
     public static class PlayerViewHolder extends RecyclerView.ViewHolder {
         ImageView imgAvatar;
-        TextView txtName, txtScore;
+        TextView txtName, txtScore, txtRank;
 
         public PlayerViewHolder(@NonNull View itemView) {
             super(itemView);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
             txtName = itemView.findViewById(R.id.txtName);
             txtScore = itemView.findViewById(R.id.txtScore);
+            txtRank = itemView.findViewById(R.id.txtRank);
         }
     }
 }
