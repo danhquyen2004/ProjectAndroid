@@ -13,8 +13,12 @@
         android:theme="@style/Theme.TLUPickleball"
         tools:targetApi="31">
         <activity
+            android:name=".activities.finance"
+            android:exported="false" >
+        </activity>
+        <activity
             android:name=".activities.notification"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,14 +28,13 @@
         <activity
             android:name=".activities.record_the_match"
             android:exported="false">
-
         </activity>
         <activity
             android:name=".activities.wait_home"
             android:exported="false" />
         <activity
             android:name=".activities.activity_home"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.Solo_Rank"
             android:exported="false" />
