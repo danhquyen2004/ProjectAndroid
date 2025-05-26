@@ -1,232 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="#F5F5F5">
-
-    <!-- NAV BAR -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/topAppBar"
-        style="@style/Nav_bar_top"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:id="@+id/logoText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TPC"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
-            android:layout_gravity="start" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageButton
-                android:id="@+id/btnNotification"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_notification" />
-
-            <View
-                android:layout_width="24dp"
-                android:layout_height="match_parent" />
-
-            <ImageButton
-                android:id="@+id/btnMenu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_menu" />
-        </LinearLayout>
-    </androidx.appcompat.widget.Toolbar>
-
-
-
-    <Button
-        android:id="@+id/myButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="88dp"
-        android:text="Nút bấm 1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.875"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topAppBar" />
-
-    <Button
-        android:id="@+id/myButton1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp"
-        android:text="Nút bấm 2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.875"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/myButton" />
-    <Button
-        android:id="@+id/myButton2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp"
-        android:text="Nút bấm 3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.875"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/myButton1" />
-
-    <TextView
-        android:id="@+id/textView"
-        style="@style/StatusPending"
-        android:text="Chưa đóng quỹ"
-        app:layout_constraintBottom_toTopOf="@+id/footer_navigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topAppBar"
-        app:layout_constraintHorizontal_bias="0.23"
-        app:layout_constraintVertical_bias="0.367" />
-
-    <TextView
-        style="@style/StatusPending"
-        android:text="Đã đóng quỹ"
-        app:layout_constraintBottom_toTopOf="@+id/footer_navigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topAppBar"
-        app:layout_constraintHorizontal_bias="0.23"
-        app:layout_constraintVertical_bias="0.294" />
-
-
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/CustomInputLayoutStyle"
-        android:hint="Nhập số điện thoại"
-        app:layout_constraintBottom_toTopOf="@+id/footer_navigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topAppBar"
-        app:layout_constraintVertical_bias="0.697">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edtPhone"
-            style="@style/CustomEditTextStyle"
-            android:drawableStart="@drawable/ic_email"
-            android:drawablePadding="12dp"
-            android:inputType="phone" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
+    android:background="@android:color/white"
+    android:padding="16dp"
+    android:id="@+id/main">
 
     <LinearLayout
-        android:id="@+id/footer_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
-        android:elevation="8dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:shadowColor="#72000000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="16dp">
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <!-- Header -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:onClick="onHomeClick"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_home" />
+            <ImageButton
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/white"
+                android:src="@drawable/ic_back"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.045"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Ghi trận"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Ngày -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:layout_marginBottom="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/home"
-                android:textColor="#000000" />
-        </LinearLayout>
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/button_white_background"
+                android:drawableEnd="@drawable/ic_calender"
+                android:drawablePadding="8dp"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="14/05/2025"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Loại trận -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loại trận"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+        <include layout= "@layout/view_tablayout" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:onClick="onMatchClick"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_match" />
-
+            android:orientation="horizontal">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="190dp"
                 android:layout_height="wrap_content"
-                android:text="@string/match"
-                android:textColor="#000000" />
+                android:gravity="center"
+                android:text="Đội 1"
+                android:textStyle="bold"
+                />
+            <TextView
+                android:layout_width="190dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Đội 2"
+                android:textStyle="bold" />
         </LinearLayout>
+
+        <!-- Sân đấu -->
+        <include layout="@layout/view_pickleball_court" />
+
+        <!-- Trạng thái -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trạng thái"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:onClick="onFinanceClick"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_finance" />
-
-            <TextView
-                android:layout_width="wrap_content"
+            <RadioGroup
+                android:id="@+id/radGroup_status"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/finance"
-                android:textColor="#000000" />
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rad_ongoing"
+                    android:layout_width="190dp"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Đang diễn ra" />
+
+                <RadioButton
+                    android:id="@+id/rad_completed"
+                    android:layout_width="190dp"
+                    android:layout_height="wrap_content"
+                    android:text="Đã kết thúc" />
+            </RadioGroup>
+
+
         </LinearLayout>
+
+        <!-- Số set thắng -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số set thắng"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:onClick="onRankClick"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:weightSum="2">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_rank" />
-
-            <TextView
-                android:layout_width="wrap_content"
+            <EditText
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="@string/rank"
-                android:textColor="#000000" />
+                android:hint="Đội 1"/>
+
+            <Space
+                android:layout_width="16dp"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="Đội 2"/>
+
         </LinearLayout>
 
+        <!-- Nút xác nhận -->
+        <Button
+            style="@style/Base.Theme.Button.Blue"
+            android:layout_gravity="center"
+            android:text="Xác nhận"
+            android:layout_marginTop="24dp" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

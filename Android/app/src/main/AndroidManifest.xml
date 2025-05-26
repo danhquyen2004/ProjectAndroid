@@ -25,8 +25,22 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activities.notification"
+            android:exported="false" >
+        </activity>
+        <activity
             android:name=".activities.AllResult_End"
             android:exported="false" />
+        <activity
+            android:name=".activities.record_the_match"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".activities.wait_home"
+            android:exported="false" />
+        <activity
+            android:name=".activities.activity_home"
+            android:exported="false"></activity>
         <activity
             android:name=".activities.LoginActivity"
             android:exported="false" />
