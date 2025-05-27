@@ -21,6 +21,7 @@
         android:shadowColor="#72000000">
 
         <LinearLayout
+            android:id="@+id/id_home"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -41,6 +42,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/id_battle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -61,6 +63,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/id_finance"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -81,6 +84,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/id_rank"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
