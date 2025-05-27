@@ -22,13 +22,9 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".activities.finance"
-            android:exported="false" >
-        </activity>
         <activity
             android:name=".activities.notification"
             android:exported="false">
-
         </activity>
         <activity
             android:name=".activities.record_the_match"
