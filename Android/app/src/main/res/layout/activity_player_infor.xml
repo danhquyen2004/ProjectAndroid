@@ -121,8 +121,7 @@
         android:id="@+id/tvPlayerPhoneNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Giới tính"
-        android:background="@drawable/underline"
+        android:text="Số điện thoại"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginStart="35dp"
@@ -130,18 +129,20 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"/>
 
-    <EditText
-        android:id="@+id/edtPhoneNumber"
+    <TextView
+        android:id="@+id/tvPlayerPhoneNumberWData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nam"
-        android:inputType="textPersonName"
+        android:text="0123456789"
+        android:background="@drawable/underline"
+        android:textSize="18sp"
+        android:textColor="#80000000"
         android:layout_marginLeft="35dp"
         android:layout_marginRight="35dp"
-        android:backgroundTint="@color/edit_text_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlayerPhoneNumber" />
+        app:layout_constraintTop_toBottomOf="@+id/tvPlayerPhoneNumber"
+        android:layout_marginTop="10dp"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
