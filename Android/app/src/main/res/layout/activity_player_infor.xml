@@ -44,105 +44,99 @@
 
     <TextView
         android:id="@+id/tvPlayerName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Họ và tên"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginStart="35dp"
+        style="@style/LabelInforTextViewStyle"
+        android:text="Giới tính"
+        android:layout_marginTop="25dp"
         app:layout_constraintTop_toBottomOf="@+id/imgAvatar"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="25dp"/>
-
-    <EditText
-        android:id="@+id/edtPlayerName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nguyên Văn A"
-        android:inputType="textPersonName"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
-        android:backgroundTint="@color/edit_text_color"
+        app:layout_constraintStart_toStartOf="parent"/>
+    <TextView
+        android:id="@+id/tvPlayerNameInfor"
+        style="@style/InforTextViewStyle"
+        android:text="Nguyen Van A"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlayerName" />
+        app:layout_constraintTop_toBottomOf="@+id/tvPlayerName"/>
 
     <TextView
         android:id="@+id/tvPlayerGender"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/LabelInforTextViewStyle"
         android:text="Giới tính"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginStart="35dp"
-        app:layout_constraintTop_toBottomOf="@+id/edtPlayerName"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp"/>
+        app:layout_constraintTop_toBottomOf="@+id/tvPlayerNameInfor"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <EditText
-        android:id="@+id/edtGender"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nam"
-        android:inputType="textPersonName"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
-        android:backgroundTint="@color/edit_text_color"
+    <TextView
+        android:id="@+id/tvGenderInfor"
+        style="@style/InforTextViewStyle"
+        android:text="Nam"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlayerGender" />
+        app:layout_constraintTop_toBottomOf="@+id/tvPlayerGender"/>
+
 
     <TextView
         android:id="@+id/tvPlayerDob"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ngày sinh"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginStart="35dp"
-        app:layout_constraintTop_toBottomOf="@+id/edtGender"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp"/>
+        style="@style/LabelInforTextViewStyle"
+        android:text="Giới tính"
+        app:layout_constraintTop_toBottomOf="@+id/tvGenderInfor"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <EditText
-        android:id="@+id/edtDob"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="DD/MM/YYYY"
-        android:inputType="textPersonName"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
-        android:backgroundTint="@color/edit_text_color"
+    <TextView
+        android:id="@+id/tvDobInfor"
+        style="@style/InforTextViewStyle"
+        android:text="04/03/2004"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlayerDob" />
+        app:layout_constraintTop_toBottomOf="@+id/tvPlayerDob"/>
 
     <TextView
         android:id="@+id/tvPlayerPhoneNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Số điện thoại"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginStart="35dp"
-        app:layout_constraintTop_toBottomOf="@+id/edtDob"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp"/>
+        style="@style/LabelInforTextViewStyle"
+        android:text="Giới tính"
+        app:layout_constraintTop_toBottomOf="@+id/tvDobInfor"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
         android:id="@+id/tvPlayerPhoneNumberWData"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/InforTextViewStyle"
         android:text="0123456789"
-        android:background="@drawable/underline"
-        android:textSize="18sp"
-        android:textColor="#80000000"
-        android:layout_marginLeft="35dp"
-        android:layout_marginRight="35dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlayerPhoneNumber"
-        android:layout_marginTop="10dp"/>
+        app:layout_constraintTop_toBottomOf="@+id/tvPlayerPhoneNumber"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPlayerPhoneNumberWData"
+        app:layout_constraintVertical_bias="0.228">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDiaLogOK"
+            style="@style/Base.Theme.Button.Blue"
+            android:backgroundTint="#0CE952"
+            android:layout_width="230dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:text="Xác nhận" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDiaLogCancel"
+            style="@style/Base.Theme.Button.White"
+            android:layout_width="230dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:text="Từ chối" />
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

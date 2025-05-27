@@ -146,4 +146,25 @@
         <item name="android:maxLines">1</item>
     </style>
 
+    //style cho TextView Thong tin
+    <style name="InforTextViewStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/underline</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#80000000</item>
+        <item name="android:layout_marginLeft">35dp</item>
+        <item name="android:layout_marginRight">35dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+    </style>
+
+    //Style cho TextView Label Thong tin
+    <style name="LabelInforTextViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginStart">35dp</item>
+        <item name="android:layout_marginTop">30dp</item>
+    </style>
 </resources>
