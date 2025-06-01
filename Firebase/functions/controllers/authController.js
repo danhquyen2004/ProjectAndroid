@@ -5,10 +5,13 @@ const FIREBASE_API_KEY = require("../apiKey").FIREBASE_API_KEY;
 // [POST] /auth/register
 exports.register = async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).send("Missing email or password");
+
+  if (!email || !password) {
+    return res.status(400).send("Missing email or password.");
+  }
 
   try {
-    // Đăng ký tài khoản qua Firebase REST API
+    // 1. Gọi Firebase REST API để tạo user (xác thực)
     const response = await axios.post(
       `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`,
       {
@@ -18,17 +21,18 @@ exports.register = async (req, res) => {
       }
     );
 
-    const { idToken, localId } = response.data;
+    const { idToken, localId: uid } = response.data;
 
-    // Tạo user profile trong Firestore
-    await admin.firestore().collection("users").doc(localId).set({
+    // 2. Tạo document trong Firestore: users/{uid}
+    await admin.firestore().collection("users").doc(uid).set({
       email,
       role: "member",
-      approved: false,
+      isApproved: false,
+      isDisabled: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    // Gửi email xác minh
+    // 3. Gửi email xác minh
     await axios.post(
       `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FIREBASE_API_KEY}`,
       {
@@ -38,10 +42,10 @@ exports.register = async (req, res) => {
     );
 
     return res.status(201).send({
-      message: "User registered. Please verify your email.",
-      uid: localId
-    }
-    );
+      message: "User registered successfully. Please verify your email.",
+      uid
+    });
+
   } catch (err) {
     console.error("Register error:", err.response?.data || err.message);
     return res.status(500).send("Registration failed.");

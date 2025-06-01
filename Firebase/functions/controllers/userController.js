@@ -1,38 +1,41 @@
 const admin = require("../utils/firebase");
 
-// Gửi thông tin hồ sơ cá nhân (người dùng tự gọi)
+// [POST] /users/profile/submit
 exports.submitProfile = async (req, res) => {
   try {
-    const uid = req.uid;
-    const { name, dob, gender } = req.body;
+    const uid = req.uid; // Middleware đã decode token và gán req.uid
+    const { fullName, birthDate, gender, level, memberCode } = req.body;
 
-    if (!name || !dob || !gender) {
-      return res.status(400).send("Missing profile fields");
+    // Validate các trường bắt buộc
+    if (!fullName || !birthDate || !gender) {
+      return res.status(400).send("Missing required profile fields.");
     }
 
-    const userRecord = await admin.auth().getUser(uid);
-    const email = userRecord.email;
+    // Dữ liệu chuẩn hóa
+    const profileData = {
+      fullName,
+      gender,                        // "male" | "female"
+      birthDate: new Date(birthDate), // ISO string hoặc yyyy-mm-dd
+      level: level || "new",          // default nếu chưa nhập
+      memberCode: memberCode || ""
+    };
 
-    const userRef = admin.firestore().collection("users").doc(uid);
-    const doc = await userRef.get();
+    const profileRef = admin.firestore()
+      .collection("users")
+      .doc(uid)
+      .collection("profile")
+      .doc("info");
 
-    if (!doc.exists) {
-      await userRef.set({
-        name, dob, gender, email,
-        role: "member",
-        approved: false,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-    } else {
-      await userRef.set({ name, dob, gender }, { merge: true });
-    }
+    await profileRef.set(profileData, { merge: true });
 
-    res.send("Profile updated");
+    return res.status(200).send("Profile submitted successfully.");
+
   } catch (e) {
-    console.error(e);
-    res.status(500).send("Error updating profile");
+    console.error("submitProfile error:", e);
+    return res.status(500).send("Error submitting profile.");
   }
 };
+
 
 // Admin duyệt người dùng
 exports.approveUser = async (req, res) => {

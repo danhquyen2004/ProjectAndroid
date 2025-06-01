@@ -1,0 +1,485 @@
+{
+  "users": [
+    {
+      "uid": "user1",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746200910,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "uid": "user2",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746287310,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "uid": "user3",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746373710,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "uid": "user4",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746460110,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "uid": "user5",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746546510,
+        "_nanoseconds": 0
+      }
+    }
+  ],
+  "user_profiles": {
+    "user1": {
+      "fullName": "An",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 1057592910,
+        "_nanoseconds": 0
+      },
+      "memberCode": "MBC-1000",
+      "level": "sơ trung"
+    },
+    "user2": {
+      "fullName": "Bình",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 1031672910,
+        "_nanoseconds": 0
+      },
+      "memberCode": "MBC-1001",
+      "level": "cao trung"
+    },
+    "user3": {
+      "fullName": "Chi",
+      "gender": "female",
+      "birthDate": {
+        "_seconds": 1005752910,
+        "_nanoseconds": 0
+      },
+      "memberCode": "MBC-1002",
+      "level": "cao trung"
+    },
+    "user4": {
+      "fullName": "Dũng",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 979832910,
+        "_nanoseconds": 0
+      },
+      "memberCode": "MBC-1003",
+      "level": "sơ trung"
+    },
+    "user5": {
+      "fullName": "Hà",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 953912910,
+        "_nanoseconds": 0
+      },
+      "memberCode": "MBC-1004",
+      "level": "cao trung"
+    }
+  },
+  "matches": [
+    {
+      "matchId": "match1",
+      "type": "double",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1747928910,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user1"
+    },
+    {
+      "matchId": "match2",
+      "type": "single",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1748101710,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user2"
+    },
+    {
+      "matchId": "match3",
+      "type": "double",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1748274510,
+        "_nanoseconds": 0
+      },
+      "status": "pending",
+      "createdBy": "user3"
+    }
+  ],
+  "expenses": [
+    {
+      "expenseId": "expense1",
+      "reason": "Mua nước + cầu lông",
+      "amount": 200000,
+      "createdBy": "admin",
+      "createdAt": {
+        "_seconds": 1748360910,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "expenseId": "expense2",
+      "reason": "Mua nước + cầu lông",
+      "amount": 250000,
+      "createdBy": "admin",
+      "createdAt": {
+        "_seconds": 1748274510,
+        "_nanoseconds": 0
+      }
+    }
+  ],
+  "transactions": {
+    "user1": [
+      {
+        "transactionId": "73288ac5-a176-4aae-8c3c-fecb9145e002",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "4127353d-9dad-47ea-9c07-6a7f42bda4a1",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user2": [
+      {
+        "transactionId": "abe6e718-6159-4e1b-b26f-12db9ddde8c2",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "88c44cae-4732-45eb-95df-5c0f62fe5e4a",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user3": [
+      {
+        "transactionId": "eebaabd5-bad1-4e62-8c19-c5dbf6686265",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "624cde44-2577-4185-b0b8-5f25dadfcecf",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user4": [
+      {
+        "transactionId": "96388bc3-4add-408c-a58a-a82165f7c35d",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "ee0eaeb8-c53e-4b69-914e-460deb4f3b95",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user5": [
+      {
+        "transactionId": "8c2efa3c-9e97-451b-9dcf-20d958a5f238",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "794ca77b-c9c5-4e54-b869-d74c604ecc5d",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ]
+  },
+  "payment_requests": {
+    "user1": [
+      {
+        "requestId": "a26210b3-d3c0-4565-823b-57a5790eec8b",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match1",
+        "createdAt": {
+          "_seconds": 1747928910,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      }
+    ],
+    "user2": [],
+    "user3": [],
+    "user4": [
+      {
+        "requestId": "44c4c8aa-f710-4fb2-9d19-934dafffd59a",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match1",
+        "createdAt": {
+          "_seconds": 1747928910,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      }
+    ],
+    "user5": []
+  },
+  "finance_logs": {
+    "user1": [
+      {
+        "logId": "c107a82e-1285-4b9d-be4a-3c5a20431b7a",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match1",
+        "createdAt": {
+          "_seconds": 1747928910,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "29a367fe-7491-4dc5-8c4e-060a553f166c",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "bdf22086-9a98-4064-94ca-27b52cd63c4a",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user2": [
+      {
+        "logId": "b9058cf8-5335-4aac-a160-adc61e6f6d80",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "41d35fdc-d26b-4609-bed2-f954ae652a6b",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user3": [
+      {
+        "logId": "fa924198-94f4-4643-809f-43a1b00ae5cf",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "d9dddbcb-5897-4701-b0ab-fb80b721a0c8",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user4": [
+      {
+        "logId": "b9a5f622-3523-4efd-8dcb-07c60fd7db48",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match1",
+        "createdAt": {
+          "_seconds": 1747928910,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "e22648ea-69b0-43f4-a6ac-39d527b4c6fe",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "f193bdfd-e1ca-45f3-9f36-54cd11806aeb",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user5": [
+      {
+        "logId": "fbffc698-7e8f-4edd-82d4-197f1306461d",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748533710,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "25f99f26-4f34-4497-b7d8-e3d33c6892bc",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748706510,
+          "_nanoseconds": 0
+        }
+      }
+    ]
+  },
+  "score_histories": {
+    "user1": [
+      {
+        "scoreId": "e6c7aa54-1401-4600-b0ab-bbf262c0a068",
+        "change": 10,
+        "reason": "Match match1",
+        "createdAt": {
+          "_seconds": 1747928910,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user2": [
+      {
+        "scoreId": "9b55c107-1d52-4514-b0c7-3c9100e49b61",
+        "change": 30,
+        "reason": "Match match1",
+        "createdAt": {
+          "_seconds": 1747928910,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user3": [],
+    "user4": [
+      {
+        "scoreId": "042c8d91-0aec-4406-a6a4-0f79d13c7bc9",
+        "change": 10,
+        "reason": "Match match1",
+        "createdAt": {
+          "_seconds": 1747928910,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "c6e97180-89e7-4901-99a4-df6b76e49264",
+        "change": 30,
+        "reason": "Match match2",
+        "createdAt": {
+          "_seconds": 1748101710,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user5": [
+      {
+        "scoreId": "96a2ed84-df9f-486e-bf4a-9484a72ed79d",
+        "change": 30,
+        "reason": "Match match1",
+        "createdAt": {
+          "_seconds": 1747928910,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "9c41ac91-a720-4c5d-b105-ccba379a5426",
+        "change": 30,
+        "reason": "Match match2",
+        "createdAt": {
+          "_seconds": 1748101710,
+          "_nanoseconds": 0
+        }
+      }
+    ]
+  }
+}

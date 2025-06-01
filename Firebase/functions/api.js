@@ -13,4 +13,7 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 
 
+const devRoutes = require('./routes/devRoutes');
+app.use('/dev', devRoutes);
+
 module.exports = app;

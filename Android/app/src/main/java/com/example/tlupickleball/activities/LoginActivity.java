@@ -71,7 +71,7 @@ public class LoginActivity extends BaseActivity {
 
                     checkUserProfileAndRedirect(LoginActivity.this, body.getUid());
                 } else {
-                    Toast.makeText(LoginActivity.this, "Login failed: " + response.message(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Login failed: " + response.errorBody(), Toast.LENGTH_SHORT).show();
                 }
                 hideLoading();
             }
