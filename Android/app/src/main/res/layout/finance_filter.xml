@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvFilterTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lọc giao dịch"
+        android:textStyle="bold"
+        android:textSize="18sp" />
+
+    <ImageView
+        android:id="@+id/ivClose"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="end"
+        android:src="@drawable/ic_close" />
+
+    <TextView
+        android:id="@+id/tvDateRange"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thời gian"
+        android:paddingTop="16dp"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/dateRangeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/tvDateRangeValue"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="01/05/2025 -> 31/05/2025" />
+
+        <ImageView
+            android:id="@+id/ivCalendar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_calender" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnConfirmFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xác nhận"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/blue"
+        android:textColor="@android:color/white" />
+</LinearLayout>

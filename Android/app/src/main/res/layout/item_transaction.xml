@@ -28,8 +28,9 @@
         android:textColor="#009900"
         android:textSize="14sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Ngày giờ -->
     <TextView
@@ -42,17 +43,5 @@
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitle" />
-
-    <!-- Trạng thái -->
-    <TextView
-        android:id="@+id/tvStatus_transaction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Thành công"
-        android:textColor="#009900"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAmount" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,6 +18,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     private List<Transaction> transactions;
 
+    public TransactionAdapter(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
     public static class TransactionViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle, tvAmount, tvTime, tvStatus;
 
@@ -26,7 +30,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvAmount = itemView.findViewById(R.id.tvAmount);
             tvTime = itemView.findViewById(R.id.tvTime);
-            tvStatus = itemView.findViewById(R.id.tvStatus_transaction);
         }
     }
 
@@ -44,7 +47,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.tvTitle.setText(transaction.getTitle());
         holder.tvAmount.setText(transaction.getAmount());
         holder.tvTime.setText(transaction.getTime());
-        holder.tvStatus.setText(transaction.getStatus());
 
         // Màu tiền
         if (transaction.isIncome()) {
@@ -58,6 +60,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public int getItemCount() {
         return transactions.size();
     }
+
+    public void setData(List<Transaction> newList) {
+        this.transactions = newList;
+        notifyDataSetChanged();
+    }
+
 
 
 }
