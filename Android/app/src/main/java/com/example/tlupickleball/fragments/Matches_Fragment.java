@@ -1,10 +1,11 @@
 package com.example.tlupickleball.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.core.content.ContextCompat;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.adapters.DateAdapter;
@@ -22,232 +22,317 @@ import com.example.tlupickleball.adapters.MatchAdapter;
 import com.example.tlupickleball.model.DateItem;
 import com.example.tlupickleball.model.Matches;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap; // Thêm import này
 import java.util.List;
 import java.util.Locale;
+import java.util.Map; // Thêm import này
 
-public class Matches_Fragment extends Fragment implements DateAdapter.OnDateClickListener {
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
-    private ImageView imgHeader;
-    private TextView tvTabCaNhan;
-    private TextView tvTabTongQuat;
-    private TextView tvTabIndicator;
+public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSelectedListener {
 
     private RecyclerView recyclerViewDates;
     private RecyclerView recyclerViewMatches;
-
+    private TextView textViewSelectedDate;
+    private TextView textFilter;
+    private LinearLayout filterButton;
+    private FloatingActionButton btnAddMatch;
     private DateAdapter dateAdapter;
     private MatchAdapter matchAdapter;
+    private List<DateItem> datesList;
+    private List<Matches> allMatchesForSelectedDate;
+    private List<Matches> displayedMatchesList;
 
-    private List<DateItem> dateList = new ArrayList<>();
-    private List<Matches> allMatchesList = new ArrayList<>();
+    private TextView item1Tab;
+    private TextView item2Tab;
+    private TextView selectTabIndicator;
 
-    private String currentSelectedDateFilter = null;
-    private String currentSelectedTabCriteria = "Cá nhân";
+    private String currentMatchType = "individual";
+    private String currentSelectedFilter = "Tất cả";
+    private DateItem currentlySelectedDate; // Sẽ lưu trữ ngày hiện tại được chọn
 
-    public Matches_Fragment() {
-        // Required empty public constructor
-    }
+    // Maps để lưu trữ dữ liệu giả động
+    private Map<String, List<Matches>> dummyIndividualMatchesData;
+    private Map<String, List<Matches>> dummyGeneralMatchesData;
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_matches, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        imgHeader = view.findViewById(R.id.imgHeader);
-
-        View customTabLayoutView = view.findViewById(R.id.customTabLayout);
-        if (customTabLayoutView != null) {
-            View tabContentFrame = customTabLayoutView.findViewById(R.id.tab_content_frame);
-            if (tabContentFrame != null) {
-                tvTabCaNhan = tabContentFrame.findViewById(R.id.item1);
-                tvTabTongQuat = tabContentFrame.findViewById(R.id.item2);
-                tvTabIndicator = tabContentFrame.findViewById(R.id.select);
-            } else {
-                tvTabCaNhan = customTabLayoutView.findViewById(R.id.item1);
-                tvTabTongQuat = customTabLayoutView.findViewById(R.id.item2);
-                tvTabIndicator = customTabLayoutView.findViewById(R.id.select);
-            }
-        }
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_matches, container, false);
 
         recyclerViewDates = view.findViewById(R.id.recyclerViewDates);
         recyclerViewMatches = view.findViewById(R.id.recyclerViewMatches);
+        textViewSelectedDate = view.findViewById(R.id.textViewSelectedDate);
+        textFilter = view.findViewById(R.id.textFilter);
+        filterButton = view.findViewById(R.id.filterButton);
+        btnAddMatch = view.findViewById(R.id.btnAddMatch);
 
-        recyclerViewDates.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        dateAdapter = new DateAdapter(getContext(), dateList, this);
-        recyclerViewDates.setAdapter(dateAdapter);
+        item1Tab = view.findViewById(R.id.item1);
+        item2Tab = view.findViewById(R.id.item2);
+        selectTabIndicator = view.findViewById(R.id.select);
 
-        recyclerViewMatches.setLayoutManager(new LinearLayoutManager(getContext()));
-        matchAdapter = new MatchAdapter(getContext(), new ArrayList<>());
-        recyclerViewMatches.setAdapter(matchAdapter);
-
-        prepareDateData();
-        prepareMatchData();
+        // Khởi tạo dữ liệu giả ngay từ đầu
+        initializeDummyData();
 
         setupCustomTabs();
+        setupMatchRecyclerView();
+        setupFilterButton();
+        setupAddMatchButton();
 
-        if (!dateList.isEmpty()) {
-            String todayFormatted = getTodayFormattedForFilter();
-            int todayPosition = findDateItemPosition(todayFormatted);
-            if (todayPosition != -1) {
-                dateAdapter.setSelectedPosition(todayPosition);
-                onDateClick(dateList.get(todayPosition), todayPosition);
+        // --- Bắt đầu logic khởi tạo ngày tháng và tải dữ liệu mặc định ---
+        setupDateRecyclerView(); // Tạo datesList và khởi tạo Adapter (ban đầu với width=0)
+
+        // Sau khi datesList được tạo và layout đã sẵn sàng, tính toán chiều rộng và cập nhật Adapter
+        recyclerViewDates.post(() -> {
+            int width = recyclerViewDates.getWidth();
+            if (width > 0) {
+                // Khởi tạo lại dateAdapter với chiều rộng thực tế
+                // và truyền ngày đầu tiên là ngày được chọn mặc định
+                if (!datesList.isEmpty()) {
+                    currentlySelectedDate = datesList.get(0);
+                    currentlySelectedDate.setSelected(true); // Đánh dấu ngày đầu tiên là được chọn
+                }
+
+                dateAdapter = new DateAdapter(datesList, this, width);
+                recyclerViewDates.setAdapter(dateAdapter);
+
+                // Cập nhật text hiển thị ngày đã chọn (là ngày hiện tại)
+                if (currentlySelectedDate != null) {
+                    updateSelectedDateText(currentlySelectedDate);
+                }
+
+                // Thực hiện click giả lập vào tab "Cá nhân" để tải dữ liệu mặc định
+                // (Sau khi đã đảm bảo selectTabIndicator có vị trí và kích thước chính xác)
+                item1Tab.post(() -> {
+                    ViewGroup.LayoutParams params = selectTabIndicator.getLayoutParams();
+                    params.width = item1Tab.getWidth(); // Set width to match tab
+                    selectTabIndicator.setLayoutParams(params);
+                    selectTabIndicator.setX(item1Tab.getX()); // Set initial position
+                    item1Tab.performClick(); // Kích hoạt tab "Cá nhân" và tải dữ liệu
+                });
+
             } else {
-                dateAdapter.setSelectedPosition(0);
-                onDateClick(dateList.get(0), 0);
+                Log.e("Matches_Fragment", "recyclerViewDates width is 0. Cannot setup DateAdapter for even distribution.");
+                // Fallback nếu không thể lấy chiều rộng, vẫn cố gắng tải dữ liệu
+                if (currentlySelectedDate != null) {
+                    loadMatchesForDate(currentlySelectedDate, currentMatchType);
+                }
             }
-        }
+        });
+        // --- Kết thúc logic khởi tạo ngày tháng và tải dữ liệu mặc định ---
+
+        return view;
     }
 
     private void setupCustomTabs() {
-        if (tvTabCaNhan != null && tvTabTongQuat != null && tvTabIndicator != null) {
-            selectCustomTab(tvTabCaNhan);
-            handleTabSelection("Cá nhân"); // Kích hoạt bộ lọc mặc định
+        item1Tab.setOnClickListener(v -> {
+            currentMatchType = "individual";
+            selectTabIndicator.animate().x(0).setDuration(300);
+            item1Tab.setTextColor(Color.WHITE);
+            item2Tab.setTextColor(Color.BLACK);
+            item1Tab.setBackgroundResource(android.R.color.transparent);
+            item2Tab.setBackgroundResource(android.R.color.transparent);
 
-            tvTabCaNhan.setOnClickListener(v -> {
-                selectCustomTab(tvTabCaNhan);
-                handleTabSelection("Cá nhân");
-            });
-
-            tvTabTongQuat.setOnClickListener(v -> {
-                selectCustomTab(tvTabTongQuat);
-                handleTabSelection("Tổng quát");
-            });
-        } else {
-            if (getContext() != null) {
-                Toast.makeText(getContext(), "Lỗi: Không tìm thấy các tab tùy chỉnh", Toast.LENGTH_LONG).show();
+            // Tải dữ liệu cho tab "Cá nhân" cho ngày hiện tại
+            if (currentlySelectedDate != null) {
+                loadMatchesForDate(currentlySelectedDate, currentMatchType);
             }
-        }
-    }
+        });
 
-    private void selectCustomTab(TextView selectedTab) {
-        if (getContext() == null) return;
+        item2Tab.setOnClickListener(v -> {
+            currentMatchType = "general";
+            selectTabIndicator.animate().x(item2Tab.getX()).setDuration(300);
+            item1Tab.setTextColor(Color.BLACK);
+            item2Tab.setTextColor(Color.WHITE);
+            item1Tab.setBackgroundResource(android.R.color.transparent);
+            item2Tab.setBackgroundResource(android.R.color.transparent);
 
-        if (tvTabCaNhan != null) {
-            tvTabCaNhan.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-        }
-        if (tvTabTongQuat != null) {
-            tvTabTongQuat.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-        }
-
-        selectedTab.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
-
-        selectedTab.post(() -> {
-            animateTabIndicator(selectedTab);
+            // Tải dữ liệu cho tab "Tổng quát" cho ngày hiện tại
+            if (currentlySelectedDate != null) {
+                loadMatchesForDate(currentlySelectedDate, currentMatchType);
+            }
         });
     }
 
-    private void animateTabIndicator(TextView selectedTab) {
-        if (tvTabIndicator == null) return;
+    private void setupDateRecyclerView() {
+        datesList = generateDatesForNext7Days();
+        // Khởi tạo dateAdapter ban đầu với chiều rộng 0, sẽ được cập nhật sau
+        dateAdapter = new DateAdapter(datesList, this, 0); // <-- Truyền 0 width ban đầu
+        recyclerViewDates.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        recyclerViewDates.setAdapter(dateAdapter);
 
-        int targetX = selectedTab.getLeft();
-        int targetWidth = selectedTab.getWidth();
-
-        ViewGroup.LayoutParams params = tvTabIndicator.getLayoutParams();
-        if (params instanceof LinearLayout.LayoutParams) {
-            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) params;
-            lp.width = targetWidth;
-            tvTabIndicator.setLayoutParams(lp);
-        }
-
-        tvTabIndicator.animate()
-                .translationX(targetX)
-                .setDuration(200)
-                .start();
+        // Không cần gọi notifyItemChanged(0) ở đây, vì logic post() sẽ xử lý
     }
 
-    private void prepareDateData() {
-        dateList.clear();
-        LocalDate today = LocalDate.now();
-
-        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("M");
-        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("d");
-
-        for (int i = -1; i <= 5; i++) {
-            LocalDate date = today.plusDays(i);
-            String day = dayFormatter.format(date);
-            String month = "tháng " + monthFormatter.format(date);
-            dateList.add(new DateItem(day, month));
-        }
-        dateAdapter.notifyDataSetChanged();
+    private void setupMatchRecyclerView() {
+        allMatchesForSelectedDate = new ArrayList<>();
+        displayedMatchesList = new ArrayList<>();
+        matchAdapter = new MatchAdapter(displayedMatchesList);
+        recyclerViewMatches.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewMatches.setAdapter(matchAdapter);
     }
 
-    private void prepareMatchData() {
-        allMatchesList.clear();
-
-        // Giả lập dữ liệu trận đấu
-        // Ngày 25/05
-        allMatchesList.add(new Matches("Tùng", R.drawable.avatar_1, "Nam", R.drawable.avatar_1, "2 - 0", "25 tháng 5", "Giải đấu 1", true, "25/5"));
-        allMatchesList.add(new Matches("Linh", R.drawable.avatar_1, "Hải", R.drawable.avatar_1, "1 - 2", "25 tháng 5", "Giải đấu 2", false, "25/5"));
-        allMatchesList.add(new Matches("Minh", R.drawable.avatar_1, "Hoa", R.drawable.avatar_1, "2 - 1", "25 tháng 5", "Giải đấu 1", false, "25/5"));
-
-        // Ngày 26/05
-        allMatchesList.add(new Matches("Phong", R.drawable.avatar_1, "Lan", R.drawable.avatar_1, "0 - 2", "26 tháng 5", "Giải đấu 3", true, "26/5"));
-        allMatchesList.add(new Matches("Thảo", R.drawable.avatar_1, "Sơn", R.drawable.avatar_1, "2 - 0", "26 tháng 5", "Giải đấu 2", false, "26/5"));
-
-        // Ngày 27/05
-        allMatchesList.add(new Matches("Trang", R.drawable.avatar_1, "Long", R.drawable.avatar_1, "1 - 1", "27 tháng 5", "Giải đấu 1", true, "27/5"));
-        allMatchesList.add(new Matches("Quang", R.drawable.avatar_1, "Uyên", R.drawable.avatar_1, "2 - 0", "27 tháng 5", "Giải đấu 3", false, "27/5"));
-
-        // Ngày 28/05 (Ví dụ hôm nay)
-        allMatchesList.add(new Matches("Việt", R.drawable.avatar_1, "Nga", R.drawable.avatar_1, "2 - 1", "28 tháng 5", "Giải đấu 2", true, "28/5"));
-        allMatchesList.add(new Matches("Hùng", R.drawable.avatar_1, "Thu", R.drawable.avatar_1, "0 - 2", "28 tháng 5", "Giải đấu 1", false, "28/5"));
-        allMatchesList.add(new Matches("Duy", R.drawable.avatar_1, "Mai", R.drawable.avatar_1, "2 - 0", "28 tháng 5", "Giải đấu 3", false, "28/5"));
-
-        matchAdapter.updateMatches(allMatchesList);
+    private void setupFilterButton() {
+        textFilter.setText("Tất cả");
+        filterButton.setOnClickListener(v -> {
+            showFilterOptionsDialog();
+        });
     }
 
-    private String getTodayFormattedForFilter() {
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M", Locale.getDefault());
-        return formatter.format(today);
-    }
-
-    private int findDateItemPosition(String dateFilter) {
-        for (int i = 0; i < dateList.size(); i++) {
-            DateItem item = dateList.get(i);
-            String itemMonthNum = item.getMonth().replace("tháng ", "").trim();
-            String itemFormatted = item.getDay() + "/" + itemMonthNum;
-            if (itemFormatted.equals(dateFilter)) {
-                return i;
+    private void showFilterOptionsDialog() {
+        final String[] filterOptions = {"Tất cả", "Đang diễn ra", "Sắp diễn ra", "Đã kết thúc"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Lọc trận đấu theo trạng thái");
+        builder.setItems(filterOptions, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                currentSelectedFilter = filterOptions[which];
+                textFilter.setText(currentSelectedFilter);
+                filterMatchesByStatus(currentSelectedFilter);
             }
-        }
-        return -1;
+        });
+        builder.show();
     }
 
-    private void handleTabSelection(String tabText) {
-        currentSelectedTabCriteria = tabText;
-        // Không cần ẩn/hiện recyclerViewDates và recyclerViewMatches ở đây nữa
-        // vì chúng luôn hiển thị. Logic hiển thị được điều khiển bởi applyFilters.
+    private void setupAddMatchButton() {
+        btnAddMatch.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Nút Thêm trận đấu đã được nhấp!", Toast.LENGTH_SHORT).show();
+            // Điều hướng đến màn hình "Thêm trận đấu" hoặc hiển thị một dialog
+        });
+    }
 
-        if (getContext() != null) {
-            Toast.makeText(getContext(), "Đang hiển thị " + tabText + " trận đấu", Toast.LENGTH_SHORT).show();
+    private List<DateItem> generateDatesForNext7Days() {
+        List<DateItem> dates = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        Locale locale = new Locale("vi", "VN");
+        SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.getDefault());
+        // Sử dụng "MMMM" để lấy tên tháng đầy đủ (ví dụ: "Tháng 6")
+        SimpleDateFormat monthDisplayFormat = new SimpleDateFormat("MMMM", locale);
+
+        for (int i = 0; i < 7; i++) {
+            String day = dayFormat.format(calendar.getTime());
+            String monthDisplay = monthDisplayFormat.format(calendar.getTime()); // Tháng để hiển thị
+
+            dates.add(new DateItem(day, monthDisplay));
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
-        applyFilters(); // Luôn gọi applyFilters để cập nhật RecyclerView
+        return dates;
+    }
+
+    private void updateSelectedDateText(DateItem date) {
+        String formattedDate = String.format(Locale.getDefault(), "Ngày %s %s", date.getDayOfMonth(), date.getMonth());
+        textViewSelectedDate.setText(formattedDate);
     }
 
     @Override
-    public void onDateClick(DateItem dateModel, int position) {
-        if (getContext() != null) {
-            Toast.makeText(getContext(), "Chọn ngày: " + dateModel.getDay() + " " + dateModel.getMonth(), Toast.LENGTH_SHORT).show();
-        }
-        String monthNumber = dateModel.getMonth().replace("tháng ", "").trim();
-        currentSelectedDateFilter = dateModel.getDay() + "/" + monthNumber;
-        applyFilters();
+    public void onDateSelected(DateItem date) {
+        currentlySelectedDate = date;
+        updateSelectedDateText(date);
+        loadMatchesForDate(date, currentMatchType); // Tải lại trận đấu khi ngày được chọn
+        Toast.makeText(getContext(), "Ngày được chọn: " + date.getDayOfMonth() + " " + date.getMonth(), Toast.LENGTH_SHORT).show();
     }
 
-    private void applyFilters() {
-        if (matchAdapter == null) return;
+    // Phương thức để khởi tạo dữ liệu giả động
+    private void initializeDummyData() {
+        dummyIndividualMatchesData = new HashMap<>();
+        dummyGeneralMatchesData = new HashMap<>();
 
-        // Cả hai RecyclerView (date và matches) đều sẽ luôn hiển thị.
-        // Chỉ cần gọi filterMatches với các tiêu chí hiện tại.
-        matchAdapter.filterMatches(currentSelectedDateFilter, currentSelectedTabCriteria);
+        Calendar calendar = Calendar.getInstance(); // Lấy ngày hiện tại
+        Locale locale = new Locale("vi", "VN");
+        // Định dạng "dd MMMM" để tạo key ví dụ: "03 Tháng 6"
+        SimpleDateFormat dayMonthFormat = new SimpleDateFormat("dd MMMM", locale);
+
+        // Tạo dữ liệu giả cho ngày hôm nay và 6 ngày tiếp theo
+        for (int i = 0; i < 7; i++) {
+            String dateKey = dayMonthFormat.format(calendar.getTime()); // Ví dụ: "03 Tháng 6"
+            Log.d("DummyData", "Generating dummy data for: " + dateKey);
+
+            List<Matches> individualList = new ArrayList<>();
+            List<Matches> generalList = new ArrayList<>();
+
+            // Điền dữ liệu cá nhân
+            if (i == 0) { // Dữ liệu cho Ngày Hôm Nay
+                individualList.add(new Matches("Nguyễn An (CN)", "Trần Bình (CN)", R.drawable.avatar_1, R.drawable.avatar_1, "2 - 1", "09h00", "Đã kết thúc"));
+                individualList.add(new Matches("Lê Cường (CN)", "Phạm Dung (CN)", R.drawable.avatar_1, R.drawable.avatar_1, "0 - 0", "11h30", "Sắp diễn ra"));
+                individualList.add(new Matches("Hoàng Giáp (CN)", "Vũ Hùng (CN)", R.drawable.avatar_1, R.drawable.avatar_1, "1 - 1", "15h00", "Đang diễn ra"));
+            } else if (i == 1) { // Dữ liệu cho Ngày Mai
+                individualList.add(new Matches("Đinh Kha (CN)", "Mai Lan (CN)", R.drawable.avatar_1, R.drawable.avatar_1, "0 - 0", "10h00", "Sắp diễn ra"));
+                individualList.add(new Matches("Tôn Nam (CN)", "Cao Phong (CN)", R.drawable.avatar_1, R.drawable.avatar_1, "2 - 0", "14h00", "Đang diễn ra"));
+            } else if (i == 2) { // Dữ liệu cho Ngày Kia
+                individualList.add(new Matches("Dương Quyết (CN)", "Bùi Sáng (CN)", R.drawable.avatar_1, R.drawable.avatar_1, "1 - 2", "08h30", "Đã kết thúc"));
+            }
+            // Các ngày còn lại (i=3 đến 6) sẽ không có dữ liệu cụ thể, và sẽ hiển thị dữ liệu mặc định
+
+            // Điền dữ liệu tổng quát
+            if (i == 0) { // Dữ liệu cho Ngày Hôm Nay
+                generalList.add(new Matches("Đội Vàng (TQ)", "Đội Xanh (TQ)", R.drawable.avatar_1, R.drawable.avatar_1, "3 - 2", "09h30", "Đã kết thúc"));
+                generalList.add(new Matches("Đội Đỏ (TQ)", "Đội Trắng (TQ)", R.drawable.avatar_1, R.drawable.avatar_1, "0 - 0", "13h00", "Đang diễn ra"));
+                generalList.add(new Matches("Đội Đen (TQ)", "Đội Tím (TQ)", R.drawable.avatar_1, R.drawable.avatar_1, "0 - 0", "19h00", "Sắp diễn ra"));
+            } else if (i == 1) { // Dữ liệu cho Ngày Mai
+                generalList.add(new Matches("Đội Sói (TQ)", "Đội Gấu (TQ)", R.drawable.avatar_1, R.drawable.avatar_1, "1 - 0", "16h00", "Đang diễn ra"));
+            } else if (i == 2) { // Dữ liệu cho Ngày Kia
+                generalList.add(new Matches("Đội Hổ (TQ)", "Đội Báo (TQ)", R.drawable.avatar_1, R.drawable.avatar_1, "0 - 0", "10h30", "Sắp diễn ra"));
+                generalList.add(new Matches("Đội Chim (TQ)", "Đội Cá (TQ)", R.drawable.avatar_1, R.drawable.avatar_1, "2 - 2", "14h30", "Đã kết thúc"));
+            }
+            // Các ngày còn lại (i=3 đến 6) sẽ không có dữ liệu cụ thể, và sẽ hiển thị dữ liệu mặc định
+
+            dummyIndividualMatchesData.put(dateKey, individualList);
+            dummyGeneralMatchesData.put(dateKey, generalList);
+
+            calendar.add(Calendar.DAY_OF_MONTH, 1); // Chuyển sang ngày tiếp theo
+        }
+    }
+
+
+    private void loadMatchesForDate(DateItem date, String matchType) {
+        allMatchesForSelectedDate.clear();
+
+        String selectedDay = date.getDayOfMonth();
+        String selectedMonthDisplay = date.getMonth(); // Bây giờ sẽ là "Tháng 6"
+        // Tạo key để tìm kiếm trong map dữ liệu giả
+        String dateKey = selectedDay + " " + selectedMonthDisplay;
+
+        Log.d("MatchesFragment", "Loading matches for key: " + dateKey + ", Match Type: " + matchType);
+
+        List<Matches> matchesToLoad = null;
+
+        if (matchType.equals("individual")) {
+            matchesToLoad = dummyIndividualMatchesData.get(dateKey);
+        } else { // general matches
+            matchesToLoad = dummyGeneralMatchesData.get(dateKey);
+        }
+
+        if (matchesToLoad != null && !matchesToLoad.isEmpty()) {
+            allMatchesForSelectedDate.addAll(matchesToLoad);
+            Log.d("MatchesFragment", "Found " + matchesToLoad.size() + " matches for " + dateKey);
+        } else {
+            // Dữ liệu mặc định nếu không có dữ liệu cụ thể cho ngày được chọn
+            String defaultPlayer1 = (matchType.equals("individual") ? "Cá nhân" : "Tổng quát") + " mặc định";
+            String defaultPlayer2 = "Đối thủ mặc định";
+            String defaultStatus = "Sắp diễn ra"; // Chọn trạng thái mặc định phù hợp
+            allMatchesForSelectedDate.add(new Matches(defaultPlayer1 + " (" + selectedDay + " " + selectedMonthDisplay + ")", defaultPlayer2, R.drawable.avatar_1, R.drawable.avatar_1, "N/A", "N/A", defaultStatus));
+            Log.d("MatchesFragment", "No specific data for " + dateKey + ", added default match.");
+        }
+        filterMatchesByStatus(currentSelectedFilter); // Sau khi tải, lọc theo trạng thái hiện tại
+    }
+
+    private void filterMatchesByStatus(String statusFilter) {
+        displayedMatchesList.clear();
+        if (statusFilter.equals("Tất cả")) {
+            displayedMatchesList.addAll(allMatchesForSelectedDate);
+        } else {
+            for (Matches match : allMatchesForSelectedDate) {
+                if (match.getMatchStatus().equals(statusFilter)) {
+                    displayedMatchesList.add(match);
+                }
+            }
+        }
+        matchAdapter.notifyDataSetChanged(); // Rất quan trọng để cập nhật UI
     }
 }

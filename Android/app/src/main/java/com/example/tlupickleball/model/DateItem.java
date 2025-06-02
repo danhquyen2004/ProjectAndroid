@@ -1,42 +1,38 @@
 package com.example.tlupickleball.model;
-
 public class DateItem {
-    private String day;
+    private String dayOfMonth;
     private String month;
-    private boolean isSelected; // Để quản lý trạng thái được chọn
+    private boolean isSelected;
 
-    public DateItem(String day, String month) {
-        this.day = day;
+    public DateItem(String dayOfMonth, String month) {
+        this.dayOfMonth = dayOfMonth;
         this.month = month;
-        this.isSelected = false;
+        this.isSelected = false; // Mặc định là không được chọn
     }
 
-    public String getDay() {
-        return day;
-    }
-
-    public void setDay(String day) {
-        this.day = day;
+    // Getters
+    public String getDayOfMonth() {
+        return dayOfMonth;
     }
 
     public String getMonth() {
         return month;
     }
 
-    public void setMonth(String month) {
-        this.month = month;
-    }
-
     public boolean isSelected() {
         return isSelected;
     }
 
-    public void setSelected(boolean selected) {
-        isSelected = selected;
+    // Setters
+    public void setDayOfMonth(String dayOfMonth) {
+        this.dayOfMonth = dayOfMonth;
     }
 
-    // Hiển thị dạng "14\ntháng 5"
-    public String getFormattedDate() {
-        return day + "\n" + month;
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }
