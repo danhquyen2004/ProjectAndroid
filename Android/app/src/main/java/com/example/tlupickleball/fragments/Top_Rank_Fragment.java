@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Solo_Rank_Fragment extends Fragment {
+public class Top_Rank_Fragment extends Fragment {
 
     private RecyclerView recyclerView;
     private PlayerAdapter adapter;

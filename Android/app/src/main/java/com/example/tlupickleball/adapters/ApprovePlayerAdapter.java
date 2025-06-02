@@ -15,11 +15,11 @@ import com.example.tlupickleball.model.Player;
 
 import java.util.List;
 
-public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder> {
+public class ApprovePlayerAdapter extends RecyclerView.Adapter<ApprovePlayerAdapter.ApprovePlayerViewHolder> {
     private List<Player> playerList;
     private Context context;
 
-    public PlayerAdapter(Context context,List<Player> playerList)
+    public ApprovePlayerAdapter(Context context, List<Player> playerList)
     {
         this.context = context;
         this.playerList = playerList;
@@ -27,18 +27,17 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
 
     @NonNull
     @Override
-    public PlayerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_player_rank, parent, false);
-        return new PlayerViewHolder(view);
+    public ApprovePlayerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_player_infor, parent, false);
+        return new ApprovePlayerViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ApprovePlayerViewHolder holder, int position) {
         Player player = playerList.get(position);
         holder.txtName.setText(player.getName());
-        holder.txtScore.setText(String.valueOf(player.getSoloPoint()));
+        holder.txtEmail.setText(String.valueOf(player.getEmail()));
         holder.imgAvatar.setImageResource(player.getAvatarResourceId());
-        holder.txtRank.setText((String.valueOf(position + 4)));
     }
 
     @Override
@@ -46,16 +45,15 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
         return playerList.size();
     }
 
-    public static class PlayerViewHolder extends RecyclerView.ViewHolder {
+    public static class ApprovePlayerViewHolder extends RecyclerView.ViewHolder {
         ImageView imgAvatar;
-        TextView txtName, txtScore, txtRank;
+        TextView txtName, txtEmail;
 
-        public PlayerViewHolder(@NonNull View itemView) {
+        public ApprovePlayerViewHolder(@NonNull View itemView) {
             super(itemView);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
             txtName = itemView.findViewById(R.id.txtName);
-            txtScore = itemView.findViewById(R.id.txtScore);
-            txtRank = itemView.findViewById(R.id.txtRank);
+            txtEmail = itemView.findViewById(R.id.txtEmail);
         }
     }
 }
