@@ -49,9 +49,9 @@ public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         tabLayout.addTab(tabLayout.newTab().setText("Trang chủ")
                 .setIcon(R.drawable.ic_home));
-        tabLayout.addTab(tabLayout.newTab().setText("Tran đấu")
+        tabLayout.addTab(tabLayout.newTab().setText("Trận đấu")
                 .setIcon(R.drawable.ic_match));
-        tabLayout.addTab(tabLayout.newTab().setText("Tai chinh")
+        tabLayout.addTab(tabLayout.newTab().setText("Tài chính")
                 .setIcon(R.drawable.ic_finance));
         tabLayout.addTab(tabLayout.newTab().setText("Xếp hạng")
                 .setIcon(R.drawable.ic_rank));
