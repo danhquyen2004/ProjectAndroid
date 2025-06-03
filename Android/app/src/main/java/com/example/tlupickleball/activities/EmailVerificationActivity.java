@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.base.AuthActivity;
 import com.example.tlupickleball.activities.base.BaseActivity;
 import com.example.tlupickleball.network.api_model.auth.EmailVerificationRequest;
 import com.example.tlupickleball.network.api_model.auth.EmailVerificationResponse;
@@ -22,22 +23,29 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class EmailVerificationActivity extends BaseActivity {
+public class EmailVerificationActivity extends AuthActivity {
     private Handler handler;
     private Runnable checkVerifiedRunnable;
-    private AuthService authService;
 
+    Button resendButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_email_verification);
-        authService = ApiClient.getClient(this).create(AuthService.class);
-
         handler = new Handler(Looper.getMainLooper());
 
-        Button resendButton = findViewById(R.id.resendButton);
-        resendButton.setOnClickListener(v -> resendVerificationEmail());
-
+        resendButton = findViewById(R.id.resendButton);
+        resendButton.setOnClickListener(v -> {
+            resendVerificationEmail(this,
+                    () -> startCooldown(this, resendButton),
+                    () -> {}
+            );
+        });
+        // Save the current time as the last sent time if this is the first entry
+        if (getCooldownTimeLeft(this) == 0) {
+            saveLastSentTime(this);
+        }
+        startCooldown(this, resendButton);
         startEmailVerificationPolling();
     }
 
@@ -59,11 +67,9 @@ public class EmailVerificationActivity extends BaseActivity {
                                 startActivity(new Intent(EmailVerificationActivity.this, LoginActivity.class));
                                 finish();
                             } else {
-                                Toast.makeText(EmailVerificationActivity.this, "✅ Email checking 1", Toast.LENGTH_SHORT).show();
                                 handler.postDelayed( checkVerifiedRunnable, 5000);
                             }
                         } else {
-                            Toast.makeText(EmailVerificationActivity.this, "✅ Email checking 2", Toast.LENGTH_SHORT).show();
                             handler.postDelayed(checkVerifiedRunnable, 5000);
                         }
                     }
@@ -77,31 +83,6 @@ public class EmailVerificationActivity extends BaseActivity {
         };
 
         handler.postDelayed(checkVerifiedRunnable, 5000);
-    }
-
-    private void resendVerificationEmail() {
-        showLoading();
-        EmailVerificationRequest request = new EmailVerificationRequest(SessionManager.getIdToken(this));
-        authService.sendVerificationEmail(request).enqueue(new Callback<GenericResponse>() {
-            @Override
-            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
-                if(response.isSuccessful())
-                {
-                    hideLoading();
-                    Toast.makeText(EmailVerificationActivity.this, "Verification email sent again.", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    hideLoading();
-                    Toast.makeText(EmailVerificationActivity.this, "Failed to resend", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<GenericResponse> call, Throwable t) {
-
-            }
-        });
     }
     @Override
     protected void onDestroy() {

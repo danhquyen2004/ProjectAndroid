@@ -1,0 +1,2303 @@
+{
+  "users": [
+    {
+      "userId": "user1",
+      "email": "user1@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746266716,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user2",
+      "email": "user2@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746353116,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user3",
+      "email": "user3@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746439516,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user4",
+      "email": "user4@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746525916,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user5",
+      "email": "user5@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746612316,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user6",
+      "email": "user6@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746698716,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user7",
+      "email": "user7@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746785116,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user8",
+      "email": "user8@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746871516,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user9",
+      "email": "user9@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1746957916,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user10",
+      "email": "user10@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1747044316,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user11",
+      "email": "user11@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1747130716,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "userId": "user12",
+      "email": "user12@example.com",
+      "passwordHash": "hashedpassword",
+      "role": "member",
+      "isApproved": true,
+      "isDisabled": false,
+      "createdAt": {
+        "_seconds": 1747217116,
+        "_nanoseconds": 0
+      }
+    }
+  ],
+  "user_profiles": {
+    "user1": {
+      "userId": "user1",
+      "fullName": "An",
+      "gender": "female",
+      "birthDate": {
+        "_seconds": 971258716,
+        "_nanoseconds": 0
+      },
+      "level": "sơ trung",
+      "memberCode": "MB-1000"
+    },
+    "user2": {
+      "userId": "user2",
+      "fullName": "Bình",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 971172316,
+        "_nanoseconds": 0
+      },
+      "level": "new",
+      "memberCode": "MB-1001"
+    },
+    "user3": {
+      "userId": "user3",
+      "fullName": "Chi",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 971085916,
+        "_nanoseconds": 0
+      },
+      "level": "cao trung",
+      "memberCode": "MB-1002"
+    },
+    "user4": {
+      "userId": "user4",
+      "fullName": "Dũng",
+      "gender": "female",
+      "birthDate": {
+        "_seconds": 970999516,
+        "_nanoseconds": 0
+      },
+      "level": "cao trung",
+      "memberCode": "MB-1003"
+    },
+    "user5": {
+      "userId": "user5",
+      "fullName": "Hà",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 970913116,
+        "_nanoseconds": 0
+      },
+      "level": "sơ trung",
+      "memberCode": "MB-1004"
+    },
+    "user6": {
+      "userId": "user6",
+      "fullName": "Hương",
+      "gender": "female",
+      "birthDate": {
+        "_seconds": 970826716,
+        "_nanoseconds": 0
+      },
+      "level": "new",
+      "memberCode": "MB-1005"
+    },
+    "user7": {
+      "userId": "user7",
+      "fullName": "Khoa",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 970740316,
+        "_nanoseconds": 0
+      },
+      "level": "sơ trung",
+      "memberCode": "MB-1006"
+    },
+    "user8": {
+      "userId": "user8",
+      "fullName": "Linh",
+      "gender": "female",
+      "birthDate": {
+        "_seconds": 970653916,
+        "_nanoseconds": 0
+      },
+      "level": "sơ trung",
+      "memberCode": "MB-1007"
+    },
+    "user9": {
+      "userId": "user9",
+      "fullName": "Minh",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 970567516,
+        "_nanoseconds": 0
+      },
+      "level": "new",
+      "memberCode": "MB-1008"
+    },
+    "user10": {
+      "userId": "user10",
+      "fullName": "Nga",
+      "gender": "female",
+      "birthDate": {
+        "_seconds": 970481116,
+        "_nanoseconds": 0
+      },
+      "level": "sơ trung",
+      "memberCode": "MB-1009"
+    },
+    "user11": {
+      "userId": "user11",
+      "fullName": "Quang",
+      "gender": "female",
+      "birthDate": {
+        "_seconds": 970394716,
+        "_nanoseconds": 0
+      },
+      "level": "cao trung",
+      "memberCode": "MB-1010"
+    },
+    "user12": {
+      "userId": "user12",
+      "fullName": "Tú",
+      "gender": "male",
+      "birthDate": {
+        "_seconds": 970308316,
+        "_nanoseconds": 0
+      },
+      "level": "sơ trung",
+      "memberCode": "MB-1011"
+    }
+  },
+  "transactions": {
+    "user1": [
+      {
+        "transactionId": "547b835b-51ff-4711-86c0-cf91be423f9b",
+        "userId": "user1",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "af246d90-09ac-4656-8c80-6da54bb39102",
+        "userId": "user1",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user2": [
+      {
+        "transactionId": "1b778180-13aa-49a6-b645-bd41f2e075cc",
+        "userId": "user2",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "d1dba547-cf3b-44b0-8b53-13f7ae33e644",
+        "userId": "user2",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user3": [
+      {
+        "transactionId": "a255e28e-1949-4f8a-a369-a08c714bbc51",
+        "userId": "user3",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "e7f1e518-90cd-40d1-b06e-4846b80d75ef",
+        "userId": "user3",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user4": [
+      {
+        "transactionId": "3feacf49-9a1e-46b4-a80f-3698e5bb3bf8",
+        "userId": "user4",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "18881443-8945-4ea0-a787-e1efbb738643",
+        "userId": "user4",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user5": [
+      {
+        "transactionId": "844db733-3072-4904-b15e-62fa723581a9",
+        "userId": "user5",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "330a830d-fb9d-425b-869e-8e14033dad61",
+        "userId": "user5",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user6": [
+      {
+        "transactionId": "d841a91c-bf3c-4411-8d4d-5c1673d33a9c",
+        "userId": "user6",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "d6ead5d7-d8a6-430c-8e79-f8ffa8c264b7",
+        "userId": "user6",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user7": [
+      {
+        "transactionId": "bd0413ce-5141-4d21-9454-4f40dca0955d",
+        "userId": "user7",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "e7e02f38-d371-47bd-822f-9b378b33cbbd",
+        "userId": "user7",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user8": [
+      {
+        "transactionId": "14affa66-7fea-4c52-83e0-6368a281a00c",
+        "userId": "user8",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "c973dedc-e721-4f82-9a3f-5d2c3f80e39e",
+        "userId": "user8",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user9": [
+      {
+        "transactionId": "b2d1f5d1-7f74-49f2-b844-9861a16a846d",
+        "userId": "user9",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "ce689196-fffc-4cf7-9971-b810f27faa5e",
+        "userId": "user9",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user10": [
+      {
+        "transactionId": "5cf7050d-a44a-41cb-b420-ef36c38e95a3",
+        "userId": "user10",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "e1cbc988-368c-49b1-b292-a04cf8c7c839",
+        "userId": "user10",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user11": [
+      {
+        "transactionId": "cfb2e1e2-6153-46cb-8de4-781704613628",
+        "userId": "user11",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "fc8c59ed-65b6-40c7-b314-ae612a1d5c82",
+        "userId": "user11",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user12": [
+      {
+        "transactionId": "f3d2cb8b-2c2f-4691-b510-14df11eb7eb2",
+        "userId": "user12",
+        "type": "fixed",
+        "amount": 100000,
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "transactionId": "ff8cd65c-aab7-4bd4-b379-77aa27d23af8",
+        "userId": "user12",
+        "type": "donation",
+        "amount": 50000,
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        }
+      }
+    ]
+  },
+  "payment_requests": {
+    "user6": [
+      {
+        "requestId": "d28ca460-042a-41d0-974a-d618c538f67c",
+        "userId": "user6",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match1",
+        "createdAt": {
+          "_seconds": 1747562716,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      },
+      {
+        "requestId": "5496dd58-4278-4ce6-b0fe-48515a8e1e61",
+        "userId": "user6",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match4",
+        "createdAt": {
+          "_seconds": 1747821916,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      },
+      {
+        "requestId": "d21053cd-515f-4799-b250-26f5a942203a",
+        "userId": "user6",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match10",
+        "createdAt": {
+          "_seconds": 1748340316,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      }
+    ],
+    "user2": [
+      {
+        "requestId": "8d05bfbd-8180-4e9f-a6d4-6ee7129b5e85",
+        "userId": "user2",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match1",
+        "createdAt": {
+          "_seconds": 1747562716,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      },
+      {
+        "requestId": "5dc43bfa-176f-43ae-8250-19655dc79a4d",
+        "userId": "user2",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match3",
+        "createdAt": {
+          "_seconds": 1747735516,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      }
+    ],
+    "user11": [
+      {
+        "requestId": "c22cad72-27b8-4447-901d-c90e79c12bfc",
+        "userId": "user11",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match2",
+        "createdAt": {
+          "_seconds": 1747649116,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      },
+      {
+        "requestId": "2eed149d-9e27-4315-846d-82a6ceda16ff",
+        "userId": "user11",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match3",
+        "createdAt": {
+          "_seconds": 1747735516,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      },
+      {
+        "requestId": "4e10c27b-9a64-4208-a566-bbf5d5584f70",
+        "userId": "user11",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match9",
+        "createdAt": {
+          "_seconds": 1748253916,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      }
+    ],
+    "user9": [
+      {
+        "requestId": "5eb5a45c-97f0-4d99-8829-511d88376769",
+        "userId": "user9",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match5",
+        "createdAt": {
+          "_seconds": 1747908316,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      }
+    ],
+    "user1": [
+      {
+        "requestId": "b6525daf-7b66-4b43-98a8-1a411b0b6231",
+        "userId": "user1",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match5",
+        "createdAt": {
+          "_seconds": 1747908316,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      },
+      {
+        "requestId": "681ca4e9-3161-4fa4-95cf-35da3d7aad87",
+        "userId": "user1",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match7",
+        "createdAt": {
+          "_seconds": 1748081116,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      }
+    ],
+    "user5": [
+      {
+        "requestId": "7329714e-cf48-42b7-829e-eefa1923286d",
+        "userId": "user5",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match6",
+        "createdAt": {
+          "_seconds": 1747994716,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      },
+      {
+        "requestId": "c4e86aa9-ea62-4423-b7ab-66b8ef7ac07c",
+        "userId": "user5",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match7",
+        "createdAt": {
+          "_seconds": 1748081116,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      },
+      {
+        "requestId": "6acf1306-885b-4237-a1dd-75756d627ca6",
+        "userId": "user5",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match9",
+        "createdAt": {
+          "_seconds": 1748253916,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      }
+    ],
+    "user10": [
+      {
+        "requestId": "5ae4cbd2-15c5-4701-8835-f9d0edf005e2",
+        "userId": "user10",
+        "type": "penalty",
+        "amount": 10000,
+        "status": "unpaid",
+        "matchId": "match8",
+        "createdAt": {
+          "_seconds": 1748167516,
+          "_nanoseconds": 0
+        },
+        "paidAt": null
+      }
+    ]
+  },
+  "finance_logs": {
+    "user6": [
+      {
+        "logId": "1517014e-a571-479c-b1a6-3783ae1e67f7",
+        "userId": "user6",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match1",
+        "relatedRequestId": "d28ca460-042a-41d0-974a-d618c538f67c",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match1",
+        "createdAt": {
+          "_seconds": 1747562716,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "769ab5d8-4615-47e9-b9b8-5fc2f2a741f0",
+        "userId": "user6",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match4",
+        "relatedRequestId": "5496dd58-4278-4ce6-b0fe-48515a8e1e61",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match4",
+        "createdAt": {
+          "_seconds": 1747821916,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "72f3c70b-0b16-43c2-88cf-35a08fb638c2",
+        "userId": "user6",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match10",
+        "relatedRequestId": "d21053cd-515f-4799-b250-26f5a942203a",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match10",
+        "createdAt": {
+          "_seconds": 1748340316,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "d94a9e47-6e64-4d36-90e8-d0ff5cec86bc",
+        "userId": "user6",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "d841a91c-bf3c-4411-8d4d-5c1673d33a9c",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "65396e5c-4157-4556-8f6f-3d7b98d85ca8",
+        "userId": "user6",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "d6ead5d7-d8a6-430c-8e79-f8ffa8c264b7",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user2": [
+      {
+        "logId": "6327b38e-d0c4-4c23-a686-59bb2c5f1a8e",
+        "userId": "user2",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match1",
+        "relatedRequestId": "8d05bfbd-8180-4e9f-a6d4-6ee7129b5e85",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match1",
+        "createdAt": {
+          "_seconds": 1747562716,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "0662d0ab-9d60-4811-9dd9-e3c284ef5f6c",
+        "userId": "user2",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match3",
+        "relatedRequestId": "5dc43bfa-176f-43ae-8250-19655dc79a4d",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match3",
+        "createdAt": {
+          "_seconds": 1747735516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "eed95317-a82c-4fc6-8ff0-e83e35f4ee09",
+        "userId": "user2",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "1b778180-13aa-49a6-b645-bd41f2e075cc",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "1d1c1158-2efc-4c04-92ac-74194f64da7c",
+        "userId": "user2",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "d1dba547-cf3b-44b0-8b53-13f7ae33e644",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user11": [
+      {
+        "logId": "774767bc-1775-485d-ace6-2defb6925294",
+        "userId": "user11",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match2",
+        "relatedRequestId": "c22cad72-27b8-4447-901d-c90e79c12bfc",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match2",
+        "createdAt": {
+          "_seconds": 1747649116,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "a3eeecdb-2aa8-481d-a3b9-95cafdb4c73f",
+        "userId": "user11",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match3",
+        "relatedRequestId": "2eed149d-9e27-4315-846d-82a6ceda16ff",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match3",
+        "createdAt": {
+          "_seconds": 1747735516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "10b7ac97-d3ce-4ac6-b837-bc97d2d6bb69",
+        "userId": "user11",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match9",
+        "relatedRequestId": "4e10c27b-9a64-4208-a566-bbf5d5584f70",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match9",
+        "createdAt": {
+          "_seconds": 1748253916,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "f20d429e-40c2-47c1-8064-052356f7d34b",
+        "userId": "user11",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "cfb2e1e2-6153-46cb-8de4-781704613628",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "1de34caa-477a-4c3b-af43-68fcfda02673",
+        "userId": "user11",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "fc8c59ed-65b6-40c7-b314-ae612a1d5c82",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user9": [
+      {
+        "logId": "f924ee2d-d049-475f-bc95-28569fbf37d9",
+        "userId": "user9",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match5",
+        "relatedRequestId": "5eb5a45c-97f0-4d99-8829-511d88376769",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match5",
+        "createdAt": {
+          "_seconds": 1747908316,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "526951bb-9ad1-4d50-b305-f4f10af772fb",
+        "userId": "user9",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "b2d1f5d1-7f74-49f2-b844-9861a16a846d",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "2cbe51e1-da4a-46e2-b8cf-60f375caec88",
+        "userId": "user9",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "ce689196-fffc-4cf7-9971-b810f27faa5e",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user1": [
+      {
+        "logId": "ce2eb90d-b656-4a66-ad1c-d38bb9494435",
+        "userId": "user1",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match5",
+        "relatedRequestId": "b6525daf-7b66-4b43-98a8-1a411b0b6231",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match5",
+        "createdAt": {
+          "_seconds": 1747908316,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "6dabb4cb-f3af-4c4b-b531-cf6c06f9d181",
+        "userId": "user1",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match7",
+        "relatedRequestId": "681ca4e9-3161-4fa4-95cf-35da3d7aad87",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match7",
+        "createdAt": {
+          "_seconds": 1748081116,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "4c2cae20-de90-4837-b9d2-801bd18c0edb",
+        "userId": "user1",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "547b835b-51ff-4711-86c0-cf91be423f9b",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "5d336451-44d1-4ba1-b65b-d752c6b209be",
+        "userId": "user1",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "af246d90-09ac-4656-8c80-6da54bb39102",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user5": [
+      {
+        "logId": "9b89c2fc-c1d0-42cc-9d12-5144ffda98f6",
+        "userId": "user5",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match6",
+        "relatedRequestId": "7329714e-cf48-42b7-829e-eefa1923286d",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match6",
+        "createdAt": {
+          "_seconds": 1747994716,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "57ecb3ad-3759-4ba0-8fb7-5b582f14c860",
+        "userId": "user5",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match7",
+        "relatedRequestId": "c4e86aa9-ea62-4423-b7ab-66b8ef7ac07c",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match7",
+        "createdAt": {
+          "_seconds": 1748081116,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "5adbf204-3c93-401c-91a0-e32438343f7a",
+        "userId": "user5",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match9",
+        "relatedRequestId": "6acf1306-885b-4237-a1dd-75756d627ca6",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match9",
+        "createdAt": {
+          "_seconds": 1748253916,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "810d8c3f-f3d1-4ef0-8706-57f0b8571bab",
+        "userId": "user5",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "844db733-3072-4904-b15e-62fa723581a9",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "166724a2-8c60-4d4c-9482-2bc52add64f6",
+        "userId": "user5",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "330a830d-fb9d-425b-869e-8e14033dad61",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user10": [
+      {
+        "logId": "d340a3a3-da4c-4808-9c37-074c03a7246b",
+        "userId": "user10",
+        "type": "penalty_incurred",
+        "amount": 10000,
+        "matchId": "match8",
+        "relatedRequestId": "5ae4cbd2-15c5-4701-8835-f9d0edf005e2",
+        "transactionId": null,
+        "description": "Bị phạt sau trận match8",
+        "createdAt": {
+          "_seconds": 1748167516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "logId": "635132e4-c316-4790-80f6-b5eb0fa4c22e",
+        "userId": "user10",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "5cf7050d-a44a-41cb-b420-ef36c38e95a3",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "f30baa2f-6098-480d-b695-579c886d3668",
+        "userId": "user10",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "e1cbc988-368c-49b1-b292-a04cf8c7c839",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user3": [
+      {
+        "logId": "8e4a7eda-38aa-4c6c-95bd-b5eb5a2c5501",
+        "userId": "user3",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "a255e28e-1949-4f8a-a369-a08c714bbc51",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "8ee5f397-1eae-4569-825a-47964d45603b",
+        "userId": "user3",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "e7f1e518-90cd-40d1-b06e-4846b80d75ef",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user4": [
+      {
+        "logId": "134e85ec-5853-4e6b-9f53-63c401874fc3",
+        "userId": "user4",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "3feacf49-9a1e-46b4-a80f-3698e5bb3bf8",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "6ae8751a-edbe-443d-bfd0-8656bb48e332",
+        "userId": "user4",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "18881443-8945-4ea0-a787-e1efbb738643",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user7": [
+      {
+        "logId": "24f76c56-0535-47bf-86a7-9f86325a3219",
+        "userId": "user7",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "bd0413ce-5141-4d21-9454-4f40dca0955d",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "247cbc65-a5f2-4f9c-b13d-d653937e2994",
+        "userId": "user7",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "e7e02f38-d371-47bd-822f-9b378b33cbbd",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user8": [
+      {
+        "logId": "b9c4bbe0-2a2d-49e3-9e67-e758263d81f5",
+        "userId": "user8",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "14affa66-7fea-4c52-83e0-6368a281a00c",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "3eece341-898d-480b-b133-ff287b8537d8",
+        "userId": "user8",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "c973dedc-e721-4f82-9a3f-5d2c3f80e39e",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ],
+    "user12": [
+      {
+        "logId": "b873ec2e-57c2-412d-a6ab-7ee2af98e01c",
+        "userId": "user12",
+        "type": "fixed_paid",
+        "amount": 100000,
+        "transactionId": "f3d2cb8b-2c2f-4691-b510-14df11eb7eb2",
+        "createdAt": {
+          "_seconds": 1748599516,
+          "_nanoseconds": 0
+        },
+        "description": "Đã đóng quỹ tháng"
+      },
+      {
+        "logId": "a2aa2dec-8858-4036-9b2f-ea8382cce869",
+        "userId": "user12",
+        "type": "donation",
+        "amount": 50000,
+        "transactionId": "ff8cd65c-aab7-4bd4-b379-77aa27d23af8",
+        "createdAt": {
+          "_seconds": 1748685916,
+          "_nanoseconds": 0
+        },
+        "description": "Ủng hộ CLB"
+      }
+    ]
+  },
+  "score_histories": {
+    "user6": [
+      {
+        "scoreId": "7668f724-142a-4532-a780-3af546a2545f",
+        "userId": "user6",
+        "matchId": "match1",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1747562716,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "96e941a6-4a3d-4ea8-afc8-143460c92aa8",
+        "userId": "user6",
+        "matchId": "match4",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1747821916,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "a3af7e71-c335-469d-a7d8-cd8dde07b3a3",
+        "userId": "user6",
+        "matchId": "match7",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1748081116,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "8fb2d1f3-8cd8-4f16-8b90-c6cf6630f90f",
+        "userId": "user6",
+        "matchId": "match10",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1748340316,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user2": [
+      {
+        "scoreId": "4fe3ecc2-b793-4f99-8e87-53788d6c1486",
+        "userId": "user2",
+        "matchId": "match1",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1747562716,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "3d6b5db9-f256-48a6-826f-d8c2f0d377d8",
+        "userId": "user2",
+        "matchId": "match3",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1747735516,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user11": [
+      {
+        "scoreId": "226e5abb-af79-426a-aa62-277f151475be",
+        "userId": "user11",
+        "matchId": "match1",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1747562716,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "aff9cd15-f1a0-4d13-b060-41d857b801b6",
+        "userId": "user11",
+        "matchId": "match2",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1747649116,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "c2d195a6-c0eb-487c-8156-f13ba0fe9573",
+        "userId": "user11",
+        "matchId": "match3",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1747735516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "12d0ce95-6729-4ab3-90b9-6e67e48286fb",
+        "userId": "user11",
+        "matchId": "match5",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1747908316,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "50d3ddc1-0011-44bf-8bd6-1f57e5d311ec",
+        "userId": "user11",
+        "matchId": "match7",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1748081116,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "f4783dae-6460-4f3c-bd73-4f515ba80c38",
+        "userId": "user11",
+        "matchId": "match9",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1748253916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user8": [
+      {
+        "scoreId": "9a8daf95-89f6-48ba-b960-54b7ac3ec1e2",
+        "userId": "user8",
+        "matchId": "match1",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1747562716,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "874ac684-3d39-470d-8026-4cad9440b5c5",
+        "userId": "user8",
+        "matchId": "match8",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1748167516,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user12": [
+      {
+        "scoreId": "b085e9d3-678f-4e75-9a2d-9d147a7c430a",
+        "userId": "user12",
+        "matchId": "match2",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1747649116,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "56fb472d-70c3-45d8-ac5b-6a8dc70cb401",
+        "userId": "user12",
+        "matchId": "match3",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1747735516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "a84e7854-f9fe-4615-a49e-1d735417aece",
+        "userId": "user12",
+        "matchId": "match5",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1747908316,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "9465d966-288b-477e-94bc-7e8be9f5f68d",
+        "userId": "user12",
+        "matchId": "match10",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1748340316,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user7": [
+      {
+        "scoreId": "6aa2603d-080d-467c-a06f-1aedc6750789",
+        "userId": "user7",
+        "matchId": "match3",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1747735516,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "16d94522-e37b-4c42-8681-7f62026fb908",
+        "userId": "user7",
+        "matchId": "match9",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1748253916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user1": [
+      {
+        "scoreId": "c14715e3-1bdc-411a-9f7f-49ef1f86fd79",
+        "userId": "user1",
+        "matchId": "match4",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1747821916,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "89df13a3-2918-4888-bd8c-c9da4179aa0a",
+        "userId": "user1",
+        "matchId": "match5",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1747908316,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "7799a426-d528-4b55-abb2-66a4b618153e",
+        "userId": "user1",
+        "matchId": "match7",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1748081116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user9": [
+      {
+        "scoreId": "3e7beb3d-095f-4636-b139-374143879926",
+        "userId": "user9",
+        "matchId": "match5",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1747908316,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user10": [
+      {
+        "scoreId": "1327b7f5-4495-4310-a830-e060534f6869",
+        "userId": "user10",
+        "matchId": "match6",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1747994716,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "14b2bc04-d3c4-48c1-bc9b-1f26bf9def35",
+        "userId": "user10",
+        "matchId": "match8",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1748167516,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user5": [
+      {
+        "scoreId": "bc3e256e-dbaf-4a9e-849c-13c9afcbc913",
+        "userId": "user5",
+        "matchId": "match6",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1747994716,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "82371d36-5c85-4402-8316-c6f8f1fda77e",
+        "userId": "user5",
+        "matchId": "match7",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1748081116,
+          "_nanoseconds": 0
+        }
+      },
+      {
+        "scoreId": "8efc17de-4f17-4626-b226-c1ed3e218e7b",
+        "userId": "user5",
+        "matchId": "match9",
+        "scoreChange": -10,
+        "newTotalScore": 990,
+        "createdAt": {
+          "_seconds": 1748253916,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user3": [
+      {
+        "scoreId": "6b159adc-5071-4b6c-bdb3-16c8794e682f",
+        "userId": "user3",
+        "matchId": "match9",
+        "scoreChange": 20,
+        "newTotalScore": 1020,
+        "createdAt": {
+          "_seconds": 1748253916,
+          "_nanoseconds": 0
+        }
+      }
+    ]
+  },
+  "matches": [
+    {
+      "matchId": "match1",
+      "type": "double",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1747562716,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user6"
+    },
+    {
+      "matchId": "match2",
+      "type": "single",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1747649116,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user12"
+    },
+    {
+      "matchId": "match3",
+      "type": "double",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1747735516,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user11"
+    },
+    {
+      "matchId": "match4",
+      "type": "single",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1747821916,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user1"
+    },
+    {
+      "matchId": "match5",
+      "type": "double",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1747908316,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user11"
+    },
+    {
+      "matchId": "match6",
+      "type": "single",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1747994716,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user5"
+    },
+    {
+      "matchId": "match7",
+      "type": "double",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1748081116,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user1"
+    },
+    {
+      "matchId": "match8",
+      "type": "single",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1748167516,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user10"
+    },
+    {
+      "matchId": "match9",
+      "type": "double",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1748253916,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user3"
+    },
+    {
+      "matchId": "match10",
+      "type": "single",
+      "setCount": 3,
+      "startTime": {
+        "_seconds": 1748340316,
+        "_nanoseconds": 0
+      },
+      "status": "finished",
+      "createdBy": "user6"
+    }
+  ],
+  "match_participants": [
+    {
+      "matchId": "match1",
+      "userId": "user6",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match1",
+      "userId": "user2",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match1",
+      "userId": "user11",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match1",
+      "userId": "user8",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match2",
+      "userId": "user11",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match2",
+      "userId": "user12",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match3",
+      "userId": "user11",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match3",
+      "userId": "user2",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match3",
+      "userId": "user12",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match3",
+      "userId": "user7",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match4",
+      "userId": "user1",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match4",
+      "userId": "user6",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match5",
+      "userId": "user9",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match5",
+      "userId": "user1",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match5",
+      "userId": "user12",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match5",
+      "userId": "user11",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match6",
+      "userId": "user10",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match6",
+      "userId": "user5",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match7",
+      "userId": "user6",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match7",
+      "userId": "user11",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match7",
+      "userId": "user5",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match7",
+      "userId": "user1",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match8",
+      "userId": "user8",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match8",
+      "userId": "user10",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match9",
+      "userId": "user11",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match9",
+      "userId": "user5",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match9",
+      "userId": "user3",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match9",
+      "userId": "user7",
+      "team": 2,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match10",
+      "userId": "user12",
+      "team": 1,
+      "isConfirmed": true
+    },
+    {
+      "matchId": "match10",
+      "userId": "user6",
+      "team": 2,
+      "isConfirmed": true
+    }
+  ],
+  "match_set_results": [
+    {
+      "matchId": "match1",
+      "setNumber": 1,
+      "team1Score": 13,
+      "team2Score": 16
+    },
+    {
+      "matchId": "match1",
+      "setNumber": 2,
+      "team1Score": 14,
+      "team2Score": 15
+    },
+    {
+      "matchId": "match1",
+      "setNumber": 3,
+      "team1Score": 13,
+      "team2Score": 19
+    },
+    {
+      "matchId": "match2",
+      "setNumber": 1,
+      "team1Score": 16,
+      "team2Score": 7
+    },
+    {
+      "matchId": "match2",
+      "setNumber": 2,
+      "team1Score": 11,
+      "team2Score": 17
+    },
+    {
+      "matchId": "match2",
+      "setNumber": 3,
+      "team1Score": 12,
+      "team2Score": 17
+    },
+    {
+      "matchId": "match3",
+      "setNumber": 1,
+      "team1Score": 20,
+      "team2Score": 3
+    },
+    {
+      "matchId": "match3",
+      "setNumber": 2,
+      "team1Score": 13,
+      "team2Score": 19
+    },
+    {
+      "matchId": "match3",
+      "setNumber": 3,
+      "team1Score": 12,
+      "team2Score": 18
+    },
+    {
+      "matchId": "match4",
+      "setNumber": 1,
+      "team1Score": 15,
+      "team2Score": 17
+    },
+    {
+      "matchId": "match4",
+      "setNumber": 2,
+      "team1Score": 18,
+      "team2Score": 10
+    },
+    {
+      "matchId": "match4",
+      "setNumber": 3,
+      "team1Score": 18,
+      "team2Score": 10
+    },
+    {
+      "matchId": "match5",
+      "setNumber": 1,
+      "team1Score": 12,
+      "team2Score": 12
+    },
+    {
+      "matchId": "match5",
+      "setNumber": 2,
+      "team1Score": 15,
+      "team2Score": 19
+    },
+    {
+      "matchId": "match5",
+      "setNumber": 3,
+      "team1Score": 17,
+      "team2Score": 6
+    },
+    {
+      "matchId": "match6",
+      "setNumber": 1,
+      "team1Score": 15,
+      "team2Score": 11
+    },
+    {
+      "matchId": "match6",
+      "setNumber": 2,
+      "team1Score": 19,
+      "team2Score": 0
+    },
+    {
+      "matchId": "match6",
+      "setNumber": 3,
+      "team1Score": 15,
+      "team2Score": 12
+    },
+    {
+      "matchId": "match7",
+      "setNumber": 1,
+      "team1Score": 16,
+      "team2Score": 2
+    },
+    {
+      "matchId": "match7",
+      "setNumber": 2,
+      "team1Score": 11,
+      "team2Score": 21
+    },
+    {
+      "matchId": "match7",
+      "setNumber": 3,
+      "team1Score": 18,
+      "team2Score": 12
+    },
+    {
+      "matchId": "match8",
+      "setNumber": 1,
+      "team1Score": 17,
+      "team2Score": 1
+    },
+    {
+      "matchId": "match8",
+      "setNumber": 2,
+      "team1Score": 20,
+      "team2Score": 6
+    },
+    {
+      "matchId": "match8",
+      "setNumber": 3,
+      "team1Score": 12,
+      "team2Score": 17
+    },
+    {
+      "matchId": "match9",
+      "setNumber": 1,
+      "team1Score": 11,
+      "team2Score": 21
+    },
+    {
+      "matchId": "match9",
+      "setNumber": 2,
+      "team1Score": 11,
+      "team2Score": 18
+    },
+    {
+      "matchId": "match9",
+      "setNumber": 3,
+      "team1Score": 20,
+      "team2Score": 17
+    },
+    {
+      "matchId": "match10",
+      "setNumber": 1,
+      "team1Score": 19,
+      "team2Score": 18
+    },
+    {
+      "matchId": "match10",
+      "setNumber": 2,
+      "team1Score": 13,
+      "team2Score": 12
+    },
+    {
+      "matchId": "match10",
+      "setNumber": 3,
+      "team1Score": 15,
+      "team2Score": 18
+    }
+  ],
+  "fund_reminders": {
+    "user1": [
+      {
+        "reminderId": "f552a6c6-b92b-4dd3-bcfe-8d804e1ba877",
+        "userId": "user1",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user2": [
+      {
+        "reminderId": "8041bb89-377d-49ce-b114-0b2ac36b2069",
+        "userId": "user2",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user3": [
+      {
+        "reminderId": "747554fc-438a-4027-ad6b-bee89e63164c",
+        "userId": "user3",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user4": [
+      {
+        "reminderId": "395ef180-a6cb-44fc-a319-c43b878a688f",
+        "userId": "user4",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user5": [
+      {
+        "reminderId": "c2d07c69-f996-4e4e-bb77-0e5e3a163886",
+        "userId": "user5",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user6": [
+      {
+        "reminderId": "8af565d3-fe94-4a5f-92b9-18dbd3aea10f",
+        "userId": "user6",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user7": [
+      {
+        "reminderId": "1c0fb8b9-8169-4c5c-b49a-7e1e10d98908",
+        "userId": "user7",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user8": [
+      {
+        "reminderId": "806e4254-7be0-41a3-b93c-0bd2d754f8de",
+        "userId": "user8",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user9": [
+      {
+        "reminderId": "4243ee4a-ce55-4f66-828b-cbcbce0ffa74",
+        "userId": "user9",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user10": [
+      {
+        "reminderId": "c9aba8b9-0de2-4da5-b5f6-43fed1c04785",
+        "userId": "user10",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user11": [
+      {
+        "reminderId": "164d139c-df9d-4b67-ae42-b79104a92b13",
+        "userId": "user11",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ],
+    "user12": [
+      {
+        "reminderId": "c044f479-60fb-4b5d-aba5-14adeb38a035",
+        "userId": "user12",
+        "type": "fixed",
+        "dueMonth": "2025-06-01",
+        "isSent": true,
+        "createdAt": {
+          "_seconds": 1748513116,
+          "_nanoseconds": 0
+        }
+      }
+    ]
+  },
+  "expenses": [
+    {
+      "expenseId": "expense1",
+      "reason": "Mua nước, bóng",
+      "amount": 250000,
+      "createdBy": "user1",
+      "createdAt": {
+        "_seconds": 1748340316,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "expenseId": "expense2",
+      "reason": "Mua nước, bóng",
+      "amount": 280000,
+      "createdBy": "user1",
+      "createdAt": {
+        "_seconds": 1748253916,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "expenseId": "expense3",
+      "reason": "Mua nước, bóng",
+      "amount": 310000,
+      "createdBy": "user1",
+      "createdAt": {
+        "_seconds": 1748167516,
+        "_nanoseconds": 0
+      }
+    }
+  ]
+}

@@ -5,6 +5,27 @@ import com.google.gson.annotations.SerializedName;
 public class RegisterResponse {
     @SerializedName("message")
     private String message;
+    @SerializedName("idToken")
+    private String idToken;
+    @SerializedName("refreshToken")
+    private String refreshToken;
+
+    public String getIdToken() {
+        return idToken;
+    }
+
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
     @SerializedName("uid")
     private String uid;
 
@@ -13,9 +34,11 @@ public class RegisterResponse {
 
     }
 
-    public RegisterResponse(String message, String uid) {
+    public RegisterResponse(String message, String uid, String idToken, String refreshToken) {
         this.message = message;
         this.uid = uid;
+        this.idToken = idToken;
+        this.refreshToken = refreshToken;
     }
 
     public String getMessage() {

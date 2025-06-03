@@ -9,6 +9,26 @@ public class LoginResponse {
     private String refreshToken;
     @SerializedName("uid")
     private String uid;
+    @SerializedName("emailVerified")
+    private boolean emailVerified;
+    @SerializedName("disabled")
+    private boolean disabled;
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
 
     public String getIdToken() {
         return idToken;
@@ -36,9 +56,11 @@ public class LoginResponse {
     public LoginResponse() {
         // Default constructor
     }
-    public LoginResponse(String idToken, String refreshToken, String uid) {
+    public LoginResponse(String idToken, String refreshToken, String uid, boolean emailVerified, boolean disabled) {
         this.idToken = idToken;
         this.refreshToken = refreshToken;
         this.uid = uid;
+        this.emailVerified = emailVerified;
+        this.disabled = disabled;
     }
 }

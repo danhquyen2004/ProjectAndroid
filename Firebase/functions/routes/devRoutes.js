@@ -1,10 +1,10 @@
 const express = require('express');
-const { importFirestoreSampleData } = require('../import_data/importFirestore');
+const { importFirestoreFinalData } = require('../import_data/importFirestore');
 const router = express.Router();
 
 router.post('/import-sample', async (req, res) => {
   try {
-    const result = await importFirestoreSampleData();
+    const result = await importFirestoreFinalData();
     res.send({ message: result });
   } catch (err) {
     console.error(err);

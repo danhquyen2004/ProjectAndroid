@@ -9,18 +9,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.activities.base.ApiCallback;
+import com.example.tlupickleball.activities.base.AuthActivity;
 import com.example.tlupickleball.activities.base.BaseActivity;
 import com.example.tlupickleball.model.Account;
 import com.example.tlupickleball.network.api_model.auth.LoginResponse;
-import com.example.tlupickleball.network.auth.AuthApi;
 import com.example.tlupickleball.network.core.ApiClient;
 import com.example.tlupickleball.network.service.AuthService;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.tlupickleball.network.core.*;
 
@@ -28,11 +25,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends AuthActivity {
     private EditText emailEditText, passwordEditText;
     private Button loginButton;
     private TextView goToRegisterText;
-    private AuthService authService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +39,6 @@ public class LoginActivity extends BaseActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
         goToRegisterText = findViewById(R.id.goToRegisterText);
-
-        authService = ApiClient.getClient(this).create(AuthService.class);
 
         loginButton.setOnClickListener(v -> {
             showLoading();
@@ -64,14 +58,26 @@ public class LoginActivity extends BaseActivity {
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
                     LoginResponse body = response.body();
-
                     SessionManager.saveTokens(LoginActivity.this, body.getIdToken(), body.getRefreshToken(), body.getUid());
-                    Log.d("TOKEN", "TOKEN : " + body.getIdToken());
-                    Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                    if(body.isDisabled())
+                    {
+                        Toast.makeText(LoginActivity.this, "Tài khoản đã bị vô hiệu hóa", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(!body.isEmailVerified())
+                    {
+                        startActivity(new Intent(LoginActivity.this, EmailVerificationActivity.class));
+                    }
+                    else
+                    {
+                        Log.d("TOKEN", "TOKEN : " + body.getIdToken());
+                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                        checkUserProfileAndRedirect(LoginActivity.this, body.getUid());
+                    }
 
-                    checkUserProfileAndRedirect(LoginActivity.this, body.getUid());
                 } else {
-                    Toast.makeText(LoginActivity.this, "Login failed: " + response.errorBody(), Toast.LENGTH_SHORT).show();
+                    if(response.code() == 401){
+                        Toast.makeText(LoginActivity.this, "Email hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 hideLoading();
             }

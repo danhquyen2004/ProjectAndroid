@@ -21,7 +21,7 @@ exports.register = async (req, res) => {
       }
     );
 
-    const { idToken, localId: uid } = response.data;
+    const { idToken, refreshToken, localId: uid } = response.data;
 
     // 2. Tạo document trong Firestore: users/{uid}
     await admin.firestore().collection("users").doc(uid).set({
@@ -43,7 +43,9 @@ exports.register = async (req, res) => {
 
     return res.status(201).send({
       message: "User registered successfully. Please verify your email.",
-      uid
+      uid,
+      idToken,
+      refreshToken
     });
 
   } catch (err) {
@@ -69,18 +71,39 @@ exports.login = async (req, res) => {
 
     const { idToken, refreshToken, localId } = response.data;
 
-    // ✅ Kiểm tra lại bằng Admin SDK
     const userRecord = await admin.auth().getUser(localId);
+
+    // ✅ Gửi email xác minh nếu chưa xác minh
     if (!userRecord.emailVerified) {
-      return res.status(403).send("Email is not verified (checked by Admin SDK).");
+      try {
+        await axios.post(
+          `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FIREBASE_API_KEY}`,
+          {
+            requestType: "VERIFY_EMAIL",
+            idToken
+          }
+        );
+        console.log(`Verification email re-sent to ${email}`);
+      } catch (verifyErr) {
+        console.warn("Failed to send verification email:", verifyErr.response?.data || verifyErr.message);
+        // Không chặn flow login, chỉ log
+      }
     }
 
-    return res.send({ idToken, refreshToken, uid: localId });
+    return res.send({
+      idToken,
+      refreshToken,
+      uid: localId,
+      emailVerified: userRecord.emailVerified,
+      disabled: userRecord.disabled
+    });
+
   } catch (err) {
     console.error("Login error:", err.response?.data || err.message);
     return res.status(401).send("Login failed");
   }
 };
+
 
 // [POST] /auth/send-verification
 exports.sendVerificationEmail = async (req, res) => {
@@ -95,7 +118,7 @@ exports.sendVerificationEmail = async (req, res) => {
         idToken
       }
     );
-    return res.send("Verification email sent");
+    return res.json({ message: "Verification email sent" });
   } catch (err) {
     console.error("Send verification error:", err.response?.data || err.message);
     return res.status(500).send("Failed to send verification email");

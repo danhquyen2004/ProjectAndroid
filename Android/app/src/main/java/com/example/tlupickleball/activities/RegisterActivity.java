@@ -9,24 +9,21 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.activities.base.ApiCallback;
+import com.example.tlupickleball.activities.base.AuthActivity;
 import com.example.tlupickleball.activities.base.BaseActivity;
 import com.example.tlupickleball.model.Account;
-import com.example.tlupickleball.network.api_model.auth.GenericResponse;
 import com.example.tlupickleball.network.api_model.auth.RegisterResponse;
-import com.example.tlupickleball.network.auth.AuthApi;
 import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.core.SessionManager;
 import com.example.tlupickleball.network.service.AuthService;
-import com.google.firebase.auth.FirebaseAuth;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RegisterActivity extends BaseActivity {
+public class RegisterActivity extends AuthActivity {
     private EditText emailEditText, passwordEditText, confirmPasswordEditText;
     private Button registerButton;
-    private AuthService authService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +34,6 @@ public class RegisterActivity extends BaseActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText);
         registerButton = findViewById(R.id.registerButton);
-
-        authService = ApiClient.getClient(this).create(AuthService.class);
 
         registerButton.setOnClickListener(v -> {
             showLoading();
@@ -64,7 +59,7 @@ public class RegisterActivity extends BaseActivity {
                 if(response.isSuccessful())
                 {
                     hideLoading();
-                    Toast.makeText(RegisterActivity.this, response.message(), Toast.LENGTH_SHORT).show();
+                    SessionManager.saveTokens(RegisterActivity.this, response.body().getIdToken(), response.body().getRefreshToken(), response.body().getUid());
                     Intent intent = new Intent(RegisterActivity.this, EmailVerificationActivity.class);
                     intent.putExtra("uid", response.body().getUid());
                     RegisterActivity.this.startActivity(intent);
