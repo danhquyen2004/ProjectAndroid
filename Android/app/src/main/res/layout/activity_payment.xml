@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
@@ -39,7 +40,7 @@
 
         <Spinner
             android:id="@+id/spinnerMonth"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,12 +84,13 @@
                 app:layout_constraintStart_toEndOf="@+id/tvFundLabel"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnPayFund"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/bg_blue"
+                android:backgroundTint="@null"
                 android:text="Đóng ngay!"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"
@@ -134,7 +136,7 @@
                 app:layout_constraintStart_toEndOf="@+id/tvPenaltyLabel"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnPayPenalty"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -155,7 +157,7 @@
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_marginTop="24dp"
-            android:background="@drawable/bg_blue"
+            android:background="@drawable/bg_gray"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center_vertical"

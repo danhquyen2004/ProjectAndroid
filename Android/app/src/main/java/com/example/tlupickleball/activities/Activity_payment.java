@@ -1,6 +1,7 @@
 package com.example.tlupickleball.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,7 @@ public class Activity_payment extends AppCompatActivity {
 
     private ImageButton btnBack;
     private Spinner spinnerMonth;
-    private TextView tvFundAmount, tvPenaltyAmount;
+    private TextView tvFundAmount, tvPenaltyAmount, tvContentQr;
     private Button btnPayFund, btnPayPenalty;
     private LinearLayout btnDonate;
 
@@ -39,6 +40,10 @@ public class Activity_payment extends AppCompatActivity {
 
     private List<Transaction> transactionList = new ArrayList<>();
     private TransactionAdapter transactionAdapter;
+    ImageView imageQr;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,8 +173,12 @@ public class Activity_payment extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.qr_finance, null);
 
-        ImageView imageQr = dialogView.findViewById(R.id.image_qr);
+        imageQr = dialogView.findViewById(R.id.image_qr);
         imageQr.setImageResource(R.drawable.qr_code); // đặt QR mẫu ở drawable
+
+        tvContentQr = dialogView.findViewById(R.id.txtContent_Donate);
+        tvContentQr.setText("CHÚ Ý:\nNội dung chuyển khoản: Họ Tên + Đã đóng");
+        tvContentQr.setTextColor(Color.parseColor("#FF0000"));
 
         builder.setView(dialogView);
         AlertDialog dialog = builder.create();
