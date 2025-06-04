@@ -1,12 +1,12 @@
 package com.example.tlupickleball.model;
 
-public class Transaction {
+public class Transaction_Personal {
     private String title;
     private String amount;
     private String time;
     private boolean isIncome;
 
-    public Transaction(String title, String amount, String time, boolean isIncome) {
+    public Transaction_Personal(String title, String amount, String time, boolean isIncome) {
         this.title = title;
         this.amount = amount;
         this.time = time;

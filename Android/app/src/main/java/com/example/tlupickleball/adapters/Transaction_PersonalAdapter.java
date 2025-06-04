@@ -10,16 +10,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.model.Transaction;
+import com.example.tlupickleball.model.Transaction_Personal;
 
 import java.util.List;
 
-public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
+public class Transaction_PersonalAdapter extends RecyclerView.Adapter<Transaction_PersonalAdapter.TransactionViewHolder> {
 
-    private List<Transaction> transactions;
+    private List<Transaction_Personal> transactionPersonals;
 
-    public TransactionAdapter(List<Transaction> transactions) {
-        this.transactions = transactions;
+    public Transaction_PersonalAdapter(List<Transaction_Personal> transactionPersonals) {
+        this.transactionPersonals = transactionPersonals;
     }
 
     public static class TransactionViewHolder extends RecyclerView.ViewHolder {
@@ -43,13 +43,13 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
-        Transaction transaction = transactions.get(position);
-        holder.tvTitle.setText(transaction.getTitle());
-        holder.tvAmount.setText(transaction.getAmount());
-        holder.tvTime.setText(transaction.getTime());
+        Transaction_Personal transactionPersonal = transactionPersonals.get(position);
+        holder.tvTitle.setText(transactionPersonal.getTitle());
+        holder.tvAmount.setText(transactionPersonal.getAmount());
+        holder.tvTime.setText(transactionPersonal.getTime());
 
         // Màu tiền
-        if (transaction.isIncome()) {
+        if (transactionPersonal.isIncome()) {
             holder.tvAmount.setTextColor(Color.parseColor("#009900")); // xanh
         } else {
             holder.tvAmount.setTextColor(Color.parseColor("#FF0000")); // đỏ
@@ -58,11 +58,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public int getItemCount() {
-        return transactions.size();
+        return transactionPersonals.size();
     }
 
-    public void setData(List<Transaction> newList) {
-        this.transactions = newList;
+    public void setData(List<Transaction_Personal> newList) {
+        this.transactionPersonals = newList;
         notifyDataSetChanged();
     }
 

@@ -13,8 +13,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.adapters.RankAdapter;
-import com.example.tlupickleball.adapters.TransactionAdapter;
 import com.example.tlupickleball.adapters.Transaction_adapter_fragment;
 
 

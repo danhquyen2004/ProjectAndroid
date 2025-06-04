@@ -20,8 +20,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.adapters.TransactionAdapter;
-import com.example.tlupickleball.model.Transaction;
+import com.example.tlupickleball.adapters.Transaction_PersonalAdapter;
+import com.example.tlupickleball.model.Transaction_Personal;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,8 +38,8 @@ public class Activity_payment extends AppCompatActivity {
     private final List<String> monthList = new ArrayList<>();
     private final int year = Calendar.getInstance().get(Calendar.YEAR);
 
-    private List<Transaction> transactionList = new ArrayList<>();
-    private TransactionAdapter transactionAdapter;
+    private List<Transaction_Personal> transactionPersonalList = new ArrayList<>();
+    private Transaction_PersonalAdapter transactionPersonalAdapter;
     ImageView imageQr;
 
 
@@ -149,21 +149,21 @@ public class Activity_payment extends AppCompatActivity {
 
     // Lọc danh sách giao dịch theo tháng
     private void filterTransactionsByMonth(int month) {
-        List<Transaction> filteredList = new ArrayList<>();
+        List<Transaction_Personal> filteredList = new ArrayList<>();
 
-        for (Transaction transaction : transactionList) {
+        for (Transaction_Personal transactionPersonal : transactionPersonalList) {
             // Giả sử định dạng ngày là "dd/MM/yyyy"
-            String[] parts = transaction.getTime().split("/");
+            String[] parts = transactionPersonal.getTime().split("/");
             if (parts.length >= 2) {
                 int transactionMonth = Integer.parseInt(parts[1]);
                 if (transactionMonth == month) {
-                    filteredList.add(transaction);
+                    filteredList.add(transactionPersonal);
                 }
             }
         }
 
-        if (transactionAdapter != null) {
-            transactionAdapter.setData(filteredList);
+        if (transactionPersonalAdapter != null) {
+            transactionPersonalAdapter.setData(filteredList);
         }
     }
 

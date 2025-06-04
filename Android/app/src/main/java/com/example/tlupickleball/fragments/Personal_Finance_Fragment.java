@@ -3,7 +3,6 @@ package com.example.tlupickleball.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,15 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.Activity_payment;
-import com.example.tlupickleball.adapters.TransactionAdapter;
-import com.example.tlupickleball.model.Transaction;
+import com.example.tlupickleball.adapters.Transaction_PersonalAdapter;
+import com.example.tlupickleball.model.Transaction_Personal;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,8 +35,8 @@ public class Personal_Finance_Fragment extends Fragment {
     int year = Calendar.getInstance().get(Calendar.YEAR);
 
     private RecyclerView rvTransactions_Personal;
-    private TransactionAdapter transactionAdapter;
-    private List<Transaction> transactionList;
+    private Transaction_PersonalAdapter transactionPersonalAdapter;
+    private List<Transaction_Personal> transactionPersonalList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,34 +93,34 @@ public class Personal_Finance_Fragment extends Fragment {
         rvTransactions_Personal = rootView.findViewById(R.id.rvTransaction_Personal);
         rvTransactions_Personal.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        transactionList = new ArrayList<>();
+        transactionPersonalList = new ArrayList<>();
 
         // Tạo dữ liệu đúng với constructor Transaction(title, amount, time, status, isIncome)
-        transactionList.add(new Transaction("Đóng quỹ", "+100.000đ", "10/04/2025",  true));
-        transactionList.add(new Transaction("Đóng quỹ", "+100.000đ", "10/05/2025",  true));
-        transactionList.add(new Transaction("Đã đóng tiền phạt", "+100.000đ", "11/06/2025",  true));
-        transactionList.add(new Transaction("Đóng quỹ", "+100.000đ", "10/06/2025",  true));
-        transactionList.add(new Transaction("Đóng quỹ", "+100.000đ", "10/03/2025",  true));
-        transactionList.add(new Transaction("Đã đóng tiền phạt", "+100.000đ", "11/05/2025",  true));
+        transactionPersonalList.add(new Transaction_Personal("Đóng quỹ", "+100.000đ", "10/04/2025",  true));
+        transactionPersonalList.add(new Transaction_Personal("Đóng quỹ", "+100.000đ", "10/05/2025",  true));
+        transactionPersonalList.add(new Transaction_Personal("Đã đóng tiền phạt", "+100.000đ", "11/06/2025",  true));
+        transactionPersonalList.add(new Transaction_Personal("Đóng quỹ", "+100.000đ", "10/06/2025",  true));
+        transactionPersonalList.add(new Transaction_Personal("Đóng quỹ", "+100.000đ", "10/03/2025",  true));
+        transactionPersonalList.add(new Transaction_Personal("Đã đóng tiền phạt", "+100.000đ", "11/05/2025",  true));
 
-        transactionAdapter = new TransactionAdapter(transactionList);
-        rvTransactions_Personal.setAdapter(transactionAdapter);
+        transactionPersonalAdapter = new Transaction_PersonalAdapter(transactionPersonalList);
+        rvTransactions_Personal.setAdapter(transactionPersonalAdapter);
     }
 
     private void filterTransactionsByMonth(int month) {
-        List<Transaction> filteredList = new ArrayList<>();
+        List<Transaction_Personal> filteredList = new ArrayList<>();
 
-        for (Transaction transaction : transactionList) {
+        for (Transaction_Personal transactionPersonal : transactionPersonalList) {
             // Giả sử ngày có định dạng dd/MM/yyyy
-            String[] parts = transaction.getTime().split("/");
+            String[] parts = transactionPersonal.getTime().split("/");
             int transactionMonth = Integer.parseInt(parts[1]);
 
             if (transactionMonth == month) {
-                filteredList.add(transaction);
+                filteredList.add(transactionPersonal);
             }
         }
 
-        transactionAdapter.setData(filteredList); // Cập nhật danh sách đã lọc
+        transactionPersonalAdapter.setData(filteredList); // Cập nhật danh sách đã lọc
     }
 
     private void initViews() {
