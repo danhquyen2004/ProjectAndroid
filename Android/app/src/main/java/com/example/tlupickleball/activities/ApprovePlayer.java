@@ -36,6 +36,9 @@ public class ApprovePlayer extends AppCompatActivity {
     private ApprovePlayerAdapter adapter;
     private List<Player> lstPlayer;
     private static final float ACTION_BUTTON_WIDTH = 200;
+    private final float buttonTotalWidth = ACTION_BUTTON_WIDTH * 2;
+
+    private boolean isSwipeEnabled = false; // Biến để kiểm soát việc vuốt
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,44 +49,23 @@ public class ApprovePlayer extends AppCompatActivity {
         initData();
         setupRecyclerView();
 
-        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            private final float buttonTotalWidth = ACTION_BUTTON_WIDTH * 2;
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             private float currentSwipeDistance = 0;
 
-            private void drawText(Canvas canvas, String text, RectF button, int color) {
-                Paint textPaint = new Paint();
-                textPaint.setColor(color);
-                textPaint.setTextSize(40);
-                textPaint.setTextAlign(Paint.Align.CENTER);
-                textPaint.setAntiAlias(true);
-
-                float textX = button.centerX();
-                float textY = button.centerY() - ((textPaint.descent() + textPaint.ascent()) / 2);
-                canvas.drawText(text, textX, textY, textPaint);
-            }
-
             @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                // Ngay lập tức đặt lại vị trí item với các nút hiển thị
-                viewHolder.itemView.setTranslationX(-buttonTotalWidth);
-            }
-
-            @Override
-            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                                    @NonNull RecyclerView.ViewHolder viewHolder,
                                     float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 View itemView = viewHolder.itemView;
 
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                    if (dX < 0) { // Vuốt sang trái
-                        // Giới hạn khoảng vuốt tới width của 2 button
+                    float currentTranslation = itemView.getTranslationX();
+
+                    if (dX < 0) { // Vuốt trái
                         float swipeDistance = Math.max(dX, -buttonTotalWidth);
 
-                        // Vẽ buttons
+                        // Vẽ nút Từ chối (đỏ)
                         Paint rejectPaint = new Paint();
                         rejectPaint.setColor(Color.RED);
                         RectF rejectButton = new RectF(
@@ -94,6 +76,7 @@ public class ApprovePlayer extends AppCompatActivity {
                         );
                         c.drawRect(rejectButton, rejectPaint);
 
+                        // Vẽ nút Quay lại (xám)
                         Paint backPaint = new Paint();
                         backPaint.setColor(Color.GRAY);
                         RectF backButton = new RectF(
@@ -107,24 +90,38 @@ public class ApprovePlayer extends AppCompatActivity {
                         drawText(c, "Từ chối", rejectButton, Color.WHITE);
                         drawText(c, "Quay lại", backButton, Color.WHITE);
 
-                        // Di chuyển item
                         itemView.setTranslationX(swipeDistance);
                         currentSwipeDistance = swipeDistance;
-                    } else if (dX > 0) { // Vuốt phải để reset
-                        itemView.setTranslationX(0);
-                        currentSwipeDistance = 0;
+
+                    } else if (dX > 0) { // Vuốt phải
+                        if (currentTranslation < 0) { // Chỉ xử lý khi đã vuốt trái trước đó
+                            // Tính toán vị trí mới, giữ trong khoảng từ -buttonTotalWidth đến 0
+                            float newTranslation = Math.min(0, currentTranslation + dX);
+                            itemView.setTranslationX(newTranslation);
+                            currentSwipeDistance = newTranslation;
+                        } else {
+                            // Nếu chưa vuốt trái, không cho vuốt phải
+                            itemView.setTranslationX(0);
+                        }
                     }
                 }
             }
 
             @Override
-            public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
-                return 0.5f; // Đặt ngưỡng vuốt để trigger onSwiped
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
             }
 
             @Override
-            public float getSwipeEscapeVelocity(float defaultValue) {
-                return defaultValue * 10; // Tăng velocity cần thiết để trigger swipe
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                if (direction == ItemTouchHelper.LEFT) {
+                    // Khi vuốt trái hoàn tất, hiện buttons
+                    viewHolder.itemView.setTranslationX(-buttonTotalWidth);
+                } else if (direction == ItemTouchHelper.RIGHT) {
+                    // Khi vuốt phải hoàn tất, reset về vị trí ban đầu
+                    viewHolder.itemView.setTranslationX(0);
+                    adapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                }
             }
         };
 
@@ -137,27 +134,26 @@ public class ApprovePlayer extends AppCompatActivity {
             public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
                 View child = rv.findChildViewUnder(e.getX(), e.getY());
                 if (child != null && e.getAction() == MotionEvent.ACTION_UP) {
-                    // Lấy raw touch coordinates
                     float rawTouchX = e.getRawX();
-
-                    // Lấy tọa độ tuyệt đối của item
                     int[] itemLocation = new int[2];
                     child.getLocationOnScreen(itemLocation);
                     float itemRight = itemLocation[0] + child.getWidth();
+                    float translationX = child.getTranslationX();
 
-                    // Tính toán khoảng cách từ điểm chạm đến cạnh phải của item
-                    float distanceFromRight = itemRight - rawTouchX;
+                    // Cộng thêm translationX để tính đúng vùng bấm khi vuốt
+                    float adjustedItemRight = itemRight + buttonTotalWidth;
+                    float distanceFromRight = adjustedItemRight - rawTouchX;
 
-                    if (distanceFromRight <= ACTION_BUTTON_WIDTH * 2) { // Trong vùng buttons
+                    if (distanceFromRight >= 0 && distanceFromRight <= ACTION_BUTTON_WIDTH * 2) {
                         int position = rv.getChildAdapterPosition(child);
                         if (position != RecyclerView.NO_POSITION) {
                             if (distanceFromRight <= ACTION_BUTTON_WIDTH) {
-                                // Click vào nút Quay lại
+                                // Bấm nút Quay lại
                                 child.setTranslationX(0);
                                 adapter.notifyItemChanged(position);
                                 return true;
-                            } else if (distanceFromRight <= ACTION_BUTTON_WIDTH * 2) {
-                                // Click vào nút Từ chối
+                            } else {
+                                // Bấm nút Từ chối
                                 tuChoiThanhVien(position);
                                 return true;
                             }
@@ -179,6 +175,18 @@ public class ApprovePlayer extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void drawText(Canvas canvas, String text, RectF button, int color) {
+        Paint textPaint = new Paint();
+        textPaint.setColor(color);
+        textPaint.setTextSize(40);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setAntiAlias(true);
+
+        float textX = button.centerX();
+        float textY = button.centerY() - ((textPaint.descent() + textPaint.ascent()) / 2);
+        canvas.drawText(text, textX, textY, textPaint);
     }
 
     private void initData() {
