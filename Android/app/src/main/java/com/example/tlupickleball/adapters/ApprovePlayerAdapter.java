@@ -1,6 +1,7 @@
 package com.example.tlupickleball.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.PlayerInfor;
 import com.example.tlupickleball.model.Player;
 
 import java.util.List;
@@ -38,6 +40,15 @@ public class ApprovePlayerAdapter extends RecyclerView.Adapter<ApprovePlayerAdap
         holder.txtName.setText(player.getName());
         holder.txtEmail.setText(String.valueOf(player.getEmail()));
         holder.imgAvatar.setImageResource(player.getAvatarResourceId());
+
+        holder.itemView.setOnClickListener(v -> {
+            Context context = v.getContext();
+            Intent intent = new Intent(context, PlayerInfor.class);
+            intent.putExtra("name", player.getName());
+            intent.putExtra("email", player.getEmail());
+            intent.putExtra("avatar", player.getAvatarResourceId());
+            context.startActivity(intent);
+        });
     }
 
     @Override
