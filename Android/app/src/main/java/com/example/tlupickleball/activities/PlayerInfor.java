@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -19,6 +21,7 @@ import com.example.tlupickleball.R;
 
 public class PlayerInfor extends AppCompatActivity {
 
+    Dialog dialogForm;
     Button btnApprove, btnReject;
     ImageButton btnBack;
 
@@ -50,18 +53,22 @@ public class PlayerInfor extends AppCompatActivity {
     }
 
     private void showDialogForm(boolean isApprove) {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.view_dialog_form);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogForm = new Dialog(PlayerInfor.this);
+        dialogForm.setContentView(R.layout.view_dialog_form);
+        dialogForm.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialogForm.getWindow().setBackgroundDrawable(getDrawable(R.drawable.custom_dialog_box));
+        dialogForm.setCancelable(false);
 
         // Tìm các view trong dialog
-        TextView titleDialog = dialog.findViewById(R.id.tv_confirm);
-        TextView messageDialog = dialog.findViewById(R.id.tv_confirm_infor);
-        Button btnDiaLogOK = dialog.findViewById(R.id.btn_approve);
-        Button btnDiaLogCancel = dialog.findViewById(R.id.btn_reject);
+        ImageView iconDialog = dialogForm.findViewById(R.id.icon_dialog);
+        TextView titleDialog = dialogForm.findViewById(R.id.tv_confirm);
+        TextView messageDialog = dialogForm.findViewById(R.id.tv_confirm_infor);
+        Button btnDiaLogOK = dialogForm.findViewById(R.id.btn_approve);
+        Button btnDiaLogCancel = dialogForm.findViewById(R.id.btn_reject);
 
         // Cập nhật nội dung dialog theo trường hợp
         if (isApprove) {
+            iconDialog.setImageResource(R.drawable.info_green_fill);
             titleDialog.setText("Xác nhận phê duyệt");
             messageDialog.setText("Bạn có chắc chắn muốn phê duyệt người chơi này?");
             btnDiaLogOK.setText("Phê duyệt");
@@ -78,12 +85,12 @@ public class PlayerInfor extends AppCompatActivity {
             } else {
                 // TODO: Xử lý từ chối
             }
-            dialog.dismiss();
+            dialogForm.dismiss();
             finish();
         });
 
-        btnDiaLogCancel.setOnClickListener(v -> dialog.dismiss());
+        btnDiaLogCancel.setOnClickListener(v -> dialogForm.dismiss());
 
-        dialog.show();
+        dialogForm.show();
     }
 }
