@@ -55,6 +55,8 @@ public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 .setIcon(R.drawable.ic_finance));
         tabLayout.addTab(tabLayout.newTab().setText("Xếp hạng")
                 .setIcon(R.drawable.ic_rank));
+        tabLayout.addTab(tabLayout.newTab().setText("Hội viên")
+                .setIcon(R.drawable.ic_membercontroller));
 
         tabLayout.addOnTabSelectedListener(this);
 

@@ -24,6 +24,7 @@ public class PlayerInfor extends AppCompatActivity {
     Dialog dialogForm;
     Button btnApprove, btnReject;
     ImageButton btnBack;
+    private boolean isDialogShowing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,11 +54,17 @@ public class PlayerInfor extends AppCompatActivity {
     }
 
     private void showDialogForm(boolean isApprove) {
+        if (isDialogShowing) {
+            return; // Nếu dialog đã hiển thị, không làm gì cả
+        }
+
         dialogForm = new Dialog(PlayerInfor.this);
         dialogForm.setContentView(R.layout.view_dialog_form);
         dialogForm.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialogForm.getWindow().setBackgroundDrawable(getDrawable(R.drawable.custom_dialog_box));
         dialogForm.setCancelable(false);
+
+        isDialogShowing = true;
 
         // Tìm các view trong dialog
         ImageView iconDialog = dialogForm.findViewById(R.id.icon_dialog);
@@ -85,11 +92,20 @@ public class PlayerInfor extends AppCompatActivity {
             } else {
                 // TODO: Xử lý từ chối
             }
+            isDialogShowing = false; // Đánh dấu dialog đã đóng
             dialogForm.dismiss();
             finish();
         });
 
-        btnDiaLogCancel.setOnClickListener(v -> dialogForm.dismiss());
+        btnDiaLogCancel.setOnClickListener(v -> {
+            isDialogShowing = false; // Reset trạng thái
+            dialogForm.dismiss();
+        });
+
+        // Thêm listener khi dialog bị dismiss
+        dialogForm.setOnDismissListener(dialog -> {
+            isDialogShowing = false;
+        });
 
         dialogForm.show();
     }

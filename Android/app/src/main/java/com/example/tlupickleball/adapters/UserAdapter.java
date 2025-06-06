@@ -10,6 +10,7 @@ import com.example.tlupickleball.fragments.Duo_Rank_Fragment;
 import com.example.tlupickleball.fragments.Finance_Fragment;
 import com.example.tlupickleball.fragments.Home_Fragment;
 import com.example.tlupickleball.fragments.Matches_Fragment;
+import com.example.tlupickleball.fragments.Member_Controller;
 import com.example.tlupickleball.fragments.Rank_Fragment;
 
 public class UserAdapter extends FragmentStateAdapter {
@@ -27,12 +28,14 @@ public class UserAdapter extends FragmentStateAdapter {
                 return new Finance_Fragment();
             case 3:
                 return new Rank_Fragment();
+            case 4:
+                return new Member_Controller();
         }
         return new Home_Fragment();
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 5;
     }
 }
