@@ -27,7 +27,7 @@ exports.register = async (req, res) => {
     await admin.firestore().collection("users").doc(uid).set({
       email,
       role: "member",
-      isApproved: false,
+      approvalStatus: "pending",
       isDisabled: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });

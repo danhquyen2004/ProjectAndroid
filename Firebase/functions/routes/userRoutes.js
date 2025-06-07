@@ -7,6 +7,12 @@ const { requireAdmin } = require("../middlewares/requireAdmin");
 // Người dùng gửi thông tin cá nhân của mình
 router.post("/submit", verifyToken, userController.submitProfile);
 
+// Quản lý trạng thái phê duyệt người dùng 
+router.post("/:uid/approval-request", verifyToken, userController.submitApprovalRequest);
+router.post("/:uid/reject", verifyToken, requireAdmin, userController.rejectUser);
+router.post("/:uid/approve", verifyToken, requireAdmin, userController.approveUser);
+router.get("/pending-users", verifyToken, requireAdmin, userController.getPendingUsers);
+
 // Xem thông tin người dùng cụ thể (tự xem hoặc admin)
 router.get("/:uid", verifyToken, userController.getUserById);
 router.post("/", verifyToken, requireAdmin, userController.createUser);

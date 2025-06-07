@@ -64,7 +64,7 @@ public class EmailVerificationActivity extends AuthActivity {
 
                             if (response.body().isEmailVerified()) {
                                 Toast.makeText(EmailVerificationActivity.this, "✅ Email verified!", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(EmailVerificationActivity.this, LoginActivity.class));
+                                startActivity(new Intent(EmailVerificationActivity.this, ProfileActivity.class));
                                 finish();
                             } else {
                                 handler.postDelayed( checkVerifiedRunnable, 5000);

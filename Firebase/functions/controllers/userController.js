@@ -3,21 +3,20 @@ const admin = require("../utils/firebase");
 // [POST] /users/profile/submit
 exports.submitProfile = async (req, res) => {
   try {
-    const uid = req.uid; // Middleware đã decode token và gán req.uid
-    const { fullName, birthDate, gender, level, memberCode } = req.body;
+    const uid = req.uid;
+    const { fullName, birthDate, gender, level, memberCode, avatarUrl } = req.body;
 
-    // Validate các trường bắt buộc
     if (!fullName || !birthDate || !gender) {
       return res.status(400).send("Missing required profile fields.");
     }
 
-    // Dữ liệu chuẩn hóa
     const profileData = {
       fullName,
-      gender,                        // "male" | "female"
-      birthDate: new Date(birthDate), // ISO string hoặc yyyy-mm-dd
-      level: level || "new",          // default nếu chưa nhập
-      memberCode: memberCode || ""
+      gender,
+      birthDate: new Date(birthDate),
+      level: level || "new",
+      memberCode: memberCode || "",
+      avatarUrl: avatarUrl || ""
     };
 
     const profileRef = admin.firestore()
@@ -29,7 +28,6 @@ exports.submitProfile = async (req, res) => {
     await profileRef.set(profileData, { merge: true });
 
     return res.status(200).send("Profile submitted successfully.");
-
   } catch (e) {
     console.error("submitProfile error:", e);
     return res.status(500).send("Error submitting profile.");
@@ -37,21 +35,113 @@ exports.submitProfile = async (req, res) => {
 };
 
 
-// Admin duyệt người dùng
+exports.submitApprovalRequest = async (req, res) => {
+  try {
+    const uid = req.uid; // middleware đã decode từ token
+    const userRef = admin.firestore().collection("users").doc(uid);
+
+    await userRef.set({ approvalStatus: "pending" }, { merge: true });
+
+    return res.status(200).send("Approval request submitted.");
+  } catch (e) {
+    console.error("submitApprovalRequest error:", e);
+    return res.status(500).send("Failed to submit approval request.");
+  }
+};
+
+exports.rejectUser = async (req, res) => {
+  try {
+    const targetUid = req.params.uid;
+
+    await admin.firestore().collection("users").doc(targetUid).set({
+      approvalStatus: "rejected"
+    }, { merge: true });
+
+    return res.status(200).send("User has been rejected.");
+  } catch (e) {
+    console.error("rejectUser error:", e);
+    return res.status(500).send("Failed to reject user.");
+  }
+};
+
 exports.approveUser = async (req, res) => {
   try {
     const targetUid = req.params.uid;
 
     await admin.firestore().collection("users").doc(targetUid).set({
-      approved: true
+      approvalStatus: "approved"
     }, { merge: true });
 
-    res.send("User approved");
+    return res.status(200).send("User has been approved.");
   } catch (e) {
-    console.error(e);
-    res.status(500).send("Error approving user");
+    console.error("approveUser error:", e);
+    return res.status(500).send("Failed to approve user.");
   }
 };
+
+exports.getPendingUsers = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const startAfterUid = req.query.startAfter || null;
+
+    let query = admin.firestore()
+      .collection("users")
+      .where("approvalStatus", "==", "pending")
+      .orderBy("createdAt", "desc")
+      .limit(limit);
+
+    if (startAfterUid) {
+      const startDoc = await admin.firestore().collection("users").doc(startAfterUid).get();
+      if (startDoc.exists) {
+        query = query.startAfter(startDoc);
+      } else {
+        return res.status(400).json({ error: "Invalid startAfter UID" });
+      }
+    }
+
+    const snapshot = await query.get();
+
+    // Lấy dữ liệu profile tương ứng
+    const users = await Promise.all(snapshot.docs.map(async doc => {
+      const uid = doc.id;
+      const data = doc.data();
+
+      let fullName = null;
+      try {
+        const profileSnap = await admin.firestore()
+          .collection("users")
+          .doc(uid)
+          .collection("profile")
+          .doc("info")
+          .get();
+
+        if (profileSnap.exists) {
+          fullName = profileSnap.data().fullName || null;
+        }
+      } catch (_) {}
+
+      return {
+        uid,
+        email: data.email || null,
+        createdAt: data.createdAt?.toDate().toISOString() || null,
+        fullName,
+        approvalStatus: data.approvalStatus || null
+      };
+    }));
+
+    const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+    const nextPageToken = lastDoc ? lastDoc.id : null;
+
+    return res.status(200).json({ users, nextPageToken });
+
+  } catch (e) {
+    console.error("getPendingUsers error:", e);
+    return res.status(500).json({ error: "Failed to fetch pending users", message: e.message, stack: e.stack });
+  }
+};
+
+
+
 
 // Admin thay đổi vai trò người dùng
 exports.setUserRole = async (req, res) => {

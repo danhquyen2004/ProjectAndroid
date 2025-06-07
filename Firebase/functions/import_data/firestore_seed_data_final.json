@@ -155,7 +155,8 @@
         "_nanoseconds": 0
       },
       "level": "sơ trung",
-      "memberCode": "MB-1000"
+      "memberCode": "MB-1000",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user2": {
       "userId": "user2",
@@ -166,7 +167,8 @@
         "_nanoseconds": 0
       },
       "level": "new",
-      "memberCode": "MB-1001"
+      "memberCode": "MB-1001",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user3": {
       "userId": "user3",
@@ -177,7 +179,8 @@
         "_nanoseconds": 0
       },
       "level": "cao trung",
-      "memberCode": "MB-1002"
+      "memberCode": "MB-1002",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user4": {
       "userId": "user4",
@@ -188,7 +191,8 @@
         "_nanoseconds": 0
       },
       "level": "cao trung",
-      "memberCode": "MB-1003"
+      "memberCode": "MB-1003",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user5": {
       "userId": "user5",
@@ -199,7 +203,8 @@
         "_nanoseconds": 0
       },
       "level": "sơ trung",
-      "memberCode": "MB-1004"
+      "memberCode": "MB-1004",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user6": {
       "userId": "user6",
@@ -210,7 +215,8 @@
         "_nanoseconds": 0
       },
       "level": "new",
-      "memberCode": "MB-1005"
+      "memberCode": "MB-1005",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user7": {
       "userId": "user7",
@@ -221,7 +227,8 @@
         "_nanoseconds": 0
       },
       "level": "sơ trung",
-      "memberCode": "MB-1006"
+      "memberCode": "MB-1006",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user8": {
       "userId": "user8",
@@ -232,7 +239,8 @@
         "_nanoseconds": 0
       },
       "level": "sơ trung",
-      "memberCode": "MB-1007"
+      "memberCode": "MB-1007",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user9": {
       "userId": "user9",
@@ -243,7 +251,8 @@
         "_nanoseconds": 0
       },
       "level": "new",
-      "memberCode": "MB-1008"
+      "memberCode": "MB-1008",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user10": {
       "userId": "user10",
@@ -254,7 +263,8 @@
         "_nanoseconds": 0
       },
       "level": "sơ trung",
-      "memberCode": "MB-1009"
+      "memberCode": "MB-1009",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user11": {
       "userId": "user11",
@@ -265,7 +275,8 @@
         "_nanoseconds": 0
       },
       "level": "cao trung",
-      "memberCode": "MB-1010"
+      "memberCode": "MB-1010",
+      "avatar": "https://example.com/default_avatar.png"
     },
     "user12": {
       "userId": "user12",
@@ -276,7 +287,8 @@
         "_nanoseconds": 0
       },
       "level": "sơ trung",
-      "memberCode": "MB-1011"
+      "memberCode": "MB-1011",
+      "avatar": "https://example.com/default_avatar.png"
     }
   },
   "transactions": {
