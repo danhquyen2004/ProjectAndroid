@@ -41,6 +41,8 @@ public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSe
             return insets;
         });
 
+        tabLayout.setTabMode(TabLayout.MODE_FIXED); // Chế độ fixed width
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL); // Fill full width
 
         viewPager2 = findViewById(R.id.viewPager2);
         FragmentManager manager = getSupportFragmentManager();

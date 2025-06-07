@@ -35,6 +35,7 @@
             app:tabMode="fixed"
             app:tabGravity="fill"
             app:tabMaxWidth="0dp"
+            app:tabMinWidth="0dp"
             app:tabTextAppearance="@style/CustomTabTextAppearance" />
 
     </FrameLayout>
