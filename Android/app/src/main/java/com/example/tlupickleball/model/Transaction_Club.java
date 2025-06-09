@@ -28,4 +28,30 @@ public class Transaction_Club {
     public String getAmount() {
         return amount;
     }
+
+    public String getType() {
+        if (amount.startsWith("+")) return "Thu";
+        else return "Chi";
+    }
+
+    public int getAmountValue() {
+        try {
+            // Loại bỏ ký tự "+" hoặc "-" và "đ", sau đó parse thành số
+            String cleaned = amount.replace("+", "").replace("-", "").replace(".", "").replace("đ", "").trim();
+            return Integer.parseInt(cleaned);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public java.util.Date getDateAsDate() {
+        try {
+            String[] parts = date.split(" - ");
+            return new java.text.SimpleDateFormat("dd/MM/yyyy").parse(parts[1]); // "10/06/2025"
+        } catch (Exception e) {
+            return new java.util.Date(); // fallback nếu lỗi
+        }
+    }
+
+
 }

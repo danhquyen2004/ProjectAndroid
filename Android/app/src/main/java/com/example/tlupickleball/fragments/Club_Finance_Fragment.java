@@ -1,6 +1,7 @@
 package com.example.tlupickleball.fragments;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,17 +15,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.member_fund_manager;
 import com.example.tlupickleball.adapters.Transaction_ClubAdapter;
-import com.example.tlupickleball.adapters.Transaction_PersonalAdapter;
 import com.example.tlupickleball.model.Transaction_Club;
-import com.example.tlupickleball.model.Transaction_Personal;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.SimpleDateFormat;
@@ -47,6 +46,7 @@ public class Club_Finance_Fragment extends Fragment {
     private RecyclerView rvTransactions;
     private Transaction_ClubAdapter transactionClubAdapter;
     private List<Transaction_Club> transactionClubList;
+    private int totalRevenue, totalExpense;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,6 +70,11 @@ public class Club_Finance_Fragment extends Fragment {
     }
 
     private void setupListeners() {
+        llDonate.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), member_fund_manager.class);
+            startActivity(intent);
+        });
+
         btnAddExpense.setOnClickListener(v -> showAddExpensePopup());
     }
 
@@ -132,17 +137,24 @@ public class Club_Finance_Fragment extends Fragment {
 
     private void filterTransactionsByMonth(int month) {
         List<Transaction_Club> filteredList = new ArrayList<>();
-
-        for (Transaction_Club transactionClub : transactionClubList) {
-            // Giả sử ngày có định dạng dd/MM/yyyy
-            String[] parts = transactionClub.getDate().split("/");
-            int transactionMonth = Integer.parseInt(parts[1]);
+        for (Transaction_Club transaction : transactionClubList) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(transaction.getDateAsDate());
+            int transactionMonth = calendar.get(Calendar.MONTH) + 1;
             if (transactionMonth == month) {
-                filteredList.add(transactionClub);
+                filteredList.add(transaction);
             }
         }
 
         transactionClubAdapter.setData(filteredList); // Cập nhật danh sách đã lọc
+        // Tính và hiển thị các chỉ số
+        int revenue = TotalRevenueForMonth(month);
+        int expense = TotalExpenseForMonth(month);
+        int remainingFund = RemainingFund();
+
+        txtRevenue.setText(formatCurrency(revenue));
+        txtExpenses.setText(formatCurrency(expense));
+        txtFund.setText(formatCurrency(remainingFund));
     }
 
     // Hàm này sẽ được gọi khi người dùng nhấn nút "Thêm giao dịch"
@@ -194,5 +206,53 @@ public class Club_Finance_Fragment extends Fragment {
         dialog.show();
     }
 
+
+    private int TotalRevenueForMonth(int month) {
+        totalRevenue = 0;
+        for (Transaction_Club transaction : transactionClubList) {
+            if (transaction.getType().equals("Thu")) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(transaction.getDateAsDate());
+                int transactionMonth = calendar.get(Calendar.MONTH) + 1;
+                if (transactionMonth == month) {
+                    totalRevenue += transaction.getAmountValue();
+                }
+            }
+        }
+        return totalRevenue;
+    }
+
+    private int TotalExpenseForMonth(int month) {
+        totalExpense = 0;
+        for (Transaction_Club transaction : transactionClubList) {
+            if (transaction.getType().equals("Chi")) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(transaction.getDateAsDate());
+                int transactionMonth = calendar.get(Calendar.MONTH) + 1;
+                if (transactionMonth == month) {
+                    totalExpense += transaction.getAmountValue();
+                }
+            }
+        }
+        return totalExpense;
+    }
+
+    private int RemainingFund() {
+        totalRevenue = 0;
+        totalExpense = 0;
+        for (Transaction_Club transaction : transactionClubList) {
+            if (transaction.getType().equals("Thu")) {
+                totalRevenue += transaction.getAmountValue();
+            } else if (transaction.getType().equals("Chi")) {
+                totalExpense += transaction.getAmountValue();
+            }
+        }
+
+        return Math.max(totalRevenue - totalExpense, 0);
+    }
+
+    private String formatCurrency(int amount) {
+        return String.format("%,d", amount).replace(',', '.') + "đ";
+    }
 
 }

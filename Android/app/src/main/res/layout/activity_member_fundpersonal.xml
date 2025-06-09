@@ -13,18 +13,48 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
+
+        <ImageButton
+            android:id="@+id/id_back_donate_manager"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/white"
+            android:src="@drawable/ic_back"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.045"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <!-- Spinner tháng -->
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Chi tiết"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <!-- Avatar + Tên -->
 
         <Spinner
             android:id="@+id/spinnerMonth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="@+id/tvTitle"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
-
-        <!-- Avatar + Tên -->
         <View
             android:id="@+id/view"
             android:layout_width="match_parent"
@@ -139,39 +169,8 @@
             app:layout_constraintEnd_toEndOf="@id/image_avatar" />
 
 
-        <LinearLayout
-            android:id="@+id/btn_click_pay"
-            android:layout_width="140dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_blue"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvName">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_pay_click" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Đóng tiền"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
-        </LinearLayout>
-
         <TextView
-            android:id="@+id/tvName"
+            android:id="@+id/tvName_personal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -199,7 +198,7 @@
             app:layout_constraintTop_toBottomOf="@+id/view2" />
 
         <TextView
-            android:id="@+id/id_fund"
+            android:id="@+id/id_fund_personal"
             android:layout_width="160dp"
             android:layout_height="35dp"
             android:layout_marginTop="8dp"
@@ -214,7 +213,7 @@
         <!--Phần phạt-->
 
         <TextView
-            android:id="@+id/id_donate"
+            android:id="@+id/id_donate_personal"
             android:layout_width="160dp"
             android:layout_height="35dp"
             android:layout_marginTop="8dp"
@@ -224,7 +223,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.876"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/id_fund" />
+            app:layout_constraintTop_toBottomOf="@+id/id_fund_personal" />
 
         <TextView
             android:id="@+id/penalty"
@@ -237,10 +236,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.737"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/id_donate" />
+            app:layout_constraintTop_toBottomOf="@+id/id_donate_personal" />
 
         <TextView
-            android:id="@+id/id_penalty"
+            android:id="@+id/id_penalty_personal"
             android:layout_width="160dp"
             android:layout_height="35dp"
             android:layout_marginTop="8dp"
@@ -253,7 +252,7 @@
             app:layout_constraintTop_toBottomOf="@+id/penalty" />
 
         <TextView
-            android:id="@+id/id_penalty_done"
+            android:id="@+id/id_penalty_done_personal"
             android:layout_width="160dp"
             android:layout_height="35dp"
             android:layout_marginTop="8dp"
@@ -263,10 +262,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.876"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/id_penalty" />
+            app:layout_constraintTop_toBottomOf="@+id/id_penalty_personal" />
 
         <TextView
-            android:id="@+id/id_penalty_missing"
+            android:id="@+id/id_penalty_missing_personal"
             android:layout_width="160dp"
             android:layout_height="35dp"
             android:layout_marginTop="8dp"
@@ -276,7 +275,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.876"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/id_penalty_done" />
+            app:layout_constraintTop_toBottomOf="@+id/id_penalty_done_personal" />
 
         <View
             android:id="@+id/view3"
@@ -286,7 +285,7 @@
             android:background="@drawable/bg_line"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/id_penalty_missing" />
+            app:layout_constraintTop_toBottomOf="@+id/id_penalty_missing_personal" />
 
         <!-- Lịch sử giao dịch -->
         <androidx.recyclerview.widget.RecyclerView
@@ -297,7 +296,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view3" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

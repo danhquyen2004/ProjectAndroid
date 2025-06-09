@@ -43,11 +43,22 @@ public class Personal_Finance_Fragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView =  inflater.inflate(R.layout.fragment_personal_finance, container, false);
-
+        initViews();
+        setupListeners();
         setupMonthSpinner();
         setupRecyclerView();
-        initViews();
         return rootView;
+    }
+
+    private void initViews() {
+        btnClick = rootView.findViewById(R.id.btn_click_pay);
+    }
+
+    private void setupListeners(){
+        btnClick.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), Activity_payment.class);
+            startActivity(intent);
+        });
     }
 
     private void setupMonthSpinner() {
@@ -122,29 +133,5 @@ public class Personal_Finance_Fragment extends Fragment {
 
         transactionPersonalAdapter.setData(filteredList); // Cập nhật danh sách đã lọc
     }
-
-    private void initViews() {
-        btnClick = rootView.findViewById(R.id.btn_click_pay);
-
-        btnClick.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), Activity_payment.class);
-            startActivity(intent);
-            });
-    }
-
-
-
-
-//    private void initViews() {
-//        btnDonate = rootView.findViewById(R.id.btn_donate);
-//        btnFund = rootView.findViewById(R.id.btn_contribute_fund);
-//        btnFine = rootView.findViewById(R.id.btn_fine);
-//
-//        View.OnClickListener qrClickListener = v -> showQrPopup();
-//
-//        btnDonate.setOnClickListener(qrClickListener);
-//        btnFund.setOnClickListener(qrClickListener);
-//        btnFine.setOnClickListener(qrClickListener);
-//    }
 
 }
