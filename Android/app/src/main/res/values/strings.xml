@@ -11,4 +11,10 @@
     <string name="password">Mật khẩu</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="more">Khác</string>
+    <string-array name="number_of_sets_array">
+        <item>1 set</item>
+        <item>3 sets</item>
+        <item>5 sets</item>
+    </string-array>
 </resources>
+

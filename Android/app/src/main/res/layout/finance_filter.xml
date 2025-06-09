@@ -50,7 +50,7 @@
             android:id="@+id/ivCalendar"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_calender" />
+            android:src="@drawable/ic_calendar" />
     </LinearLayout>
 
     <Button

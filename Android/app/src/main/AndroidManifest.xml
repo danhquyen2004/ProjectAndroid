@@ -31,9 +31,6 @@
             android:name=".activities.notification"
             android:exported="false" />
         <activity
-            android:name=".activities.record_the_match"
-            android:exported="false" />
-        <activity
             android:name=".activities.wait_home"
             android:exported="false" />
         <activity

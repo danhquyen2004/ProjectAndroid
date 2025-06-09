@@ -127,4 +127,18 @@ public class DateAdapter extends RecyclerView.Adapter<DateAdapter.DateViewHolder
             txtDate = itemView.findViewById(R.id.txtDate);
         }
     }
+
+    // THÊM PHƯƠNG THỨC NÀY VÀO ĐÂY
+    public void setSelectedPosition(int position) {
+        if (selectedPosition != RecyclerView.NO_POSITION) {
+            dates.get(selectedPosition).setSelected(false);
+            notifyItemChanged(selectedPosition);
+        }
+        this.selectedPosition = position;
+        if (position != RecyclerView.NO_POSITION) {
+            dates.get(position).setSelected(true);
+            notifyItemChanged(position);
+        }
+        Log.d("DateAdapter", "setSelectedPosition called. New selected position: " + selectedPosition);
+    }
 }
