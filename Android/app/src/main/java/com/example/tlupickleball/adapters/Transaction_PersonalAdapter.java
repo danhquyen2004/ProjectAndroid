@@ -1,5 +1,6 @@
 package com.example.tlupickleball.adapters;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +17,11 @@ import java.util.List;
 
 public class Transaction_PersonalAdapter extends RecyclerView.Adapter<Transaction_PersonalAdapter.TransactionViewHolder> {
 
+    private final Context context;
     private List<Transaction_Personal> transactionPersonals;
 
-    public Transaction_PersonalAdapter(List<Transaction_Personal> transactionPersonals) {
+    public Transaction_PersonalAdapter(Context context, List<Transaction_Personal> transactionPersonals) {
+        this.context = context;
         this.transactionPersonals = transactionPersonals;
     }
 

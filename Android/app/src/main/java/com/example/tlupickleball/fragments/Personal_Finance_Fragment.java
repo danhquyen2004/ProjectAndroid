@@ -114,7 +114,7 @@ public class Personal_Finance_Fragment extends Fragment {
         transactionPersonalList.add(new Transaction_Personal("Đóng quỹ", "+100.000đ", "10/03/2025",  true));
         transactionPersonalList.add(new Transaction_Personal("Đã đóng tiền phạt", "+100.000đ", "11/05/2025",  true));
 
-        transactionPersonalAdapter = new Transaction_PersonalAdapter(transactionPersonalList);
+        transactionPersonalAdapter = new Transaction_PersonalAdapter(requireContext(),transactionPersonalList);
         rvTransactions_Personal.setAdapter(transactionPersonalAdapter);
     }
 
