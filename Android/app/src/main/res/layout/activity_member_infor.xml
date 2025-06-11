@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        tools:context=".activities.PlayerInfor">
+        tools:context=".activities.MemberApproveInfor">
         <ImageButton
             android:id="@+id/btn_back"
             android:layout_width="wrap_content"
@@ -115,6 +115,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvPlayerPhoneNumber"/>
 
+            <TextView
+                android:id="@+id/tvSoloPoint"
+                style="@style/LabelInforTextViewStyle"
+                android:text="Điểm đấu đơn"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerPhoneNumberWData"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvtvSoloPointWData"
+                style="@style/InforTextViewStyle"
+                android:text="2.5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvSoloPoint"/>
+
+            <TextView
+                android:id="@+id/tvDuoPoint"
+                style="@style/LabelInforTextViewStyle"
+                android:text="Điểm đấu đôi"
+                app:layout_constraintTop_toBottomOf="@+id/tvDobInfor"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvtvDuoPointWData"
+                style="@style/InforTextViewStyle"
+                android:text="2.6"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvDuoPoint"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -132,23 +162,23 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_approve"
-                style="@style/Base.Theme.Button.Blue"
+                style="@style/Base.Theme.Button.Gray"
                 android:layout_width="230dp"
                 android:layout_height="0dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
                 android:backgroundTint="#0CE952"
-                android:text="Phê duyệt" />
+                android:text="Vô hiệu hóa" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_reject"
-                style="@style/Base.Theme.Button.White"
+                style="@style/Base.Theme.Button.Red"
                 android:layout_width="230dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
-                android:text="Từ chối" />
+                android:text="Xóa tài khoản" />
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

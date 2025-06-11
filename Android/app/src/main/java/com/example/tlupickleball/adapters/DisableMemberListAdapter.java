@@ -12,16 +12,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.activities.PlayerInfor;
+import com.example.tlupickleball.activities.DisableMemberInfor;
+import com.example.tlupickleball.activities.MemberInfor;
 import com.example.tlupickleball.model.Player;
 
 import java.util.List;
 
-public class ApprovePlayerAdapter extends RecyclerView.Adapter<ApprovePlayerAdapter.ApprovePlayerViewHolder> {
+public class DisableMemberListAdapter extends RecyclerView.Adapter<DisableMemberListAdapter.ApprovePlayerViewHolder> {
     private List<Player> playerList;
     private Context context;
 
-    public ApprovePlayerAdapter(Context context, List<Player> playerList)
+    public DisableMemberListAdapter(Context context, List<Player> playerList)
     {
         this.context = context;
         this.playerList = playerList;
@@ -43,7 +44,7 @@ public class ApprovePlayerAdapter extends RecyclerView.Adapter<ApprovePlayerAdap
 
         holder.itemView.setOnClickListener(v -> {
             Context context = v.getContext();
-            Intent intent = new Intent(context, PlayerInfor.class);
+            Intent intent = new Intent(context, DisableMemberInfor.class);
             intent.putExtra("name", player.getName());
             intent.putExtra("email", player.getEmail());
             intent.putExtra("avatar", player.getAvatarResourceId());

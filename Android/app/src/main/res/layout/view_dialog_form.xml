@@ -37,11 +37,12 @@
 
         <TextView
             android:id="@+id/tv_confirm_infor"
-            android:layout_width="wrap_content"
+            android:layout_width="270dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="5dp"
             android:layout_marginEnd="24dp"
+            android:gravity="center"
             android:text="Phiên đăng nhập của bạn sẽ kết thúc?"
             android:fontFamily="sans-serif"
             android:textColor="@color/black"

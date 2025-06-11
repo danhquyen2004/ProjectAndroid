@@ -29,6 +29,39 @@
         <item name="android:padding">12dp</item>
     </style>
 
+    <style name="Base.Theme.Button.Gray" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">255dp</item>
+        <item name="android:layout_height">54dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#939393</item>
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
+    <style name="Base.Theme.Button.Red" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">255dp</item>
+        <item name="android:layout_height">54dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#E90C10</item>
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
+    <style name="Base.Theme.Button.Green" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">255dp</item>
+        <item name="android:layout_height">54dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#95C786</item>
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
     <style name="Base.Theme.Button.White" parent="Widget.AppCompat.Button">
         <item name="android:layout_width">255dp</item>
         <item name="android:layout_height">54dp</item>

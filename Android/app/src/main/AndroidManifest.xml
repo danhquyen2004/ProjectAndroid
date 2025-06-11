@@ -13,10 +13,26 @@
         android:theme="@style/Theme.TLUPickleball"
         tools:targetApi="31">
         <activity
-            android:name=".activities.PlayerInfor"
+            android:name=".activities.MemberApproveInfor"
             android:exported="false" />
         <activity
-            android:name=".activities.ApprovePlayer"
+            android:name=".activities.ApproveMember"
+            android:exported="false" >
+        </activity>
+        <activity
+            android:name=".activities.MemberList"
+            android:exported="false" >
+        </activity>
+        <activity
+            android:name=".activities.DisableMemberList"
+            android:exported="false" >
+        </activity>
+        <activity
+            android:name=".activities.MemberInfor"
+            android:exported="false" >
+        </activity>
+        <activity
+            android:name=".activities.DisableMemberInfor"
             android:exported="false" >
         </activity>
         <activity

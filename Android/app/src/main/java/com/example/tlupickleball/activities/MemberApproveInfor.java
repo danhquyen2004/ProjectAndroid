@@ -2,8 +2,6 @@ package com.example.tlupickleball.activities;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,7 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tlupickleball.R;
 
-public class PlayerInfor extends AppCompatActivity {
+public class MemberApproveInfor extends AppCompatActivity {
 
     Dialog dialogForm;
     Button btnApprove, btnReject;
@@ -30,7 +28,7 @@ public class PlayerInfor extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_player_infor);
+        setContentView(R.layout.activity_approve_member_infor);
 
         btnApprove = findViewById(R.id.btn_approve);
         btnReject = findViewById(R.id.btn_reject);
@@ -58,7 +56,7 @@ public class PlayerInfor extends AppCompatActivity {
             return; // Nếu dialog đã hiển thị, không làm gì cả
         }
 
-        dialogForm = new Dialog(PlayerInfor.this);
+        dialogForm = new Dialog(MemberApproveInfor.this);
         dialogForm.setContentView(R.layout.view_dialog_form);
         dialogForm.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialogForm.getWindow().setBackgroundDrawable(getDrawable(R.drawable.custom_dialog_box));

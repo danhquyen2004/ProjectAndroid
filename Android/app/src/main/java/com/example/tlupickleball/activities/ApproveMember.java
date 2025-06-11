@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -14,16 +13,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.adapters.ApprovePlayerAdapter;
+import com.example.tlupickleball.adapters.ApproveMemberAdapter;
 import com.example.tlupickleball.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ApprovePlayer extends AppCompatActivity {
+public class ApproveMember extends AppCompatActivity {
     private RecyclerView recyclerView;
-    private ApprovePlayerAdapter adapter;
+    private ApproveMemberAdapter adapter;
     private List<Player> lstPlayer;
+    ImageButton btnBack;
     private static final float ACTION_BUTTON_WIDTH = 200;
     private final float buttonTotalWidth = ACTION_BUTTON_WIDTH * 2;
 
@@ -33,7 +33,10 @@ public class ApprovePlayer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_approve_player);
+        setContentView(R.layout.activity_approve_member);
+
+        btnBack = findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(v -> onBackPressed());
 
         initData();
         setupRecyclerView();
@@ -193,7 +196,7 @@ public class ApprovePlayer extends AppCompatActivity {
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.playerList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ApprovePlayerAdapter(this, lstPlayer);
+        adapter = new ApproveMemberAdapter(this, lstPlayer);
         recyclerView.setAdapter(adapter);
     }
 
