@@ -57,7 +57,7 @@
         <TextView
             android:id="@+id/tvPlayerName"
             style="@style/LabelInforTextViewStyle"
-            android:text="Giới tính"
+            android:text="Họ và tên"
             app:layout_constraintStart_toStartOf="parent"/>
 
         <TextView
@@ -88,7 +88,7 @@
         <TextView
             android:id="@+id/tvPlayerDob"
             style="@style/LabelInforTextViewStyle"
-            android:text="Giới tính"
+            android:text="Ngày sinh"
             app:layout_constraintTop_toBottomOf="@+id/tvGenderInfor"
             app:layout_constraintStart_toStartOf="parent"/>
 
@@ -101,25 +101,25 @@
             app:layout_constraintTop_toBottomOf="@+id/tvPlayerDob"/>
 
         <TextView
-            android:id="@+id/tvPlayerPhoneNumber"
+            android:id="@+id/tvPlayerEmail"
             style="@style/LabelInforTextViewStyle"
-            android:text="Giới tính"
+            android:text="Email"
             app:layout_constraintTop_toBottomOf="@+id/tvDobInfor"
             app:layout_constraintStart_toStartOf="parent"/>
 
         <TextView
-            android:id="@+id/tvPlayerPhoneNumberWData"
+            android:id="@+id/tvPlayerEmailWData"
             style="@style/InforTextViewStyle"
-            android:text="0123456789"
+            android:text="gmail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerPhoneNumber"/>
+            app:layout_constraintTop_toBottomOf="@+id/tvPlayerEmail"/>
 
             <TextView
                 android:id="@+id/tvSoloPoint"
                 style="@style/LabelInforTextViewStyle"
                 android:text="Điểm đấu đơn"
-                app:layout_constraintTop_toBottomOf="@+id/tvPlayerPhoneNumberWData"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerEmailWData"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView

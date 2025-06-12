@@ -19,6 +19,8 @@ import com.example.tlupickleball.R;
 
 public class MemberApproveInfor extends AppCompatActivity {
 
+    TextView tvName, tvEmail, tvGender, tvDob;
+    ImageView ivAvatar;
     Dialog dialogForm;
     Button btnApprove, btnReject;
     ImageButton btnBack;
@@ -30,14 +32,19 @@ public class MemberApproveInfor extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_approve_member_infor);
 
+        tvName = findViewById(R.id.tvPlayerNameInfor);
+        tvGender = findViewById(R.id.tvGenderInfor);
+        tvDob = findViewById(R.id.tvDobInfor);
+        tvEmail = findViewById(R.id.tvPlayerEmailWData);
+        ivAvatar = findViewById(R.id.imgAvatar);
         btnApprove = findViewById(R.id.btn_approve);
         btnReject = findViewById(R.id.btn_reject);
         btnBack = findViewById(R.id.btn_back);
 
         Intent intent = getIntent();
-        String name = intent.getStringExtra("name");
-        String email = intent.getStringExtra("email");
-        int avatarResId = intent.getIntExtra("avatar", 0);
+        tvName.setText(intent.getStringExtra("name"));
+        tvEmail.setText(intent.getStringExtra("email"));
+        ivAvatar.setImageResource(intent.getIntExtra("avatar", 0));
 
         btnBack.setOnClickListener(v -> onBackPressed());
 
