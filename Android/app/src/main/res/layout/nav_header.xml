@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/imageView_avatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/avatar_1"
+        android:scaleType="centerCrop"
+        android:layout_gravity="start"/>
+
+    <TextView
+        android:id="@+id/textView_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nguyễn Văn A"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/textView_profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hồ sơ người dùng"
+        android:textColor="#666666"
+        android:textSize="14sp" />
+</LinearLayout>

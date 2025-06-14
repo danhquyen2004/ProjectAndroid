@@ -13,7 +13,7 @@
         android:theme="@style/Theme.TLUPickleball"
         tools:targetApi="31">
         <activity
-            android:name=".activities.MemberApproveInfor"
+            android:name=".activities.ApproveMemberInfor"
             android:exported="false" />
         <activity
             android:name=".activities.ApproveMember"

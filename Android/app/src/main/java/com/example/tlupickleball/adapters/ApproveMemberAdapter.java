@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.activities.MemberApproveInfor;
+import com.example.tlupickleball.activities.ApproveMemberInfor;
 import com.example.tlupickleball.model.Player;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class ApproveMemberAdapter extends RecyclerView.Adapter<ApproveMemberAdap
 
         holder.itemView.setOnClickListener(v -> {
             Context context = v.getContext();
-            Intent intent = new Intent(context, MemberApproveInfor.class);
+            Intent intent = new Intent(context, ApproveMemberInfor.class);
             intent.putExtra("name", player.getName());
             intent.putExtra("email", player.getEmail());
             intent.putExtra("avatar", player.getAvatarResourceId());

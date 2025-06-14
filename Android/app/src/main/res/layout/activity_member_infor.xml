@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        tools:context=".activities.MemberApproveInfor">
+        tools:context=".activities.ApproveMemberInfor">
         <ImageButton
             android:id="@+id/btn_back"
             android:layout_width="wrap_content"

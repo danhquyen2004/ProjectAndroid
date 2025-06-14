@@ -17,7 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tlupickleball.R;
 
-public class MemberApproveInfor extends AppCompatActivity {
+public class ApproveMemberInfor extends AppCompatActivity {
 
     TextView tvName, tvEmail, tvGender, tvDob;
     ImageView ivAvatar;
@@ -37,6 +37,7 @@ public class MemberApproveInfor extends AppCompatActivity {
         tvDob = findViewById(R.id.tvDobInfor);
         tvEmail = findViewById(R.id.tvPlayerEmailWData);
         ivAvatar = findViewById(R.id.imgAvatar);
+
         btnApprove = findViewById(R.id.btn_approve);
         btnReject = findViewById(R.id.btn_reject);
         btnBack = findViewById(R.id.btn_back);
@@ -63,7 +64,7 @@ public class MemberApproveInfor extends AppCompatActivity {
             return; // Nếu dialog đã hiển thị, không làm gì cả
         }
 
-        dialogForm = new Dialog(MemberApproveInfor.this);
+        dialogForm = new Dialog(ApproveMemberInfor.this);
         dialogForm.setContentView(R.layout.view_dialog_form);
         dialogForm.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialogForm.getWindow().setBackgroundDrawable(getDrawable(R.drawable.custom_dialog_box));

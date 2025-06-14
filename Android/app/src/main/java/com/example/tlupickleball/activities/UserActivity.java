@@ -3,20 +3,29 @@ package com.example.tlupickleball.activities;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.adapters.UserAdapter;
+import com.example.tlupickleball.fragments.Home_Fragment;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 
 public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+
+    public DrawerLayout drawerLayout; // public để fragment truy cập
+    public NavigationView navigationView;
+    public Toolbar toolbar;
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
@@ -26,6 +35,19 @@ public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.layout_tab_bottom);
+
+        drawerLayout = findViewById(R.id.main);
+//        navigationView = findViewById(R.id.navigation_view);
+//        toolbar = findViewById(R.id.toolbar);
+//
+//        // Set Toolbar nếu cần dùng
+//        setSupportActionBar(toolbar);
+//
+//        // Hiển thị fragment ban đầu
+//        getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.fragment_container, new Home_Fragment())
+//                .commit();
+
         tabLayout = findViewById(R.id.tabLayout);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -83,5 +105,9 @@ public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
 
+    }
+
+    public void openDrawerFromRight() {
+        drawerLayout.openDrawer(GravityCompat.END);
     }
 }
