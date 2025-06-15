@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.DisableMemberInfor;
-import com.example.tlupickleball.activities.MemberInfor;
 import com.example.tlupickleball.model.Player;
 
 import java.util.List;

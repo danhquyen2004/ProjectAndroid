@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.activities.MemberInfor;
+import com.example.tlupickleball.activities.MemberControllerInfor;
 import com.example.tlupickleball.model.Player;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Ap
 
         holder.itemView.setOnClickListener(v -> {
             Context context = v.getContext();
-            Intent intent = new Intent(context, MemberInfor.class);
+            Intent intent = new Intent(context, MemberControllerInfor.class);
             intent.putExtra("name", player.getName());
             intent.putExtra("email", player.getEmail());
             intent.putExtra("avatar", player.getAvatarResourceId());

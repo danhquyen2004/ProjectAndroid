@@ -16,12 +16,15 @@ import com.example.tlupickleball.activities.DisableMemberList;
 import com.example.tlupickleball.activities.MemberList;
 
 public class Member_Controller extends Fragment {
+
+    LinearLayout layoutApproveList, layoutMemberList, layoutDisableMemberList;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_member__controller, container, false);
 
-        LinearLayout layoutApproveList = view.findViewById(R.id.layoutApproveList);
+        layoutApproveList = view.findViewById(R.id.layoutApproveList);
         layoutApproveList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -30,7 +33,7 @@ public class Member_Controller extends Fragment {
             }
         });
 
-        LinearLayout layoutMemberList = view.findViewById(R.id.layoutMemberList);
+        layoutMemberList = view.findViewById(R.id.layoutMemberList);
         layoutMemberList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -39,7 +42,7 @@ public class Member_Controller extends Fragment {
             }
         });
 
-        LinearLayout layoutDisableMemberList = view.findViewById(R.id.layoutDisableList);
+        layoutDisableMemberList = view.findViewById(R.id.layoutDisableList);
         layoutDisableMemberList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

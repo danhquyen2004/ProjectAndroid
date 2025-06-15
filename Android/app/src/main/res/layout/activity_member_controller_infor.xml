@@ -161,24 +161,24 @@
             app:layout_constraintVertical_bias="0.228">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_change_password"
-                style="@style/Base.Theme.Button.Blue"
+                android:id="@+id/btn_approve"
+                style="@style/Base.Theme.Button.Gray"
                 android:layout_width="230dp"
                 android:layout_height="0dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
                 android:backgroundTint="#0CE952"
-                android:text="Thay đổi mật khẩu" />
+                android:text="Vô hiệu hóa" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_edit_profile"
-                style="@style/Base.Theme.Button.Blue"
+                android:id="@+id/btn_reject"
+                style="@style/Base.Theme.Button.Red"
                 android:layout_width="230dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
-                android:text="Sửa thông tin" />
+                android:text="Xóa tài khoản" />
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
