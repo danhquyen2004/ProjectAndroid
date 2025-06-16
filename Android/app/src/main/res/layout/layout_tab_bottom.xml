@@ -122,17 +122,12 @@
                             android:foreground="?attr/selectableItemBackground">
 
                             <TextView
-                                android:text="Hồ sơ người dùng"
+                                android:text="Hồ sơ người dùng      >"
                                 android:textColor="#888888"
                                 android:textSize="14sp"
+                                android:textStyle="normal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_marginStart="4dp"
-                                android:src="@drawable/ic_back" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>

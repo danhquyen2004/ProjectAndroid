@@ -67,6 +67,7 @@ public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSe
 //            intent.putExtra("email", player.getEmail());
 //            intent.putExtra("avatar", player.getAvatarResourceId());
             context.startActivity(intent);
+            drawerLayout.closeDrawer(GravityCompat.END);
         });
 
         tabLayout = findViewById(R.id.tabLayout);
@@ -90,7 +91,7 @@ public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSe
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.tabLayoutContainer), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(0, 0, 0, systemBars.bottom); // Trừ phần điều hướng Android
-            
+
             return insets;
         });
 

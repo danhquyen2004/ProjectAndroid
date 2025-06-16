@@ -36,6 +36,10 @@
             android:exported="false" >
         </activity>
         <activity
+            android:name=".activities.EditMemberInfor"
+            android:exported="false" >
+        </activity>
+        <activity
             android:name=".activities.DisableMemberInfor"
             android:exported="false" >
         </activity>

@@ -1,10 +1,8 @@
 package com.example.tlupickleball.activities;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -59,7 +57,7 @@ public class MemberInfor extends AppCompatActivity {
         });
         btnEditProfile.setOnClickListener(v -> {
             Context context = v.getContext();
-            Intent intentEditProfile = new Intent(context, MemberControllerInfor.class);
+            Intent intentEditProfile = new Intent(context, EditMemberInfor.class);
 //            intent.putExtra("name", player.getName());
 //            intent.putExtra("email", player.getEmail());
 //            intent.putExtra("avatar", player.getAvatarResourceId());
