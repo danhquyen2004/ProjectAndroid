@@ -15,53 +15,77 @@
       background-color: #fcfcfc;
     }
     .sidebar {
-      position: fixed;
-      width: 300px;
-      height: 100vh;
+      width: 160px;
       background-color: #bad6eb;
       padding: 20px;
-    }
-    .sidebar .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 30px;
-    }
-    .sidebar .profile {
-      text-align: center;
-    }
-    .sidebar .profile img {
-      width: 142px;
-      height: 173px;
-    }
-    .sidebar .menu {
-      margin-top: 30px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      padding-left: 40px;
+      align-items: center;
     }
-    .sidebar .menu a {
-      text-decoration: none;
-      color: black;
+
+    .sidebar .title {
+      font-weight: bold;
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar img.profile {
+      width: 100px;
+      height: 100px;
+      border-radius: 100%;
+    }
+
+    .sidebar .admin-name {
+      color: #007bff;
+      font-weight: bold;
+      margin: 10px 0 20px;
+    }
+
+    .sidebar .menu {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar .menu button {
+      width: 100%;
+      background: none;
+      border: none;
       padding: 10px;
-      border-radius: 5px;
+      text-align: left;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.2s;
     }
-    .sidebar .menu a.active {
+
+    .sidebar .menu button:hover {
+      background-color: #aad0ee;
+    }
+
+    .sidebar .menu .active {
       background-color: #0c8ce9;
       color: white;
+      padding-left: 10px;
     }
+
     .content {
-      margin-left: 300px;
-      padding: 90px 40px 40px;
+      margin-left: 160px; /* khớp với chiều rộng sidebar */
+      padding: 20px;
+      display: flex;
+      justify-content: center; /* căn giữa ngang */
+      gap: 40px; /* khoảng cách giữa các card */
+      margin-top: 60px; /* tạo khoảng cách phía trên */
     }
     .card {
       background-color: #e1f3ff;
       border-radius: 8px;
       padding: 20px;
-      width: fit-content;
-      margin-right: 40px;
-      display: inline-block;
+      width: 200px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     }
     .card img {
       width: 50px;
@@ -108,34 +132,22 @@
   </style>
 </head>
 <body>
+  <div>
+    
+  </div>
   <div class="sidebar">
-    <div class="logo">
-      <img src="https://c.animaapp.com/mbunmuejMSouiM/img/line-1.svg" width="4" height="23" alt="Line" />
-      <strong>TLU PICKLEBALL CLUB</strong>
-    </div>
-    <div class="profile">
-      <img src="https://c.animaapp.com/mbunmuejMSouiM/img/profile.png" alt="Profile" />
-      <div class="text-blue-600">Admin</div>
-    </div>
+    <div class="title">TLU PICKLEBALL CLUB</div>
+    <img class="profile" src="https://c.animaapp.com/mbunmuejMSouiM/img/pexels-photo-2379004-1.png" alt="Admin Avatar">
+    <div class="admin-name">Admin</div>
     <div class="menu">
-      <a href="#" class="active">Trang chủ</a>
-      <a href="#">Quản lý hội viên</a>
-      <a href="#">Quản lý quỹ</a>
-      <a href="#">Báo cáo</a>
-      <a href="#">Cài đặt</a>
-      <a href="#">Đăng xuất</a>
+      <button class="active">Trang chủ</button>
+      <button>Quản lý hội viên</button>
+      <button>Quản lý quỹ</button>
+      <button>Báo cáo</button>
+      <button>Cài đặt</button>
+      <button>Đăng xuất</button>
     </div>
   </div>
-
-  <header>
-    <div>&#9660;</div>
-    <div class="user-info">
-      <img src="https://c.animaapp.com/mbunmuejMSouiM/img/pexels-photo-2379004-1.png" alt="Profile" />
-      <div>Admin</div>
-    </div>
-  </header>
-
-  <div class="email">admin@gmail.com</div>
 
   <div class="content">
     <div class="card">
