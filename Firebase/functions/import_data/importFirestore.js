@@ -1,5 +1,5 @@
 const admin = require('firebase-admin');
-const data = require('./firestore_seed_data_final.json');
+const data = require('./firestore_seed_data_expanded.json');
 
 if (!admin.apps.length) {
   admin.initializeApp();
