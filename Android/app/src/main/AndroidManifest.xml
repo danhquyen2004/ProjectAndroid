@@ -13,36 +13,32 @@
         android:theme="@style/Theme.TLUPickleball"
         tools:targetApi="31">
         <activity
+            android:name=".activities.Change_Password"
+            android:exported="false" />
+        <activity
             android:name=".activities.ApproveMemberInfor"
             android:exported="false" />
         <activity
             android:name=".activities.ApproveMember"
-            android:exported="false" >
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.MemberList"
-            android:exported="false" >
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.DisableMemberList"
-            android:exported="false" >
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.MemberControllerInfor"
-            android:exported="false" >
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.MemberInfor"
-            android:exported="false" >
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.EditMemberInfor"
-            android:exported="false" >
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.DisableMemberInfor"
-            android:exported="false" >
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.UserActivity"
             android:exported="true">
@@ -54,18 +50,16 @@
         </activity>
         <activity
             android:name=".activities.notification"
-            android:exported="false" >
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.record_the_match"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.wait_home"
             android:exported="false" />
         <activity
             android:name=".activities.activity_home"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.LoginActivity"
             android:exported="false" />

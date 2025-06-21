@@ -49,7 +49,7 @@ public class MemberInfor extends AppCompatActivity {
 
         btnChangePassword.setOnClickListener(v -> {
             Context context = v.getContext();
-            Intent intentChangePass = new Intent(context, MemberControllerInfor.class);
+            Intent intentChangePass = new Intent(context, Change_Password.class);
 //            intent.putExtra("name", player.getName());
 //            intent.putExtra("email", player.getEmail());
 //            intent.putExtra("avatar", player.getAvatarResourceId());
