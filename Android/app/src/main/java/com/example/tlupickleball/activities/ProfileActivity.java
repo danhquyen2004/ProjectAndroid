@@ -56,7 +56,7 @@ public class ProfileActivity extends BaseActivity {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(ProfileActivity.this, "Cập nhật hồ sơ thành công", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+                    Intent intent = new Intent(ProfileActivity.this, UserActivity.class);
                     startActivity(intent);
                 } else {
                     Toast.makeText(ProfileActivity.this, "Lỗi: " + response.code(), Toast.LENGTH_SHORT).show();

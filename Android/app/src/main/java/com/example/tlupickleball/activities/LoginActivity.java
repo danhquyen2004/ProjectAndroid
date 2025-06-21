@@ -103,7 +103,7 @@ public class LoginActivity extends AuthActivity {
 
                         context.startActivity(new Intent(context, ProfileActivity.class));
                     } else {
-                        context.startActivity(new Intent(context, MainActivity.class));
+                        context.startActivity(new Intent(context, UserActivity.class));
                     }
                 })
                 .addOnFailureListener(e -> {
