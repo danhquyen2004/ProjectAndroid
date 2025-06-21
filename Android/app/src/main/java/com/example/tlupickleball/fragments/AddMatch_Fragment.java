@@ -1,16 +1,21 @@
 package com.example.tlupickleball.fragments;
 
-import android.animation.LayoutTransition;
+import android.animation.ObjectAnimator;
 import android.app.DatePickerDialog;
+import android.app.Dialog; // Đảm bảo import Dialog
 import android.app.TimePickerDialog;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable; // Đảm bảo import ColorDrawable
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity; // Đảm bảo import Gravity
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window; // Đảm bảo import Window
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText; // Đảm bảo import EditText
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -18,11 +23,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback; // Đảm bảo import OnBackPressedCallback
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.data.MatchDataManager;
+import com.example.tlupickleball.data.MockMatchDataManager;
 import com.example.tlupickleball.model.Matches;
 
 import java.text.SimpleDateFormat;
@@ -37,103 +45,160 @@ public class AddMatch_Fragment extends Fragment {
     private Spinner setCountSpinner;
     private Button confirmButton;
 
-    // Các nút thêm người chơi trên sân
     private ImageButton slot1, slot2, slot3, slot4;
-    // Các TextView hiển thị tên người chơi
     private TextView id_txtslot1, id_txtslot2, id_txtslot3, id_txtslot4;
 
-    private Calendar selectedDateTime;
+    private TextView item1, item2; // item1 và item2 là các TextView dùng cho tab
+    private View tabIndicator; // tabIndicator là View di chuyển
 
-    // --- Biến cho Tab Layout (Đấu đơn/Đấu đôi) ---
-    private TextView item1, item2, select; // item1 là "Đấu đơn", item2 là "Đấu đôi", select là thanh trượt
-    private FrameLayout tabContentFrame; // FrameLayout chứa các tab và thanh trượt
-    private String currentMatchFormat = "double"; // Mặc định là "đấu đôi" để hiển thị 4 slot ban đầu
+    private String currentMatchFormat = "double";
 
-    @Nullable
+    private MatchDataManager matchDataManager;
+
+    private Calendar selectedDateTime = Calendar.getInstance();
+    private String selectedSetCount = "1 set";
+
+    // Giá trị mặc định cho người chơi, bạn có thể thay đổi hoặc tải từ nguồn dữ liệu
+    private String player1Name = "Ảnh";
+    private String player2Name = "Đồng";
+    private String player3Name = "Hữu";
+    private String player4Name = "Quyền";
+
+    private LinearLayout layoutMatchSetScores; // Container cho các trường nhập điểm số
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_add_match, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_match, container, false);
 
-        // Ánh xạ các View hiện có
-        backButton = root.findViewById(R.id.backButton);
-        inputTimeButton = root.findViewById(R.id.inputTimeButton);
-        selectDateButton = root.findViewById(R.id.selectDateButton);
-        setCountSpinner = root.findViewById(R.id.setCountSpinner);
-        confirmButton = root.findViewById(R.id.confirmButton);
+        matchDataManager = new MockMatchDataManager(); // Khởi tạo MatchDataManager
 
-        // Ánh xạ các nút và TextView cho slot người chơi (từ view_pickleball_court.xml)
-        slot1 = root.findViewById(R.id.slot1);
-        slot2 = root.findViewById(R.id.slot2);
-        slot3 = root.findViewById(R.id.slot3);
-        slot4 = root.findViewById(R.id.slot4);
+        // Ánh xạ các View từ layout
+        backButton = view.findViewById(R.id.backButton);
+        inputTimeButton = view.findViewById(R.id.inputTimeButton);
+        selectDateButton = view.findViewById(R.id.selectDateButton);
+        setCountSpinner = view.findViewById(R.id.setCountSpinner);
+        confirmButton = view.findViewById(R.id.confirmButton);
 
-        id_txtslot1 = root.findViewById(R.id.id_txtslot1);
-        id_txtslot2 = root.findViewById(R.id.id_txtslot2);
-        id_txtslot3 = root.findViewById(R.id.id_txtslot3);
-        id_txtslot4 = root.findViewById(R.id.id_txtslot4);
+        slot1 = view.findViewById(R.id.slot1);
+        slot2 = view.findViewById(R.id.slot2);
+        slot3 = view.findViewById(R.id.slot3);
+        slot4 = view.findViewById(R.id.slot4);
 
-        // --- Ánh xạ các View từ view_tablayout (được include trong fragment_add_match.xml) ---
-        item1 = root.findViewById(R.id.item1); // TextView "Đấu đơn"
-        item2 = root.findViewById(R.id.item2); // TextView "Đấu đôi"
-        select = root.findViewById(R.id.select); // Thanh trượt màu xanh
-        tabContentFrame = root.findViewById(R.id.tab_content_frame); // FrameLayout chứa 2 TextView và thanh trượt
+        id_txtslot1 = view.findViewById(R.id.id_txtslot1);
+        id_txtslot2 = view.findViewById(R.id.id_txtslot2);
+        id_txtslot3 = view.findViewById(R.id.id_txtslot3);
+        id_txtslot4 = view.findViewById(R.id.id_txtslot4);
 
-        selectedDateTime = Calendar.getInstance();
+        item1 = view.findViewById(R.id.item1); // Tab "Đấu đơn"
+        item2 = view.findViewById(R.id.item2); // Tab "Đấu đôi"
+        tabIndicator = view.findViewById(R.id.tab_indicator); // View chỉ báo tab được chọn
 
-        // Thiết lập Spinner cho số set đấu
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.number_of_sets_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        setCountSpinner.setAdapter(adapter);
+        layoutMatchSetScores = view.findViewById(R.id.layoutMatchSetScoresContainer);
 
-        // Thiết lập Listener cho các nút
-        backButton.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        // Thiết lập các Listener và trạng thái ban đầu
+        setupListeners();
+        setupSpinner();
+        updateDateTimeDisplay();
+        updatePlayerSlotsVisibility();
+
+        // Cập nhật số lượng ô nhập điểm dựa trên lựa chọn spinner ban đầu
+        updateSetScoreInputs(Integer.parseInt(selectedSetCount.split(" ")[0]));
+
+        // Đặt trạng thái ban đầu của tab sau khi các view được đo lường
+        // Đảm bảo selectTab được gọi sau khi layout đã được vẽ hoàn chỉnh
+        view.post(() -> {
+            selectTab(currentMatchFormat);
+        });
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Xử lý nút back của thiết bị hoặc cử chỉ back
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (hasUnsavedData()) {
+                    // Nếu có dữ liệu chưa lưu, hiển thị dialog cảnh báo
+                    showDiscardChangesDialog();
+                } else {
+                    // Nếu không có dữ liệu chưa lưu, vô hiệu hóa callback này
+                    // để cho phép hành vi nút back mặc định (thoát khỏi fragment)
+                    setEnabled(false);
+                    requireActivity().onBackPressed(); // Thực hiện hành động back mặc định
+                }
+            }
+        });
+    }
+
+    private void setupListeners() {
+        // Xử lý nút back trên ActionBar/Toolbar tùy chỉnh
+        backButton.setOnClickListener(v -> {
+            if (hasUnsavedData()) {
+                showDiscardChangesDialog();
+            } else {
+                // Nếu không có dữ liệu, chỉ cần gọi hành động back mặc định
+                requireActivity().onBackPressed();
+            }
+        });
+
+        // Xử lý chọn thời gian và ngày
         inputTimeButton.setOnClickListener(v -> showTimePickerDialog());
         selectDateButton.setOnClickListener(v -> showDatePickerDialog());
 
-        // Thiết lập Listener cho các slot người chơi
-        setupSlotClickListeners();
+        // Xử lý nút xác nhận
+        confirmButton.setOnClickListener(v -> confirmMatch());
 
-        confirmButton.setOnClickListener(v -> {
-            // Logic xử lý khi nhấn Xác nhận
-            // Bạn cần lấy dữ liệu từ các TextView người chơi, thời gian, ngày, số set...
-            // Sau đó tạo đối tượng Matches và lưu trữ/gửi đi
-            Toast.makeText(getContext(), "Xác nhận ghi nhận trận đấu", Toast.LENGTH_SHORT).show();
-            // Ví dụ: Ghi log tên người chơi hiện tại
-            Log.d("AddMatchFragment", "Player 1: " + id_txtslot1.getText().toString());
-            Log.d("AddMatchFragment", "Player 2: " + id_txtslot2.getText().toString());
-            if (currentMatchFormat.equals("double")) {
-                Log.d("AddMatchFragment", "Player 3: " + id_txtslot3.getText().toString());
-                Log.d("AddMatchFragment", "Player 4: " + id_txtslot4.getText().toString());
-            }
-            // Quay lại fragment trước đó (Matches_Fragment)
-            getParentFragmentManager().popBackStack();
+        // Xử lý chuyển đổi giữa "Đấu đơn" và "Đấu đôi"
+        item1.setOnClickListener(v -> selectTab("single"));
+        item2.setOnClickListener(v -> selectTab("double"));
+
+        // Xử lý chọn người chơi cho các vị trí
+        slot1.setOnClickListener(v -> {
+            // Thay đổi tên người chơi và cập nhật UI (ví dụ: mở dialog chọn người chơi)
+            player1Name = "Nguyễn Văn A"; // Ví dụ: bạn sẽ thay bằng logic chọn người chơi thực tế
+            updatePlayerSlotUI(slot1, id_txtslot1, player1Name);
+            Toast.makeText(getContext(), "Đã chọn " + player1Name, Toast.LENGTH_SHORT).show();
         });
-
-        // --- Thiết lập Listener và trạng thái ban đầu cho các tab Đơn/Đôi ---
-        setupMatchFormatTabs();
-
-        return root;
-    }
-
-    private void setupSlotClickListeners() {
-        // Thiết lập listener cho slot 1 và 2 (luôn hiển thị)
-        slot1.setOnClickListener(v -> openAddPlayerDialog(1));
-        slot2.setOnClickListener(v -> openAddPlayerDialog(2));
-
-        // Thiết lập listener cho slot 3 và 4 (chỉ cho phép click khi ở chế độ đấu đôi)
+        slot2.setOnClickListener(v -> {
+            player2Name = "Trần Thị B";
+            updatePlayerSlotUI(slot2, id_txtslot2, player2Name);
+            Toast.makeText(getContext(), "Đã chọn " + player2Name, Toast.LENGTH_SHORT).show();
+        });
         slot3.setOnClickListener(v -> {
-            if (currentMatchFormat.equals("double")) {
-                openAddPlayerDialog(3);
-            } else {
-                Toast.makeText(getContext(), "Vị trí này chỉ khả dụng cho đấu đôi.", Toast.LENGTH_SHORT).show();
-            }
+            player3Name = "Lê Văn C";
+            updatePlayerSlotUI(slot3, id_txtslot3, player3Name);
+            Toast.makeText(getContext(), "Đã chọn " + player3Name, Toast.LENGTH_SHORT).show();
         });
         slot4.setOnClickListener(v -> {
-            if (currentMatchFormat.equals("double")) {
-                openAddPlayerDialog(4);
-            } else {
-                Toast.makeText(getContext(), "Vị trí này chỉ khả dụng cho đấu đôi.", Toast.LENGTH_SHORT).show();
+            player4Name = "Phạm Thị D";
+            updatePlayerSlotUI(slot4, id_txtslot4, player4Name);
+            Toast.makeText(getContext(), "Đã chọn " + player4Name, Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void setupSpinner() {
+        // Thiết lập Adapter cho Spinner chọn số set đấu
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.set_count_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        setCountSpinner.setAdapter(adapter);
+
+        // Lắng nghe sự kiện chọn item trên Spinner
+        setCountSpinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                selectedSetCount = parent.getItemAtPosition(position).toString();
+                int numberOfSets = Integer.parseInt(selectedSetCount.split(" ")[0]);
+                updateSetScoreInputs(numberOfSets); // Cập nhật số ô nhập điểm
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // Do nothing
             }
         });
     }
@@ -146,14 +211,9 @@ public class AddMatch_Fragment extends Fragment {
                 (view, hourOfDay, minuteOfHour) -> {
                     selectedDateTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     selectedDateTime.set(Calendar.MINUTE, minuteOfHour);
-                    updateTimeButtonText();
-                }, hour, minute, true); // true cho định dạng 24h
+                    updateDateTimeDisplay(); // Cập nhật hiển thị thời gian
+                }, hour, minute, true); // true để hiển thị định dạng 24 giờ
         timePickerDialog.show();
-    }
-
-    private void updateTimeButtonText() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        inputTimeButton.setText(sdf.format(selectedDateTime.getTime()));
     }
 
     private void showDatePickerDialog() {
@@ -164,157 +224,239 @@ public class AddMatch_Fragment extends Fragment {
         DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
                 (view, year1, month1, dayOfMonth) -> {
                     selectedDateTime.set(year1, month1, dayOfMonth);
-                    updateDateButtonText();
+                    updateDateTimeDisplay(); // Cập nhật hiển thị ngày
                 }, year, month, day);
         datePickerDialog.show();
     }
 
-    private void updateDateButtonText() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        selectDateButton.setText(sdf.format(selectedDateTime.getTime()));
+    private void updateDateTimeDisplay() {
+        // Định dạng và hiển thị ngày tháng, thời gian
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        selectDateButton.setText(dateFormat.format(selectedDateTime.getTime()));
+        inputTimeButton.setText(timeFormat.format(selectedDateTime.getTime()));
     }
 
-    // Xử lý logic hiển thị pop-up thêm người chơi
-    private void openAddPlayerDialog(int slotNumber) {
-        // Đây là nơi bạn sẽ hiển thị AlertDialog hoặc BottomSheetDialog
-        // với layout dialog_add_player.xml đã tạo trước đó.
-        // Trong dialog đó, bạn sẽ có EditText để tìm kiếm và RecyclerView để hiển thị danh sách người chơi.
+    private void selectTab(String format) {
+        currentMatchFormat = format;
 
-        // Ví dụ đơn giản hiển thị Toast và gán tên tạm thời
-        Toast.makeText(getContext(), "Mở pop-up để thêm người chơi cho vị trí " + slotNumber, Toast.LENGTH_SHORT).show();
-
-        // Sau khi người dùng chọn người chơi từ dialog, bạn sẽ cập nhật TextView tương ứng:
-        // Ví dụ:
-        String selectedPlayerName = "Người chơi " + slotNumber; // Giả sử tên được chọn
-        switch (slotNumber) {
-            case 1:
-                id_txtslot1.setText(selectedPlayerName);
-                break;
-            case 2:
-                id_txtslot2.setText(selectedPlayerName);
-                break;
-            case 3:
-                id_txtslot3.setText(selectedPlayerName);
-                break;
-            case 4:
-                id_txtslot4.setText(selectedPlayerName);
-                break;
-        }
-        // Để triển khai pop-up đầy đủ, bạn sẽ cần tạo một DialogFragment riêng
-        // hoặc xây dựng AlertDialog trực tiếp ở đây với Custom View.
-    }
-
-    // --- Các phương thức cho việc xử lý tab Đơn/Đôi ---
-
-    /**
-     * Thiết lập các listener cho các tab "Đấu đơn" và "Đấu đôi" và quản lý hiệu ứng chuyển động.
-     */
-    private void setupMatchFormatTabs() {
-        // Tìm parent LinearLayout của item1.
-        // Dựa trên view_tablayout.xml, item1 nằm trực tiếp trong một LinearLayout.
-        LinearLayout parentLinearLayout = null;
-        if (item1 != null && item1.getParent() instanceof LinearLayout) {
-            parentLinearLayout = (LinearLayout) item1.getParent();
-        }
-
-        // Kích hoạt LayoutTransition để có hiệu ứng chuyển động mượt mà cho thanh trượt
-        if (parentLinearLayout != null) {
-            // Kiểm tra nếu LayoutTransition là null, nếu có, hãy tạo một LayoutTransition mới
-            if (parentLinearLayout.getLayoutTransition() == null) {
-                parentLinearLayout.setLayoutTransition(new LayoutTransition());
-            }
-            // Bây giờ bạn có thể an toàn gọi enableTransitionType
-            parentLinearLayout.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-        } else {
-            Log.e("AddMatchFragment", "Parent LinearLayout for tabs not found or not a LinearLayout.");
-        }
-
-
-        // Listener cho tab "Đấu đơn"
-        if (item1 != null) {
-            item1.setOnClickListener(v -> {
-                if (!currentMatchFormat.equals("single")) { // Chỉ cập nhật nếu khác trạng thái hiện tại
-                    currentMatchFormat = "single";
-                    updateTabFormatSelection(currentMatchFormat); // Cập nhật UI của tab
-                    updatePlayerSlotsVisibility(); // Cập nhật hiển thị các slot người chơi
-                }
-            });
-        }
-
-        // Listener cho tab "Đấu đôi"
-        if (item2 != null) {
-            item2.setOnClickListener(v -> {
-                if (!currentMatchFormat.equals("double")) { // Chỉ cập nhật nếu khác trạng thái hiện tại
-                    currentMatchFormat = "double";
-                    updateTabFormatSelection(currentMatchFormat); // Cập nhật UI của tab
-                    updatePlayerSlotsVisibility(); // Cập nhật hiển thị các slot người chơi
-                }
-            });
-        }
-
-        // Thiết lập trạng thái ban đầu của tab và các slot khi Fragment được tạo
-        updateTabFormatSelection(currentMatchFormat);
-        updatePlayerSlotsVisibility();
-    }
-
-    /**
-     * Cập nhật UI của tab layout (vị trí thanh chọn và màu chữ) dựa trên loại trận đấu được chọn.
-     *
-     * @param selectedFormat "single" cho Đấu đơn, "double" cho Đấu đôi.
-     */
-    private void updateTabFormatSelection(String selectedFormat) {
-        if (tabContentFrame == null || select == null || item1 == null || item2 == null) {
-            Log.e("AddMatchFragment", "Tab layout views not initialized.");
+        // Đảm bảo các view đã được đo lường trước khi lấy chiều rộng
+        // Nếu width là 0, tức là view chưa được vẽ, post lại để gọi sau
+        if (item1.getWidth() == 0 || item2.getWidth() == 0) {
+            item1.post(() -> selectTab(format));
             return;
         }
 
-        // Đảm bảo layout đã được đo để tránh lỗi getWidth() = 0
-        if (tabContentFrame.getWidth() == 0) {
-            tabContentFrame.post(() -> updateTabFormatSelection(selectedFormat));
-            return;
-        }
+        int tabWidth = item1.getWidth(); // Cả hai tab nên có cùng chiều rộng
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) tabIndicator.getLayoutParams();
 
-        int tabWidth = tabContentFrame.getWidth() / 2; // Chiều rộng của mỗi tab
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) select.getLayoutParams();
-        params.width = tabWidth; // Đặt chiều rộng của thanh trượt
+        if (currentMatchFormat.equals("single")) {
+            // Di chuyển indicator đến vị trí "Đấu đơn"
+            ObjectAnimator.ofFloat(tabIndicator, "translationX", 0f).setDuration(200).start();
+            params.width = tabWidth; // Đặt chiều rộng của indicator bằng chiều rộng của tab
+            tabIndicator.setLayoutParams(params);
 
-        if (selectedFormat.equals("single")) {
-            params.setMarginStart(0); // Đặt thanh trượt ở vị trí tab đầu tiên
-            select.setLayoutParams(params);
-            item1.setTextColor(Color.WHITE); // Màu chữ trắng cho tab đang chọn
-            item2.setTextColor(Color.BLACK); // Màu chữ đen cho tab không chọn
-        } else if (selectedFormat.equals("double")) {
-            params.setMarginStart(tabWidth); // Đặt thanh trượt ở vị trí tab thứ hai
-            select.setLayoutParams(params);
-            item1.setTextColor(Color.BLACK);
+            // Đặt màu chữ cho tab được chọn và không được chọn
+            item1.setTextColor(Color.WHITE);
+            item2.setTextColor(getResources().getColor(R.color.black));
+        } else { // "double"
+            // Di chuyển indicator đến vị trí "Đấu đôi"
+            ObjectAnimator.ofFloat(tabIndicator, "translationX", tabWidth).setDuration(200).start();
+            params.width = tabWidth; // Đặt chiều rộng của indicator bằng chiều rộng của tab
+            tabIndicator.setLayoutParams(params);
+
+            // Đặt màu chữ cho tab được chọn và không được chọn
+            item1.setTextColor(getResources().getColor(R.color.black));
             item2.setTextColor(Color.WHITE);
         }
+        updatePlayerSlotsVisibility(); // Cập nhật hiển thị slot người chơi
     }
 
-    /**
-     * Cập nhật visibility của các slot người chơi dựa trên loại trận đấu được chọn.
-     * - "single": chỉ hiển thị slot 1 và 2.
-     * - "double": hiển thị tất cả slot 1, 2, 3, 4.
-     */
     private void updatePlayerSlotsVisibility() {
         if (currentMatchFormat.equals("single")) {
-            // Ẩn slot 3 và 4 cùng với TextView của chúng
+            // Ẩn slot 3 và 4 nếu là đấu đơn
             if (slot3 != null) slot3.setVisibility(View.GONE);
             if (id_txtslot3 != null) {
                 id_txtslot3.setVisibility(View.GONE);
-                id_txtslot3.setText(""); // Xóa văn bản nếu đang ẩn
+                id_txtslot3.setText(""); // Xóa tên người chơi nếu bị ẩn
             }
             if (slot4 != null) slot4.setVisibility(View.GONE);
             if (id_txtslot4 != null) {
                 id_txtslot4.setVisibility(View.GONE);
-                id_txtslot4.setText(""); // Xóa văn bản nếu đang ẩn
+                id_txtslot4.setText(""); // Xóa tên người chơi nếu bị ẩn
             }
-        } else { // "double"
-            // Hiển thị tất cả các slot và TextView của chúng
+        } else {
+            // Hiển thị slot 3 và 4 nếu là đấu đôi
             if (slot3 != null) slot3.setVisibility(View.VISIBLE);
-            if (id_txtslot3 != null) id_txtslot3.setVisibility(View.VISIBLE);
+            if (id_txtslot3 != null) {
+                id_txtslot3.setVisibility(View.VISIBLE);
+                id_txtslot3.setText(player3Name);
+            }
             if (slot4 != null) slot4.setVisibility(View.VISIBLE);
-            if (id_txtslot4 != null) id_txtslot4.setVisibility(View.VISIBLE);
+            if (id_txtslot4 != null) {
+                id_txtslot4.setVisibility(View.VISIBLE);
+                id_txtslot4.setText(player4Name);
+            }
         }
+        // Cập nhật UI cho slot 1 và 2 dựa trên tên người chơi hiện tại
+        updatePlayerSlotUI(slot1, id_txtslot1, player1Name);
+        updatePlayerSlotUI(slot2, id_txtslot2, player2Name);
+    }
+
+    private void updatePlayerSlotUI(ImageButton slotButton, TextView slotTextView, String playerName) {
+        // Cập nhật giao diện của ô người chơi: hiển thị TextView nếu có tên, ImageButton nếu là placeholder
+        if (playerName != null && !playerName.isEmpty() &&
+                !playerName.equals("Ảnh") && !playerName.equals("Đồng") &&
+                !playerName.equals("Hữu") && !playerName.equals("Quyền")) { // Kiểm tra nếu đã chọn người chơi
+            slotButton.setVisibility(View.GONE);
+            slotTextView.setVisibility(View.VISIBLE);
+            slotTextView.setText(playerName);
+            slotTextView.setBackgroundColor(Color.parseColor("#2A77DB")); // Màu nền khi đã chọn
+            slotTextView.setTextColor(Color.WHITE);
+            slotTextView.setTextSize(18f);
+            slotTextView.setGravity(Gravity.CENTER);
+            slotTextView.setPadding(0, 10, 0, 10);
+        } else {
+            slotButton.setVisibility(View.VISIBLE);
+            slotTextView.setVisibility(View.VISIBLE);
+            slotTextView.setText(playerName); // Vẫn hiển thị tên placeholder
+            slotTextView.setBackground(null); // Xóa nền nếu là placeholder
+            slotTextView.setTextColor(Color.WHITE); // Màu chữ mặc định cho placeholder
+            slotTextView.setTextSize(12f); // Kích thước chữ mặc định cho placeholder
+            slotTextView.setGravity(Gravity.CENTER); // Đảm bảo placeholder cũng căn giữa
+            slotTextView.setPadding(0, 0, 0, 0); // Reset padding
+        }
+    }
+
+    private void updateSetScoreInputs(int numberOfSets) {
+        if (layoutMatchSetScores == null) {
+            Log.e("AddMatch_Fragment", "layoutMatchSetScores is null. Please ensure it's initialized.");
+            return;
+        }
+
+        layoutMatchSetScores.removeAllViews(); // Xóa tất cả các ô nhập điểm hiện có
+
+        // Thêm các ô nhập điểm mới tương ứng với số set
+        for (int i = 1; i <= numberOfSets; i++) {
+            View setItemView = getLayoutInflater().inflate(R.layout.item_match_set_score, layoutMatchSetScores, false);
+            TextView textViewSetLabel = setItemView.findViewById(R.id.textViewSetLabel);
+            textViewSetLabel.setText("Set " + i);
+
+            layoutMatchSetScores.addView(setItemView);
+        }
+    }
+
+    private void confirmMatch() {
+        String matchTime = inputTimeButton.getText().toString();
+        String matchDate = selectDateButton.getText().toString();
+        String fullDateTime = matchDate + " " + matchTime;
+        String format = currentMatchFormat.equals("single") ? "Đấu đơn" : "Đấu đôi";
+
+        StringBuilder scoresBuilder = new StringBuilder();
+        // Lặp qua từng set để lấy điểm số
+        for (int i = 0; i < layoutMatchSetScores.getChildCount(); i++) {
+            View setItemView = layoutMatchSetScores.getChildAt(i);
+            EditText etScoreTeam1 = setItemView.findViewById(R.id.editTextScoreTeam1);
+            EditText etScoreTeam2 = setItemView.findViewById(R.id.editTextScoreTeam2);
+
+            String score1 = etScoreTeam1.getText().toString();
+            String score2 = etScoreTeam2.getText().toString();
+
+            // Kiểm tra xem điểm số đã được nhập đầy đủ chưa
+            if (score1.isEmpty() || score2.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng nhập đầy đủ điểm số cho tất cả các set!", Toast.LENGTH_SHORT).show();
+                return; // Dừng lại nếu thiếu điểm
+            }
+
+            scoresBuilder.append(score1).append("-").append(score2);
+            if (i < layoutMatchSetScores.getChildCount() - 1) {
+                scoresBuilder.append(", "); // Thêm dấu phẩy nếu không phải set cuối cùng
+            }
+        }
+        String scores = scoresBuilder.toString();
+
+        // Chuẩn bị tên người chơi dựa trên định dạng trận đấu
+        String p1 = player1Name;
+        String p2 = player2Name;
+        String p3 = (currentMatchFormat.equals("double") && player3Name != null && !player3Name.equals("Hữu")) ? player3Name : "";
+        String p4 = (currentMatchFormat.equals("double") && player4Name != null && !player4Name.equals("Quyền")) ? player4Name : "";
+
+
+        // Tạo đối tượng Matches mới
+        Matches newMatch;
+        if (currentMatchFormat.equals("single")) {
+            newMatch = new Matches(p1, p2, R.drawable.avatar_1, R.drawable.avatar_1, scores, fullDateTime, "Đã kết thúc");
+        } else {
+            newMatch = new Matches(p1 + " & " + p3, p2 + " & " + p4, R.drawable.avatar_1, R.drawable.avatar_1, scores, fullDateTime, "Đã kết thúc");
+        }
+
+        // Gửi trận đấu mới
+        matchDataManager.submitNewMatch(newMatch, new MatchDataManager.SubmitMatchCallback() {
+            @Override
+            public void onSuccess(String message) {
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                // Sau khi lưu thành công, thoát Fragment
+                requireActivity().onBackPressed();
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(getContext(), "Lỗi: " + errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private boolean hasUnsavedData() {
+        // Kiểm tra xem người chơi đã được chọn ngoài giá trị mặc định chưa
+        boolean playersSelected = !(player1Name.equals("Ảnh") && player2Name.equals("Đồng"));
+        if (currentMatchFormat.equals("double")) {
+            playersSelected = playersSelected && !(player3Name.equals("Hữu") && player4Name.equals("Quyền"));
+        }
+
+        // Kiểm tra xem có điểm số nào được nhập chưa
+        boolean scoresEntered = false;
+        if (layoutMatchSetScores != null) {
+            for (int i = 0; i < layoutMatchSetScores.getChildCount(); i++) {
+                View setItemView = layoutMatchSetScores.getChildAt(i);
+                EditText etScoreTeam1 = setItemView.findViewById(R.id.editTextScoreTeam1);
+                EditText etScoreTeam2 = setItemView.findViewById(R.id.editTextScoreTeam2);
+                if (etScoreTeam1 != null && !etScoreTeam1.getText().toString().isEmpty() ||
+                        etScoreTeam2 != null && !etScoreTeam2.getText().toString().isEmpty()) {
+                    scoresEntered = true;
+                    break;
+                }
+            }
+        }
+        return playersSelected || scoresEntered; // Trả về true nếu có bất kỳ dữ liệu nào đã thay đổi
+    }
+
+    private void showDiscardChangesDialog() {
+        // Tạo một Dialog tùy chỉnh thay vì AlertDialog mặc định
+        final Dialog dialog = new Dialog(getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // Bỏ title mặc định của dialog
+        dialog.setContentView(R.layout.dialog_discard_changes); // Gán layout tùy chỉnh của bạn
+
+        // Để dialog có nền trong suốt (chỉ hiển thị phần bo góc của layout)
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        // Lấy các nút từ layout của dialog
+        Button btnConfirmExit = dialog.findViewById(R.id.btn_confirm_exit);
+        Button btnCancelExit = dialog.findViewById(R.id.btn_cancel_exit);
+
+        // Thiết lập Listener cho các nút
+        btnConfirmExit.setOnClickListener(v -> {
+            dialog.dismiss(); // Đóng dialog
+            // Khi người dùng xác nhận thoát, chúng ta chỉ cần gọi onBackPressed()
+            // Callback đã được thiết lập ở onViewCreated sẽ tự động xử lý phần còn lại.
+            requireActivity().onBackPressed();
+        });
+
+        btnCancelExit.setOnClickListener(v -> {
+            dialog.dismiss(); // Đóng dialog
+        });
+
+        dialog.show(); // Hiển thị dialog
     }
 }
