@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const userController = require("../controllers/userController");
 const { verifyToken } = require("../middlewares/verifyToken");
 const { requireAdmin } = require("../middlewares/requireAdmin");
-
+const userController = require("../controllers/userController");
 const fileParser = require("express-multipart-file-parser");
 
 // Người dùng gửi thông tin cá nhân của mình

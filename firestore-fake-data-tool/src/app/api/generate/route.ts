@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { faker } from '@faker-js/faker';
 import { getRandomVietnameseName } from '@/utils/vietnameseNames';
 import { admin } from '@/lib/firebase';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 const db = admin.firestore();
 
@@ -15,6 +17,39 @@ type InputPayload = {
     penaltyPaidRatio?: number;
     donationRatio?: number;
 };
+
+async function uploadLocalAvatar(uid: string, gender: 'male' | 'female'): Promise<string> {
+  const folderPath = path.join(process.cwd(), 'assets', gender);
+  const files = await fs.readdir(folderPath);
+
+  if (files.length === 0) {
+    throw new Error(`No avatar files found in ${folderPath}`);
+  }
+
+  const fileName = files[Math.floor(Math.random() * files.length)];
+  const filePath = path.join(folderPath, fileName);
+  const fileBuffer = await fs.readFile(filePath);
+
+  // Xác định content type
+  const ext = path.extname(fileName).toLowerCase();
+  let contentType = 'image/jpeg';
+  if (ext === '.png') {
+    contentType = 'image/png';
+  }
+
+  const bucket = admin.storage().bucket();
+  const file = bucket.file(`avatars/${uid}/avatar${ext}`);
+
+  await file.save(fileBuffer, {
+    contentType,
+    metadata: {
+      cacheControl: 'public,max-age=31536000',
+    },
+  });
+
+  await file.makePublic();
+  return file.publicUrl();
+}
 
 export async function POST(req: Request) {
     const {
@@ -52,15 +87,19 @@ export async function POST(req: Request) {
             await db.collection('users').doc(uid).set({
                 email,
                 role,
-                approvalStatus: faker.helpers.arrayElement(['approved', 'pending', 'rejected']),
+                approvalStatus: faker.helpers.arrayElement(['approved']),
                 isDisabled: false,
                 createdAt,
             });
 
+            const gender = faker.helpers.arrayElement(['male', 'female']);
+            const avatarUrl = await uploadLocalAvatar(uid, gender);
+
             await db.collection('users').doc(uid).collection('profile').doc('info').set({
                 fullName: getRandomVietnameseName(),
-                gender: faker.helpers.arrayElement(['male', 'female']),
+                gender,
                 birthDate: faker.date.birthdate(),
+                avatarUrl,
             });
         }
 
@@ -138,7 +177,9 @@ export async function POST(req: Request) {
 
                     // Cộng vào tổng điểm
                     userScores[userId][type] += pointDelta;
-
+                    if(userScores[userId][type] < 0) {
+                        userScores[userId][type] = 0; // Không để điểm âm
+                    }
                     await db.collection('users').doc(userId).collection('scoreHistories').add({
                         scoreId: faker.string.uuid(),
                         matchId,
@@ -235,18 +276,36 @@ export async function POST(req: Request) {
             if (!matchData) continue;
 
             const participantsSnap = await db.collection('matches').doc(matchId).collection('participants').get();
+            if (participantsSnap.empty) continue;
+
+            // Xác định team thắng dựa trên setResults
+            const setSnap = await db.collection('matches').doc(matchId).collection('setResults').get();
+            if (setSnap.empty) continue;
+
+            let team1Wins = 0;
+            let team2Wins = 0;
+            for (const set of setSnap.docs) {
+                const data = set.data();
+                if (data.team1Score > data.team2Score) {
+                    team1Wins++;
+                } else {
+                    team2Wins++;
+                }
+            }
+            const winningTeam = team1Wins > team2Wins ? 1 : 2;
+
             for (const doc of participantsSnap.docs) {
                 const p = doc.data();
                 const userId = p.userId;
+                const team = p.team;
 
-                const isWinner = p.team === 1;
-                if (isWinner) continue;
+                if (team === winningTeam) continue; // Không phạt người thắng
 
+                // Tính tiền phạt
                 const requestId = faker.string.uuid();
                 const penaltyAmount = 10000;
                 const createdAt = matchData.startTime.toDate?.() ?? new Date(matchData.startTime);
                 const isPaid = Math.random() * 100 < penaltyPaidRatio;
-
                 const paidAt = isPaid ? faker.date.soon({ days: 5, refDate: createdAt.toISOString() }) : null;
 
                 await db.collection('users').doc(userId).collection('paymentRequests').doc(requestId).set({
@@ -257,7 +316,7 @@ export async function POST(req: Request) {
                     status: isPaid ? 'paid' : 'unpaid',
                     matchId,
                     createdAt,
-                    paidAt: isPaid ? faker.date.soon({ days: 5, refDate: createdAt }) : null,
+                    paidAt,
                 });
 
                 let transactionId = null;
@@ -285,6 +344,7 @@ export async function POST(req: Request) {
                 });
             }
         }
+
 
         const adminUser = userIds[0];
         for (let i = 0; i < 20; i++) {
