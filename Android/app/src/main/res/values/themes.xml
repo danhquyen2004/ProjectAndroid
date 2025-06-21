@@ -87,13 +87,18 @@
     </style>
 
     <style name="StatusPending" parent="StatusBase">
-        <item name="android:textColor">#E7564F</item>
-        <item name="android:drawableStart">@drawable/ic_status_red</item>
+        <item name="android:textColor">#CF0000</item>
+        <item name="android:background">#FFDDDD</item>
     </style>
 
     <style name="StatusDone" parent="StatusBase">
-        <item name="android:textColor">#26BF3D</item>
-        <item name="android:drawableStart">@drawable/ic_status_green</item>
+        <item name="android:textColor">#126C35</item>
+        <item name="android:background">#00CF00</item>
+    </style>
+
+    <style name="Status" parent="StatusBase">
+        <item name="android:textColor">#FFB120</item>
+        <item name="android:background">#FFE2AC</item>
     </style>
 
 

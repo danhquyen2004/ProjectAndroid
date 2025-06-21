@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="220dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/CtLMemberFund"
+        android:layout_width="match_parent"
+        android:background="@drawable/bg_memberfund"
+        android:layout_height="200dp"
+        android:layout_margin="10dp"
+        android:padding="16dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/image_avatar"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="28dp"
+            android:layout_marginTop="24dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background"
+            app:layout_constraintEnd_toStartOf="@+id/tvMemberPenalty"
+            app:layout_constraintHorizontal_bias="0.214"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+        <ImageView
+            android:id="@+id/icon_camera"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:src="@drawable/ic_camera"
+            app:layout_constraintBottom_toBottomOf="@id/image_avatar"
+            app:layout_constraintEnd_toEndOf="@id/image_avatar" />
+
+        <TextView
+            android:id="@+id/tvMemberName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="24dp"
+            android:text="Nguyễn Văn A"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/tvMemberDonate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/image_avatar" />
+
+        <TextView
+            android:id="@+id/tvMemberFund"
+            android:layout_width="160dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/button_white_background"
+            android:gravity="center"
+            android:text="Quỹ: 100.000đ"
+            android:textColor="#00CF00"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvMemberPenalty"
+            android:layout_width="160dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/button_white_background"
+            android:gravity="center"
+            android:text="Phạt: 50.000đ"
+            android:textColor="#CF0000"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvMemberFund" />
+
+        <TextView
+            android:id="@+id/tvMemberDonate"
+            android:layout_width="160dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/button_white_background"
+            android:gravity="center"
+            android:text="Ủng hộ: 100.000đ"
+            android:textColor="#FFB120"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvMemberPenalty" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

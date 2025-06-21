@@ -5,132 +5,225 @@
     android:id="@+id/club_finance"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    android:padding="16dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#FFFFFF">
 
-
-        <!-- Nút thêm chi tiêu và quản lý quỹ -->
-
-        <Button
-            android:id="@+id/btnAddExpense"
-            style="@style/Base.Theme.Button.Blue"
-            android:layout_width="180dp"
-            android:layout_height="55dp"
-            android:layout_weight="1"
-            android:text="Thêm chi tiêu"
-            app:layout_constraintBottom_toTopOf="@+id/cardTotalFund"
+        <!-- Quỹ còn lại -->
+        <LinearLayout
+            android:id="@+id/LL_financeClub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_finance_club"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.069"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.863" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Tổng quỹ -->
-        <Button
-            android:id="@+id/btnManageFund"
-            style="@style/Base.Theme.Button.Blue"
-            android:layout_width="180dp"
-            android:layout_height="55dp"
-            android:layout_weight="1"
-            android:text="Quản lý quỹ"
-            app:layout_constraintBottom_toTopOf="@+id/cardTotalFund"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.909"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.863" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardTotalFund"
-            android:layout_width="370dp"
-            android:layout_height="90dp"
-            app:cardBackgroundColor="#E7E6EB"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.491"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.27">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <TextView
+                android:id="@+id/tvFundLabel"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="35dp"
+                android:gravity="center"
+                android:text="Quỹ còn lại"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvFund"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="100.000đ"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </LinearLayout>
+
+        <!-- Spinner chọn tháng -->
+        <Spinner
+            android:id="@+id/spinnerMonth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/LL_financeClub" />
+
+        <!-- Tổng thu / Tổng chi -->
+        <LinearLayout
+            android:id="@+id/summaryLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spinnerMonth">
+
+            <LinearLayout
+                android:id="@+id/LL_Total_revenue"
+                android:layout_width="175dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_finance_club"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:id="@+id/txt_TotalFundTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0đ"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:gravity="center"
+                    android:text="Tổng thu"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
                     android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/txt_TotalFundValue"
-                    app:layout_constraintVertical_bias="0.384" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/txt_TotalFundValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tổng quỹ"
-                    android:textColor="#7C7C7C"
-                    android:textSize="16dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:id="@+id/tvRevenue"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:text="100.000đ"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="30dp"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:id="@+id/LL_Total_expenses"
+                android:layout_width="175dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_finance_club"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:gravity="center"
+                    android:text="Tổng chi"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.242" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tvExpenses"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:text="100.000đ"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </LinearLayout>
+        </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        <!-- Nút thống kê -->
+        <LinearLayout
+            android:id="@+id/llDonate"
+            android:layout_width="320dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/bg_blue"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.493"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/summaryLayout">
 
-        <!-- Tiêu đề danh sách -->
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_wallet" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:text="Thống kê quỹ của thành viên"
+                android:textColor="#FFFFFF"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <!-- Tiêu đề Lịch sử -->
         <TextView
-            android:id="@+id/tvTransactionTitle"
+            android:id="@+id/tvHistoryLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:layout_marginTop="32dp"
             android:text="Lịch sử giao dịch"
-            android:textColor="#000000"
-            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardTotalFund" />
+            app:layout_constraintTop_toBottomOf="@+id/llDonate" />
 
-        <!-- Icon filter -->
-        <ImageView
-            android:id="@+id/ivFilter"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="32dp"
-            android:src="@drawable/ic_filter_search"
-            app:layout_constraintBottom_toBottomOf="@id/tvTransactionTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvTransactionTitle"
-            app:layout_constraintVertical_bias="1.0" />
-
-        <!-- RecyclerView danh sách giao dịch -->
+        <!-- RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvTransactions"
+            android:id="@+id/recyclerFundClubHistory"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            app:layout_constraintTop_toBottomOf="@id/tvTransactionTitle"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
+            android:paddingBottom="100dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel" />
+
+        <!-- Floating Add Expense Button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAddExpense"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:text="Chi tiêu"
+            android:background="@drawable/bg_blue"
+            android:textColor="@android:color/white"
+            android:drawableLeft="@drawable/ic_add"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 
 </FrameLayout>

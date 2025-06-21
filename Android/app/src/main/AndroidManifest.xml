@@ -73,10 +73,25 @@
             android:name=".activities.ProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.OtpActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".activities.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.member_fundpersonal"
+            android:exported="false" />
+        <activity
+            android:name=".activities.member_fund_manager"
+            android:exported="false" />
+        <activity
+            android:name=".activities.donate"
+            android:exported="false" />
+        <activity
+            android:name=".activities.Activity_payment"
             android:exported="false" />
     </application>
 
