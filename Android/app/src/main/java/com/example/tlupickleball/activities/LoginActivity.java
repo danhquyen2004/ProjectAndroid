@@ -1,86 +1,114 @@
 package com.example.tlupickleball.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 
 import com.example.tlupickleball.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.example.tlupickleball.activities.base.AuthActivity;
+import com.example.tlupickleball.activities.base.BaseActivity;
+import com.example.tlupickleball.model.Account;
+import com.example.tlupickleball.network.api_model.auth.LoginResponse;
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.service.AuthService;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.tlupickleball.network.core.*;
 
-public class LoginActivity extends AppCompatActivity {
-    EditText edtPhone, edtPassword;
-    Button btnLogin, btnRegister;
-    FirebaseFirestore db;
-    FirebaseAuth mAuth;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class LoginActivity extends AuthActivity {
+    private EditText emailEditText, passwordEditText;
+    private Button loginButton;
+    private TextView goToRegisterText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        edtPhone = findViewById(R.id.edtPhone);
-        edtPassword = findViewById(R.id.edtPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnRegister = findViewById(R.id.btnRegister);
+        emailEditText = findViewById(R.id.emailEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+        loginButton = findViewById(R.id.loginButton);
+        goToRegisterText = findViewById(R.id.goToRegisterText);
 
-        db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-
-
-        btnRegister.setOnClickListener(v -> {
-            Intent intent = new Intent(this, RegisterActivity.class);
-            startActivity(intent);
+        loginButton.setOnClickListener(v -> {
+            showLoading();
+            String email = emailEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
+            loginUser(email, password);
         });
 
-        btnLogin.setOnClickListener(v -> {
-            String phone = edtPhone.getText().toString().trim();
-            String password = edtPassword.getText().toString().trim();
+        goToRegisterText.setOnClickListener(v -> {
+            startActivity(new Intent(this, RegisterActivity.class));
+        });
+    }
+    private void loginUser(String email, String password) {
+        Account account = new Account(email, password);
+        authService.login(account).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                if (response.isSuccessful()) {
+                    LoginResponse body = response.body();
+                    SessionManager.saveTokens(LoginActivity.this, body.getIdToken(), body.getRefreshToken(), body.getUid());
+                    if(body.isDisabled())
+                    {
+                        Toast.makeText(LoginActivity.this, "Tài khoản đã bị vô hiệu hóa", Toast.LENGTH_SHORT).show();
+                    }
+                    else if(!body.isEmailVerified())
+                    {
+                        startActivity(new Intent(LoginActivity.this, EmailVerificationActivity.class));
+                    }
+                    else
+                    {
+                        Log.d("TOKEN", "TOKEN : " + body.getIdToken());
+                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                        checkUserProfileAndRedirect(LoginActivity.this, body.getUid());
+                    }
 
-            if (phone.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
-                return;
+                } else {
+                    if(response.code() == 401){
+                        Toast.makeText(LoginActivity.this, "Email hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                hideLoading();
             }
 
-            loginWithPhoneAndPassword(phone, password);
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("LoginActivity", "onFailure: " + t.getMessage());
+                hideLoading();
+            }
         });
     }
 
-    private void loginWithPhoneAndPassword(String phone, String password) {
-        db.collection("users")
-                .whereEqualTo("phoneNumber", phone)
+    private static void checkUserProfileAndRedirect(Context context, String uid) {
+        FirebaseFirestore.getInstance().collection("users")
+                .document(uid)
                 .get()
-                .addOnSuccessListener(query -> {
-                    if (query.isEmpty()) {
-                        Toast.makeText(this, "Không tìm thấy tài khoản", Toast.LENGTH_SHORT).show();
-                        return;
+                .addOnSuccessListener(document -> {
+                    if (!document.exists() ||
+                            !document.contains("name") ||
+                            !document.contains("dob") ||
+                            !document.contains("gender")) {
+
+                        context.startActivity(new Intent(context, ProfileActivity.class));
+                    } else {
+                        context.startActivity(new Intent(context, MainActivity.class));
                     }
-
-                    DocumentSnapshot userDoc = query.getDocuments().get(0);
-                    String savedPassword = userDoc.getString("password");
-
-                    if (!password.equals(savedPassword)) {
-                        Toast.makeText(this, "Sai mật khẩu", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    // ✅ Cho vào app nếu đúng mật khẩu
-                    // Có thể kiểm tra approved nếu muốn tại đây
-                    startActivity(new Intent(this, MainActivity.class));
-                    finish();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi khi truy vấn Firestore", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    Toast.makeText(context, "Không thể truy vấn hồ sơ người dùng", Toast.LENGTH_SHORT).show();
                 });
     }
+
 }

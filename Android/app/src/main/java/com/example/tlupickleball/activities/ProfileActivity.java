@@ -1,52 +1,74 @@
 package com.example.tlupickleball.activities;
 
-import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.apis.UserApi;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.tlupickleball.activities.base.BaseActivity;
+import com.example.tlupickleball.model.User;
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.service.UserService;
 
-public class ProfileActivity extends AppCompatActivity {
-    EditText edtName, edtDob, edtGender;
-    Button btnSubmit;
-    String idToken;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    @SuppressLint("MissingInflatedId")
+public class ProfileActivity extends BaseActivity {
+    private EditText nameEditText, dobEditText, genderEditText;
+    private Button submitButton;
+    UserService service;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        edtName = findViewById(R.id.edtName);
-        edtDob = findViewById(R.id.edtDob);
-        edtGender = findViewById(R.id.edtGender);
-        btnSubmit = findViewById(R.id.btnSubmit);
+        nameEditText = findViewById(R.id.nameEditText);
+        dobEditText = findViewById(R.id.dobEditText);
+        genderEditText = findViewById(R.id.genderEditText);
+        submitButton = findViewById(R.id.submitButton);
 
-        // Lấy ID Token từ Firebase
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(true)
-                .addOnSuccessListener(result -> idToken = result.getToken());
+        service = ApiClient.getClient(this).create(UserService.class);
 
-        btnSubmit.setOnClickListener(v -> {
-            String name = edtName.getText().toString().trim();
-            String dob = edtDob.getText().toString().trim();
-            String gender = edtGender.getText().toString().trim();
+        submitButton.setOnClickListener(v -> {
+            showLoading();
 
-            if (name.isEmpty() || dob.isEmpty() || gender.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
-                return;
+            String name = nameEditText.getText().toString().trim();
+            String dob = dobEditText.getText().toString().trim();
+            String gender = genderEditText.getText().toString().trim();
+
+            saveUserProfile(name, dob,gender);
+        });
+    }
+
+    private void saveUserProfile(String name, String dob, String gender)
+    {
+        User user = new User();
+        user.setName(name);
+        user.setDob(dob);
+        user.setGender(gender);
+
+        service.submitProfile(user).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ProfileActivity.this, "Cập nhật hồ sơ thành công", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Lỗi: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+                hideLoading();
             }
 
-            UserApi.sendSubmitProfile(this, idToken, name, dob, gender);
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                hideLoading();
+            }
         });
     }
 }
