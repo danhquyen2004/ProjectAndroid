@@ -12,7 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton; // Import ImageButton
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.EditText;
@@ -25,10 +25,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.fragments.PlayerSelectionDialog; // Import dialog
+import com.example.tlupickleball.model.User; // Import model User của bạn
 import com.example.tlupickleball.network.api_model.match.CreateMatchRequest;
 import com.example.tlupickleball.network.core.ApiClient;
 import com.example.tlupickleball.network.service.MatchService;
-import com.example.tlupickleball.network.api_model.match.CreateMatchResponse; // Import CreateMatchResponse
+import com.example.tlupickleball.network.api_model.match.CreateMatchResponse;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,21 +40,20 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AddMatch_Fragment extends Fragment {
+public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog.PlayerSelectedListener { //
 
     private ImageButton backButton;
     private Button inputTimeButton;
     private Button selectDateButton;
-    private TextView item1MatchType; // Đấu đơn
-    private TextView item2MatchType; // Đấu đôi
-    private View tabIndicator; // View di chuyển để chỉ báo tab
-    private LinearLayout customTabLayoutContainer; // Đã sửa từ FrameLayout sang LinearLayout
+    private TextView item1MatchType;
+    private TextView item2MatchType;
+    private View tabIndicator;
+    private LinearLayout customTabLayoutContainer;
 
     private Spinner setCountSpinner;
     private FrameLayout pickleballCourtContainer;
@@ -61,11 +62,12 @@ public class AddMatch_Fragment extends Fragment {
 
     private Calendar selectedDate;
     private String selectedTime;
-    private String selectedMatchType; // "single" hoặc "double"
+    private String selectedMatchType;
     private int selectedSetCount;
 
-    private List<String> team1Players = new ArrayList<>();
-    private List<String> team2Players = new ArrayList<>();
+    // Sử dụng đối tượng User thay vì chỉ UIDs
+    private List<User> team1Players = new ArrayList<>();
+    private List<User> team2Players = new ArrayList<>();
 
     private MatchService matchService;
 
@@ -80,6 +82,13 @@ public class AddMatch_Fragment extends Fragment {
     private ImageButton player2Team1AddButton;
     private ImageButton player1Team2AddButton;
     private ImageButton player2Team2AddButton;
+
+    // Hằng số cho các vị trí người chơi
+    private static final int PLAYER_SLOT_1_TEAM_1 = 1;
+    private static final int PLAYER_SLOT_2_TEAM_1 = 2;
+    private static final int PLAYER_SLOT_1_TEAM_2 = 3;
+    private static final int PLAYER_SLOT_2_TEAM_2 = 4;
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -110,7 +119,7 @@ public class AddMatch_Fragment extends Fragment {
         layoutMatchSetScoresContainer = view.findViewById(R.id.layoutMatchSetScoresContainer);
         confirmButton = view.findViewById(R.id.confirmButton);
 
-        // Ánh xạ các ImageButton để thêm người chơi
+
         player1Team1AddButton = pickleballCourtContainer.findViewById(R.id.player1_team1_add_button);
         player2Team1AddButton = pickleballCourtContainer.findViewById(R.id.player2_team1_add_button);
         player1Team2AddButton = pickleballCourtContainer.findViewById(R.id.player1_team2_add_button);
@@ -152,11 +161,11 @@ public class AddMatch_Fragment extends Fragment {
 
         confirmButton.setOnClickListener(v -> createMatch());
 
-        // Thêm listener cho các nút thêm người chơi (tùy chọn)
-        player1Team1AddButton.setOnClickListener(v -> Toast.makeText(getContext(), "Chọn người chơi A", Toast.LENGTH_SHORT).show());
-        player2Team1AddButton.setOnClickListener(v -> Toast.makeText(getContext(), "Chọn người chơi C", Toast.LENGTH_SHORT).show());
-        player1Team2AddButton.setOnClickListener(v -> Toast.makeText(getContext(), "Chọn người chơi B", Toast.LENGTH_SHORT).show());
-        player2Team2AddButton.setOnClickListener(v -> Toast.makeText(getContext(), "Chọn người chơi D", Toast.LENGTH_SHORT).show());
+        // Thêm listener cho các nút thêm người chơi để hiển thị PlayerSelectionDialog
+        player1Team1AddButton.setOnClickListener(v -> showPlayerSelectionDialog(PLAYER_SLOT_1_TEAM_1));
+        player2Team1AddButton.setOnClickListener(v -> showPlayerSelectionDialog(PLAYER_SLOT_2_TEAM_1));
+        player1Team2AddButton.setOnClickListener(v -> showPlayerSelectionDialog(PLAYER_SLOT_1_TEAM_2));
+        player2Team2AddButton.setOnClickListener(v -> showPlayerSelectionDialog(PLAYER_SLOT_2_TEAM_2));
     }
 
     private void setupInitialData() {
@@ -172,10 +181,7 @@ public class AddMatch_Fragment extends Fragment {
         selectedSetCount = Integer.parseInt(setCountSpinner.getItemAtPosition(0).toString());
         generateSetScoreInputs(selectedSetCount);
 
-        // UUID người chơi giả để minh họa
-        team1Players.add("7e008907-f932-4857-b9a6-fec32c30fe93");
-        team2Players.add("e8fd3d9e-431c-492e-8cb6-f7b3728e5341");
-        updatePickleballCourtView();
+        updatePickleballCourtView(); // Gọi ban đầu để thiết lập hiển thị chính xác
     }
 
     private void selectMatchType(String type) {
@@ -183,14 +189,15 @@ public class AddMatch_Fragment extends Fragment {
         updateMatchTypeTabs(type);
         updatePickleballCourtView();
 
-        if (selectedMatchType.equals("single")) {
-            if (team1Players.size() > 1) team1Players = team1Players.subList(0,1);
-            if (team2Players.size() > 1) team2Players = team2Players.subList(0,1);
-        } else { // "double"
-            // Đảm bảo có đủ 2 người chơi mỗi đội cho đấu đôi
-            while (team1Players.size() < 2) team1Players.add(UUID.randomUUID().toString());
-            while (team2Players.size() < 2) team2Players.add(UUID.randomUUID().toString());
-        }
+        // Xóa người chơi khi chuyển loại trận đấu để tránh các lựa chọn không hợp lệ
+        team1Players.clear();
+        team2Players.clear();
+
+        // Đặt lại TextViews
+        if (player1Team1NameTextView != null) player1Team1NameTextView.setText("Chọn người chơi A");
+        if (player2Team1NameTextView != null) player2Team1NameTextView.setText("Chọn người chơi C");
+        if (player1Team2NameTextView != null) player1Team2NameTextView.setText("Chọn người chơi B");
+        if (player2Team2NameTextView != null) player2Team2NameTextView.setText("Chọn người chơi D");
     }
 
     private void updateMatchTypeTabs(String selectedType) {
@@ -257,31 +264,85 @@ public class AddMatch_Fragment extends Fragment {
         timePickerDialog.show();
     }
 
-    private void updatePickleballCourtView() {
-        // Cập nhật hiển thị tên người chơi
-        if (player1Team1NameTextView != null) player1Team1NameTextView.setText("Người chơi A");
-        if (player1Team2NameTextView != null) player1Team2NameTextView.setText("Người chơi B");
+    // Phương thức để hiển thị dialog chọn người chơi
+    private void showPlayerSelectionDialog(int playerSlot) {
+        PlayerSelectionDialog dialog = PlayerSelectionDialog.newInstance(playerSlot);
+        dialog.setPlayerSelectedListener(this); // Đặt fragment này làm listener
+        dialog.show(getParentFragmentManager(), "PlayerSelectionDialog");
+    }
 
-        // Điều chỉnh hiển thị của người chơi thứ 2 trong mỗi đội tùy thuộc vào loại trận đấu
+    // Callback khi một người chơi được chọn từ dialog
+    @Override
+    public void onPlayerSelected(User player, int playerSlot) {
+        // Kiểm tra trùng lặp người chơi (cùng một người chơi ở nhiều vị trí)
+        if (team1Players.contains(player) || team2Players.contains(player)) {
+            Toast.makeText(getContext(), "Người chơi này đã được chọn cho một đội khác.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        switch (playerSlot) {
+            case PLAYER_SLOT_1_TEAM_1:
+                if (!team1Players.isEmpty()) team1Players.set(0, player);
+                else team1Players.add(player);
+                if (player1Team1NameTextView != null) player1Team1NameTextView.setText(player.getFullName());
+                break;
+            case PLAYER_SLOT_2_TEAM_1:
+                if (selectedMatchType.equals("single")) {
+                    Toast.makeText(getContext(), "Không thể thêm người chơi thứ 2 cho đấu đơn.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (team1Players.size() > 1) team1Players.set(1, player);
+                else team1Players.add(player);
+                if (player2Team1NameTextView != null) player2Team1NameTextView.setText(player.getFullName());
+                break;
+            case PLAYER_SLOT_1_TEAM_2:
+                if (!team2Players.isEmpty()) team2Players.set(0, player);
+                else team2Players.add(player);
+                if (player1Team2NameTextView != null) player1Team2NameTextView.setText(player.getFullName());
+                break;
+            case PLAYER_SLOT_2_TEAM_2:
+                if (selectedMatchType.equals("single")) {
+                    Toast.makeText(getContext(), "Không thể thêm người chơi thứ 2 cho đấu đơn.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (team2Players.size() > 1) team2Players.set(1, player);
+                else team2Players.add(player);
+                if (player2Team2NameTextView != null) player2Team2NameTextView.setText(player.getFullName());
+                break;
+        }
+        updatePickleballCourtView(); // Cập nhật UI sau khi chọn
+    }
+
+
+    private void updatePickleballCourtView() {
+        // Cập nhật hiển thị tên người chơi dựa trên người chơi đã chọn
+        if (player1Team1NameTextView != null) {
+            player1Team1NameTextView.setText(team1Players.isEmpty() ? "Chọn người chơi A" : team1Players.get(0).getFullName());
+        }
+        if (player1Team2NameTextView != null) {
+            player1Team2NameTextView.setText(team2Players.isEmpty() ? "Chọn người chơi B" : team2Players.get(0).getFullName());
+        }
+
+        // Điều chỉnh hiển thị của người chơi thứ hai trong mỗi đội dựa trên loại trận đấu
         if (selectedMatchType.equals("single")) {
             if (player2Team1NameTextView != null) player2Team1NameTextView.setVisibility(View.GONE);
             if (player2Team2NameTextView != null) player2Team2NameTextView.setVisibility(View.GONE);
 
-            // Ẩn các nút thêm người chơi thứ 2
+            // Ẩn nút thêm người chơi thứ hai
             if (player2Team1AddButton != null) player2Team1AddButton.setVisibility(View.GONE);
             if (player2Team2AddButton != null) player2Team2AddButton.setVisibility(View.GONE);
 
         } else if (selectedMatchType.equals("double")) {
             if (player2Team1NameTextView != null) {
                 player2Team1NameTextView.setVisibility(View.VISIBLE);
-                player2Team1NameTextView.setText("Người chơi C");
+                player2Team1NameTextView.setText(team1Players.size() > 1 ? team1Players.get(1).getFullName() : "Chọn người chơi C");
             }
             if (player2Team2NameTextView != null) {
                 player2Team2NameTextView.setVisibility(View.VISIBLE);
-                player2Team2NameTextView.setText("Người chơi D");
+                player2Team2NameTextView.setText(team2Players.size() > 1 ? team2Players.get(1).getFullName() : "Chọn người chơi D");
             }
 
-            // Hiển thị các nút thêm người chơi thứ 2
+            // Hiển thị nút thêm người chơi thứ hai
             if (player2Team1AddButton != null) player2Team1AddButton.setVisibility(View.VISIBLE);
             if (player2Team2AddButton != null) player2Team2AddButton.setVisibility(View.VISIBLE);
         }
@@ -342,6 +403,19 @@ public class AddMatch_Fragment extends Fragment {
             return;
         }
 
+        // Kiểm tra tính hợp lệ của việc chọn người chơi dựa trên loại trận đấu
+        if (selectedMatchType.equals("single")) {
+            if (team1Players.size() != 1 || team2Players.size() != 1) {
+                Toast.makeText(requireContext(), "Vui lòng chọn 1 người chơi cho mỗi đội trong đấu đơn.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else if (selectedMatchType.equals("double")) {
+            if (team1Players.size() != 2 || team2Players.size() != 2) {
+                Toast.makeText(requireContext(), "Vui lòng chọn 2 người chơi cho mỗi đội trong đấu đôi.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
         List<CreateMatchRequest.SetResult> setResults = new ArrayList<>();
         for (int i = 1; i <= selectedSetCount; i++) {
             EditText team1ScoreEditText = layoutMatchSetScoresContainer.findViewWithTag("team1_score_set_" + i);
@@ -367,21 +441,18 @@ public class AddMatch_Fragment extends Fragment {
         SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String startDate = apiDateFormat.format(selectedDate.getTime());
 
-        // Logic để đảm bảo đủ người chơi cho loại trận đấu đã chọn
-        // Nếu là đấu đơn, chỉ giữ lại 1 người chơi mỗi đội.
-        // Nếu là đấu đôi, đảm bảo có 2 người chơi mỗi đội (thêm UUID giả nếu thiếu).
-        if (selectedMatchType.equals("single")) {
-            if (team1Players.size() > 1) team1Players = team1Players.subList(0, 1);
-            else if (team1Players.isEmpty()) team1Players.add(UUID.randomUUID().toString()); // Đảm bảo có ít nhất 1
-            if (team2Players.size() > 1) team2Players = team2Players.subList(0, 1);
-            else if (team2Players.isEmpty()) team2Players.add(UUID.randomUUID().toString()); // Đảm bảo có ít nhất 1
-        } else if (selectedMatchType.equals("double")) {
-            while (team1Players.size() < 2) team1Players.add(UUID.randomUUID().toString());
-            while (team2Players.size() < 2) team2Players.add(UUID.randomUUID().toString());
+        // Trích xuất UIDs từ các đối tượng User đã chọn
+        List<String> team1PlayerUids = new ArrayList<>();
+        for (User player : team1Players) {
+            team1PlayerUids.add(player.getUid());
         }
 
+        List<String> team2PlayerUids = new ArrayList<>();
+        for (User player : team2Players) {
+            team2PlayerUids.add(player.getUid());
+        }
 
-        CreateMatchRequest.Teams teams = new CreateMatchRequest.Teams(team1Players, team2Players);
+        CreateMatchRequest.Teams teams = new CreateMatchRequest.Teams(team1PlayerUids, team2PlayerUids);
 
         CreateMatchRequest matchRequest = new CreateMatchRequest(
                 startDate,

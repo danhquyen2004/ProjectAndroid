@@ -29,4 +29,4 @@
         android:layout_height="wrap_content"
         android:nestedScrollingEnabled="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_player_selection" /> </LinearLayout>
+        tools:listitem="@layout/item_player_search" /> </LinearLayout>
