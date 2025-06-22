@@ -134,8 +134,10 @@ exports.listMatchesByDay = async (req, res) => {
 
     // Tính thời gian bắt đầu và kết thúc của ngày
     const [year, month, day] = date.split("-").map(Number);
-    const startDate = new Date(year, month - 1, day, 0, 0, 0);
-    const endDate = new Date(year, month - 1, day, 23, 59, 59, 999);
+    // 00:00:00 VN = 17:00:00 hôm trước UTC
+    const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0) - 7 * 60 * 60 * 1000);
+    // 23:59:59.999 VN = 16:59:59.999 cùng ngày UTC
+    const endDate = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999) - 7 * 60 * 60 * 1000);
 
     // Lấy các trận đấu trong ngày
     const matchesSnap = await admin.firestore()
@@ -149,6 +151,15 @@ exports.listMatchesByDay = async (req, res) => {
 
     const matches = await Promise.all(matchesSnap.docs.map(async doc => {
       const match = doc.data();
+      // Lấy startTime chuẩn kiểu Date
+      let startTime = null;
+      if (match.startTime) {
+        if (typeof match.startTime.toDate === "function") {
+          startTime = match.startTime.toDate();
+        } else {
+          startTime = new Date(match.startTime);
+        }
+      }
       // Lấy danh sách người tham gia
       const participantsSnap = await admin.firestore()
         .collection("matches").doc(doc.id)
@@ -180,7 +191,7 @@ exports.listMatchesByDay = async (req, res) => {
       return {
         matchId: doc.id,
         status: match.status,
-        startTime: toVietnamTime(match.startTime),
+        startTime: startTime ? toVietnamTime(startTime) : null,
         participants,
         team1Wins,
         team2Wins
@@ -211,10 +222,12 @@ exports.listUserMatchesByDay = async (req, res) => {
     const pageInt = parseInt(page);
     const pageSizeInt = parseInt(pageSize);
 
-    // Tính thời gian bắt đầu và kết thúc của ngày
+    // Tính thời gian bắt đầu và kết thúc của ngày (theo giờ Việt Nam, convert sang UTC)
     const [year, month, day] = date.split("-").map(Number);
-    const startDate = new Date(year, month - 1, day, 0, 0, 0);
-    const endDate = new Date(year, month - 1, day, 23, 59, 59, 999);
+    // 00:00:00 VN = 17:00:00 hôm trước UTC
+    const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0) - 7 * 60 * 60 * 1000);
+    // 23:59:59.999 VN = 16:59:59.999 cùng ngày UTC
+    const endDate = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999) - 7 * 60 * 60 * 1000);
 
     // Lấy các trận đấu trong ngày
     const matchesSnap = await admin.firestore()
@@ -235,6 +248,15 @@ exports.listUserMatchesByDay = async (req, res) => {
         .get();
       if (!participantsSnap.empty) {
         const match = doc.data();
+        // Lấy startTime chuẩn kiểu Date
+        let startTime = null;
+        if (match.startTime) {
+          if (typeof match.startTime.toDate === "function") {
+            startTime = match.startTime.toDate();
+          } else {
+            startTime = new Date(match.startTime);
+          }
+        }
         // Lấy danh sách người tham gia
         const allParticipantsSnap = await admin.firestore()
           .collection("matches").doc(matchId)
@@ -265,7 +287,7 @@ exports.listUserMatchesByDay = async (req, res) => {
         userMatches.push({
           matchId,
           status: match.status,
-          startTime: toVietnamTime(match.startTime),
+          startTime: startTime ? toVietnamTime(startTime) : null,
           participants,
           team1Wins,
           team2Wins
@@ -328,16 +350,19 @@ exports.createMatch = async (req, res) => {
       }
     }
 
-    // Tạo document trận đấu
-    const matchRef = await admin.firestore().collection("matches").add({
-      type,
+    // Tạo matchId trước (dùng doc thay vì add)
+    const matchId = admin.firestore().collection("matches").doc().id;
+    const matchRef = admin.firestore().collection("matches").doc(matchId);
+    // Lưu đúng các trường yêu cầu
+    const matchData = {
+      createdBy: req.uid || null,
+      matchId,
       setCount,
       startTime: startDateTimeUTC,
       status,
-      createdBy: req.uid || null,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-    const matchId = matchRef.id;
+      type
+    };
+    await matchRef.set(matchData);
 
     // Thêm participants
     const batch = admin.firestore().batch();

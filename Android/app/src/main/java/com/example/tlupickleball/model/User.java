@@ -20,25 +20,25 @@ public class User {
     @SerializedName("profileImageUrl")
     private String profileImageUrl; // Thêm trường ảnh đại diện nếu cần
     @SerializedName("currentSingleScore")
-    private int currentSingleScore;
+    private float currentSingleScore;
     @SerializedName("currentDoubleScore")
-    private int currentDoubleScore;
+    private float currentDoubleScore;
     @SerializedName("createdAt")
     private String createdAt; // có thể dùng Timestamp nếu parse từ Firestore
 
-    public int getCurrentSingleScore() {
+    public float getCurrentSingleScore() {
         return currentSingleScore;
     }
 
-    public void setCurrentSingleScore(int currentSingleScore) {
+    public void setCurrentSingleScore(float currentSingleScore) {
         this.currentSingleScore = currentSingleScore;
     }
 
-    public int getCurrentDoubleScore() {
+    public float getCurrentDoubleScore() {
         return currentDoubleScore;
     }
 
-    public void setCurrentDoubleScore(int currentDoubleScore) {
+    public void setCurrentDoubleScore(float currentDoubleScore) {
         this.currentDoubleScore = currentDoubleScore;
     }
 
