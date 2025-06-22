@@ -3,6 +3,7 @@ package com.example.tlupickleball.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,7 +61,7 @@ public class Personal_Finance_Fragment extends Fragment {
         setupListeners();
         setupMonthSpinner();
         setupRecyclerView();
-        loadFinanceStatus(SessionManager.getUid(requireContext()));
+        loadFinanceStatus(SessionManager.getUid(requireContext()), Calendar.getInstance().get(Calendar.MONTH) + 1, year);
         return rootView;
     }
 
@@ -105,11 +106,15 @@ public class Personal_Finance_Fragment extends Fragment {
         spinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedMonth = parent.getItemAtPosition(position).toString();
-                // Xử lý logic theo tháng được chọn
+                // Lấy tháng được chọn từ Spinner
+                String selectedMonthStr = parent.getItemAtPosition(position).toString();
+                // Tách tháng và năm từ chuỗi "Tháng x/yyyy"
+                int selectedMonthNumber = Integer.parseInt(selectedMonthStr.split(" ")[1].split("/")[0]);
+                int selectedYear = year;
 
-                // Tách tháng từ chuỗi "Tháng x/yyyy"
-                int selectedMonthNumber = Integer.parseInt(selectedMonth.split(" ")[1].split("/")[0]);
+                // Gọi API với tháng và năm đã chọn
+                loadFinanceStatus(SessionManager.getUid(requireContext()), selectedMonthNumber, selectedYear);
+                // Lọc giao dịch theo tháng đã chọn
                 filterTransactionsByMonth(selectedMonthNumber);
             }
 
@@ -154,18 +159,69 @@ public class Personal_Finance_Fragment extends Fragment {
         transactionPersonalAdapter.setData(filteredList); // Cập nhật danh sách đã lọc
     }
 
-    private void loadFinanceStatus(String userId) {
-
-        financeService.financeStatus(userId).enqueue(new Callback<MemberFund1>() {
+    private void loadFinanceStatus(String userId, int month, int year) {
+        financeService.financeStatus(userId, month, year).enqueue(new Callback<MemberFund1>() {
             @Override
             public void onResponse(Call<MemberFund1> call, Response<MemberFund1> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     MemberFund1 data = response.body();
-                    tvFund.setText(String.valueOf(data.getFixedFund().getAmount()));
-                    tvDonate.setText(String.valueOf(data.getTotalDonation()));
-                    txTotalPenalty.setText(String.valueOf(data.getTotalPenalty()));
-                    txTotalPenaltyUnpaid.setText(String.valueOf(data.getTotalPenaltyUnpaid()));
-                    txTotalPenaltyPaid.setText(String.valueOf(data.getTotalPenaltyPaid()));
+
+                    // Quỹ: đỏ nếu chưa đóng, xanh nếu đã đóng
+                    if ("paid".equalsIgnoreCase(data.getFixedFund().getStatus())) {
+                        tvFund.setBackgroundResource(R.drawable.button_light_green_bg);
+                        tvFund.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_Dong));
+                    } else {
+                        tvFund.setBackgroundResource(R.drawable.button_light_red_bg);
+                        tvFund.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_Dong));
+                    }
+                    tvFund.setText("Quỹ: " + data.getFixedFund().getAmount() + "đ");
+
+                    // Ủng hộ: luôn màu xanh
+                    tvDonate.setBackgroundResource(R.drawable.button_light_green_bg);
+                    tvDonate.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_Dong));
+                    tvDonate.setText("Ủng hộ: " + data.getTotalDonation() + "đ");
+
+                    // Đóng phạt
+                    long total = data.getTotalPenalty();
+                    long paid = data.getTotalPenaltyPaid();
+                    long unpaid = data.getTotalPenaltyUnpaid();
+
+                    if (total == paid) {
+                        // Tất cả đều màu xanh
+                        txTotalPenalty.setBackgroundResource(R.drawable.button_light_green_bg);
+                        txTotalPenalty.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_Dong));
+
+                        txTotalPenaltyPaid.setBackgroundResource(R.drawable.button_light_green_bg);
+                        txTotalPenaltyPaid.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_Dong));
+
+                        txTotalPenaltyUnpaid.setBackgroundResource(R.drawable.button_light_green_bg);
+                        txTotalPenaltyUnpaid.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_Dong));
+                    } else if (total == unpaid) {
+                        // Tổng và còn thiếu màu đỏ, đã đóng màu xanh
+                        txTotalPenalty.setBackgroundResource(R.drawable.button_light_red_bg);
+                        txTotalPenalty.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_Dong));
+
+                        txTotalPenaltyUnpaid.setBackgroundResource(R.drawable.button_light_red_bg);
+                        txTotalPenaltyUnpaid.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_Dong));
+
+                        txTotalPenaltyPaid.setBackgroundResource(R.drawable.button_light_green_bg);
+                        txTotalPenaltyPaid.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_Dong));
+                    } else {
+                        // Tổng vàng, đã đóng xanh, còn thiếu đỏ
+                        txTotalPenalty.setBackgroundResource(R.drawable.button_light_yellow_bg);
+                        txTotalPenalty.setTextColor(ContextCompat.getColor(requireContext(), R.color.yellow_Dong));
+
+                        txTotalPenaltyPaid.setBackgroundResource(R.drawable.button_light_green_bg);
+                        txTotalPenaltyPaid.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_Dong));
+
+                        txTotalPenaltyUnpaid.setBackgroundResource(R.drawable.button_light_green_bg);
+                        txTotalPenaltyUnpaid.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_Dong));
+                    }
+
+                    txTotalPenalty.setText("Tổng: " + total + "đ");
+                    txTotalPenaltyUnpaid.setText("Còn thiếu: " + unpaid + "đ");
+                    txTotalPenaltyPaid.setText("Đã đóng: " + paid + "đ");
+
                     Toast.makeText(requireContext(), "Tải dữ liệu thành công", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(requireContext(), "Không thể tải dữ liệu tài chính", Toast.LENGTH_SHORT).show();
