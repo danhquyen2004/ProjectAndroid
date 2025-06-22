@@ -52,9 +52,6 @@
             android:name=".activities.notification"
             android:exported="false"></activity>
         <activity
-            android:name=".activities.record_the_match"
-            android:exported="false"></activity>
-        <activity
             android:name=".activities.wait_home"
             android:exported="false" />
         <activity
@@ -71,9 +68,6 @@
         </activity>
         <activity
             android:name=".activities.ProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.OtpActivity"
             android:exported="false" />
         <activity
             android:name=".activities.RegisterActivity"
