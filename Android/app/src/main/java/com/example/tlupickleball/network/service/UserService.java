@@ -1,6 +1,7 @@
 package com.example.tlupickleball.network.service;
 
 import com.example.tlupickleball.model.User;
+import com.example.tlupickleball.network.api_model.user.UserListResponse;
 import com.example.tlupickleball.network.api_model.user.UserUpdateRequest;
 
 import retrofit2.Call;
@@ -21,8 +22,8 @@ public interface UserService {
     Call<User> getUserProfileById(@Path("uid") String uid);
 
     // Lấy danh sách toàn bộ user
-    @GET("user")
-    Call<List<User>> getAllUsers();
+    @GET("user/approved-users?limit=20")
+    Call<UserListResponse> getAllUsers();
 
     // Xoá user
     @DELETE("user/{uid}")

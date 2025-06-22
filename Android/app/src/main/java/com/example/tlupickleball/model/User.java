@@ -17,8 +17,8 @@ public class User {
     private String role;
     @SerializedName("approved")
     private boolean approved;
-    @SerializedName("profileImageUrl")
-    private String profileImageUrl; // Thêm trường ảnh đại diện nếu cần
+    @SerializedName("avatarUrl")
+    private String avatarUrl; // Thêm trường ảnh đại diện nếu cần
     @SerializedName("currentSingleScore")
     private float currentSingleScore;
     @SerializedName("currentDoubleScore")
@@ -46,12 +46,12 @@ public class User {
         return approved;
     }
 
-    public String getProfileImageUrl() {
-        return profileImageUrl;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public void setApproved(boolean approved) {
@@ -83,7 +83,12 @@ public class User {
     }
 
     public String getGender() {
-        return gender;
+        if(gender.equals("male")){
+            return "Nam";
+        }
+        else {
+            return "Nữ";
+        }
     }
 
     public void setGender(String gender) {
@@ -118,7 +123,7 @@ public class User {
     public User() {}
 
     public User(String uid, String fullName, String birthDate, String gender, String email,
-                String role, boolean approved, String profileImageUrl, int currentSingleScore, int currentDoubleScore, String createdAt) {
+                String role, boolean approved, String avatarUrl, float currentSingleScore, float currentDoubleScore, String createdAt) {
         this.uid = uid;
         this.fullName = fullName;
         this.birthDate = birthDate;
@@ -126,7 +131,7 @@ public class User {
         this.email = email;
         this.role = role;
         this.approved = approved;
-        this.profileImageUrl = profileImageUrl;
+        this.avatarUrl = avatarUrl;
         this.currentSingleScore = currentSingleScore;
         this.currentDoubleScore = currentDoubleScore;
         this.createdAt = createdAt;

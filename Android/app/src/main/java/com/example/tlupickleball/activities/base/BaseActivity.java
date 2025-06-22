@@ -15,9 +15,17 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public void showLoading() {
         if (loadingOverlay != null) loadingOverlay.show();
+        else {
+            loadingOverlay = new LoadingOverlay(this);
+            loadingOverlay.show();
+        }
     }
 
     public void hideLoading() {
         if (loadingOverlay != null) loadingOverlay.hide();
+        else {
+            loadingOverlay = new LoadingOverlay(this);
+            loadingOverlay.hide();
+        }
     }
 }
