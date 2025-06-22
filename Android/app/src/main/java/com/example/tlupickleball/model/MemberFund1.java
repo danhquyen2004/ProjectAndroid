@@ -14,6 +14,9 @@ public class MemberFund1 {
     @SerializedName("totalPenaltyUnpaid")
     private long totalPenaltyUnpaid;
 
+    public MemberFund1() {
+        // Default constructor
+    }
     public MemberFund1(FixedFund fixedFund, long totalDonation, long totalPenalty, long totalPenaltyPaid, long totalPenaltyUnpaid) {
         this.fixedFund = fixedFund;
         this.totalDonation = totalDonation;
