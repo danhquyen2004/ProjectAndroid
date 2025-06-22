@@ -27,11 +27,11 @@ import com.example.tlupickleball.model.DateItem;
 import com.example.tlupickleball.model.Matches;
 
 import com.example.tlupickleball.network.core.ApiClient;
-import com.example.tlupickleball.network.core.SessionManager; // Import SessionManager
 import com.example.tlupickleball.network.service.MatchService;
 import com.example.tlupickleball.network.api_model.match.MatchResponse;
 import com.example.tlupickleball.model.Match;
 import com.example.tlupickleball.model.Participant;
+import com.example.tlupickleball.network.core.SessionManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -60,30 +60,30 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
     private MatchAdapter matchAdapter;
     private List<DateItem> datesList;
     private List<Matches> displayedMatchesList;
-    private Map<String, List<Match>> allMatchesData; // Cache cho dữ liệu API thô
+    private Map<String, List<Match>> allMatchesData;
 
     private TextView textViewSelectedDate;
     private LinearLayout filterStatusContainer;
     private TextView textFilter;
     private FloatingActionButton btnAddMatch;
 
-    private TextView item1, item2, select; // Các phần tử cho tab layout
-    private FrameLayout tabContentFrame; // Frame chứa các tab
+    private TextView item1, item2, select;
+    private FrameLayout tabContentFrame;
+    private String currentMatchType = "individual";
+    private String currentViewType = "individual";
 
-    private String currentMatchType = "club_all"; // Mặc định là "Tổng quát cả clb"
-    private String currentSelectedDateKey; // Ngày hiện tại được chọn (định dạng yyyy-MM-dd)
-    private String currentSelectedFilter = "Tất cả"; // Bộ lọc trạng thái trận đấu hiện tại
+    private String currentSelectedDateKey;
+    private String currentSelectedFilter = "Tất cả";
 
-    // Khai báo instance của MatchService và userId của người dùng hiện tại
     private MatchService matchService;
-    private String currentUserId; // Để lưu trữ User ID của người dùng hiện tại
+    private String currentUserId;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_matches, container, false);
 
-        // Ánh xạ các View
         recyclerViewDates = root.findViewById(R.id.recyclerViewDates);
         recyclerViewMatches = root.findViewById(R.id.recyclerViewMatches);
         textViewSelectedDate = root.findViewById(R.id.textViewSelectedDate);
@@ -91,46 +91,33 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         textFilter = root.findViewById(R.id.textFilter);
         btnAddMatch = root.findViewById(R.id.btnAddMatch);
 
-        item1 = root.findViewById(R.id.item1); // Tab "Tổng quát cả clb"
-        item2 = root.findViewById(R.id.item2); // Tab "Cá nhân"
-        select = root.findViewById(R.id.select); // Thanh chọn tab
-        tabContentFrame = root.findViewById(R.id.tab_content_frame); // Frame cha của các tab
+        item1 = root.findViewById(R.id.item1);
+        item2 = root.findViewById(R.id.item2);
+        select = root.findViewById(R.id.select);
+        tabContentFrame = root.findViewById(R.id.tab_content_frame);
 
-        // Khởi tạo MatchService và lấy User ID của người dùng hiện tại
         matchService = ApiClient.getClient(getContext()).create(MatchService.class);
-        // GIẢ ĐỊNH: Bạn đã có một lớp SessionManager để lấy User ID.
-        // Ví dụ: SessionManager.getUserId(getContext())
-        // Bạn cần đảm bảo SessionManager này tồn tại và trả về userId chính xác.
         currentUserId = SessionManager.getUid(getContext());
-        if (currentUserId == null || currentUserId.isEmpty()) {
-            Log.e("MatchesFragment", "User ID is null or empty. Personal matches might not load.");
-            // Có thể hiển thị thông báo hoặc chuyển hướng nếu userId không có
-            Toast.makeText(getContext(), "Không tìm thấy ID người dùng. Trận đấu cá nhân có thể không khả dụng.", Toast.LENGTH_LONG).show();
-        }
 
 
-        allMatchesData = new HashMap<>(); // Khởi tạo cache
-        displayedMatchesList = new ArrayList<>(); // Danh sách hiển thị
+        allMatchesData = new HashMap<>();
+        displayedMatchesList = new ArrayList<>();
 
-        // Thiết lập RecyclerView cho ngày
         datesList = generateDates();
         recyclerViewDates.post(() -> {
             int recyclerViewWidth = recyclerViewDates.getWidth();
             dateAdapter = new DateAdapter(datesList, this, recyclerViewWidth);
             recyclerViewDates.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
             recyclerViewDates.setAdapter(dateAdapter);
-            selectToday(); // Chọn ngày hôm nay khi khởi tạo
+            selectToday();
         });
 
-        // Thiết lập RecyclerView cho các trận đấu
         matchAdapter = new MatchAdapter(displayedMatchesList);
         recyclerViewMatches.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewMatches.setAdapter(matchAdapter);
 
-        // Xử lý sự kiện click cho bộ lọc trạng thái
         filterStatusContainer.setOnClickListener(v -> showStatusFilterDialog());
 
-        // Xử lý sự kiện click cho nút thêm trận đấu
         btnAddMatch.setOnClickListener(v -> {
             if (btnAddMatch != null) {
                 btnAddMatch.setVisibility(View.GONE);
@@ -143,7 +130,6 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
             fragmentTransaction.commit();
         });
 
-        // Thiết lập các tab "Tổng quát cả clb" và "Cá nhân"
         setupTabLayout();
 
         return root;
@@ -155,12 +141,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         if (btnAddMatch != null) {
             btnAddMatch.setVisibility(View.VISIBLE);
         }
-        // Đảm bảo tab được chọn đúng khi fragment được resume
-        updateTabSelection(currentMatchType);
-        // Tải lại trận đấu cho ngày và loại trận đấu hiện tại
-        if (currentSelectedDateKey != null) {
-            loadMatchesForSelectedDate(currentSelectedDateKey, currentMatchType);
-        }
+        updateTabSelection(currentViewType);
     }
 
     @Override
@@ -171,81 +152,68 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         }
     }
 
-    /**
-     * Thiết lập chức năng chuyển đổi giữa các tab "Tổng quát cả clb" và "Cá nhân".
-     */
     private void setupTabLayout() {
-        // Kích hoạt animation chuyển đổi cho LayoutTransition của LinearLayout cha
         if (item1 != null && item1.getParent() instanceof LinearLayout) {
             ((LinearLayout) item1.getParent()).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
         }
 
-        // Xử lý click cho tab "Tổng quát cả clb"
         if (item1 != null) {
+            item1.setText("Cá nhân");
             item1.setOnClickListener(v -> {
-                if (!currentMatchType.equals("club_all")) {
-                    currentMatchType = "club_all"; // Cập nhật loại trận đấu
-                    updateTabSelection(currentMatchType); // Cập nhật giao diện tab
+                if (!currentViewType.equals("individual")) {
+                    currentViewType = "individual";
+                    updateTabSelection(currentViewType);
                     if (currentSelectedDateKey != null) {
-                        // Tải lại trận đấu cho ngày hiện tại với loại "Tổng quát cả clb"
-                        loadMatchesForSelectedDate(currentSelectedDateKey, currentMatchType);
+                        loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
                     }
                 }
             });
         }
 
-        // Xử lý click cho tab "Cá nhân"
         if (item2 != null) {
+            item2.setText("Tổng quát");
             item2.setOnClickListener(v -> {
-                if (!currentMatchType.equals("user_individual")) {
-                    currentMatchType = "user_individual"; // Cập nhật loại trận đấu
-                    updateTabSelection(currentMatchType); // Cập nhật giao diện tab
+                if (!currentViewType.equals("club_wide")) {
+                    currentViewType = "club_wide";
+                    updateTabSelection(currentViewType);
                     if (currentSelectedDateKey != null) {
-                        // Tải lại trận đấu cho ngày hiện tại với loại "Cá nhân"
-                        loadMatchesForSelectedDate(currentSelectedDateKey, currentMatchType);
+                        loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
                     }
                 }
             });
         }
 
-        // Cập nhật giao diện tab lần đầu khi khởi tạo
-        updateTabSelection(currentMatchType);
+        updateTabSelection(currentViewType);
     }
 
-    /**
-     * Cập nhật giao diện của thanh chọn tab (màu chữ và vị trí thanh `select`).
-     * @param selectedType Loại trận đấu được chọn ("club_all" hoặc "user_individual").
-     */
     private void updateTabSelection(String selectedType) {
         if (tabContentFrame == null || select == null || item1 == null || item2 == null) {
             Log.e("MatchesFragment", "Tab layout views not initialized.");
             return;
         }
 
-        // Đảm bảo tabContentFrame đã có chiều rộng để tính toán vị trí thanh select
         if (tabContentFrame.getWidth() == 0) {
             tabContentFrame.post(() -> updateTabSelection(selectedType));
             return;
         }
 
-        int tabWidth = tabContentFrame.getWidth() / 2; // Chiều rộng của mỗi tab
+        int tabWidth = tabContentFrame.getWidth() / 2;
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) select.getLayoutParams();
-        params.width = tabWidth; // Đặt chiều rộng cho thanh select
+        params.width = tabWidth;
 
-        if (selectedType.equals("club_all")) {
-            params.setMarginStart(0); // Đặt vị trí cho tab "Tổng quát cả clb"
+        if (selectedType.equals("individual")) {
+            params.setMarginStart(0);
             select.setLayoutParams(params);
-            item1.setTextColor(Color.WHITE); // Đổi màu chữ tab được chọn
-            item2.setTextColor(Color.BLACK); // Đổi màu chữ tab không được chọn
-        } else if (selectedType.equals("user_individual")) {
-            params.setMarginStart(tabWidth); // Đặt vị trí cho tab "Cá nhân"
+            item1.setTextColor(Color.WHITE);
+            item2.setTextColor(Color.BLACK);
+        } else if (selectedType.equals("club_wide")) {
+            params.setMarginStart(tabWidth);
             select.setLayoutParams(params);
             item1.setTextColor(Color.BLACK);
             item2.setTextColor(Color.WHITE);
         }
     }
 
-    // Phương thức tạo danh sách ngày (không thay đổi)
     private List<DateItem> generateDates() {
         List<DateItem> dates = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
@@ -253,6 +221,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
 
         SimpleDateFormat dayFormat = new SimpleDateFormat("dd", Locale.getDefault());
         SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", new Locale("vi", "VN"));
+        SimpleDateFormat fullDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
         for (int i = 0; i < 30; i++) {
             String dayOfMonth = dayFormat.format(calendar.getTime());
@@ -264,7 +233,6 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         return dates;
     }
 
-    // Phương thức chọn ngày hôm nay (không thay đổi)
     private void selectToday() {
         Calendar todayCalendar = Calendar.getInstance();
         SimpleDateFormat sdfDay = new SimpleDateFormat("dd", Locale.getDefault());
@@ -295,20 +263,18 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
             selectedCal.setTime(monthParseFormat.parse(date.getMonth()));
             selectedCal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date.getDayOfMonth()));
             Calendar now = Calendar.getInstance();
-            selectedCal.set(Calendar.YEAR, now.get(Calendar.YEAR)); // Đặt năm hiện tại
+            selectedCal.set(Calendar.YEAR, now.get(Calendar.YEAR));
         } catch (java.text.ParseException e) {
-            Log.e("MatchesFragment", "Lỗi phân tích cú pháp tháng khi chọn ngày: " + e.getMessage());
-            selectedCal = Calendar.getInstance(); // Fallback về ngày hôm nay
+            Log.e("MatchesFragment", "Error parsing month for date selection: " + e.getMessage());
+            selectedCal = Calendar.getInstance();
         }
 
         SimpleDateFormat fullDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         currentSelectedDateKey = fullDateFormat.format(selectedCal.getTime());
 
-        // Tải trận đấu dựa trên ngày và loại trận đấu hiện tại
-        loadMatchesForSelectedDate(currentSelectedDateKey, currentMatchType);
+        loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
     }
 
-    // Phương thức hiển thị dialog lọc trạng thái (không thay đổi)
     private void showStatusFilterDialog() {
         final String[] statusOptions = {"Tất cả", "Sắp diễn ra", "Đang diễn ra", "Đã kết thúc"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -321,62 +287,36 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         builder.show();
     }
 
-    /**
-     * Tải danh sách trận đấu cho ngày đã chọn và loại trận đấu đã chọn (tổng quát hay cá nhân).
-     * Dữ liệu được cache để tránh gọi API lặp lại.
-     * @param dateKey Chuỗi ngày ở định dạng "yyyy-MM-dd".
-     * @param matchType Loại trận đấu ("club_all" cho tổng quát, "user_individual" cho cá nhân).
-     */
-    private void loadMatchesForSelectedDate(String dateKey, String matchType) {
-        // Tạo khóa tổng hợp cho cache (ví dụ: "2025-06-22_club_all" hoặc "2025-06-22_user_individual")
-        String compositeKey = dateKey + "_" + matchType;
+    private void loadMatchesForSelectedDate(String dateKey, String viewType) {
+        String compositeKey = dateKey + "_" + viewType;
 
-        // Kiểm tra cache trước
         if (allMatchesData.containsKey(compositeKey)) {
-            // Dữ liệu có trong cache, chuyển đổi và hiển thị
             List<Match> cachedMatches = allMatchesData.get(compositeKey);
-            Log.d("MatchesFragment", "Tìm thấy " + cachedMatches.size() + " trận đấu cho " + compositeKey + " từ cache.");
-            convertAndDisplayMatches(cachedMatches); // Chuyển đổi và hiển thị các trận đấu
+            Log.d("MatchesFragment", "Found " + cachedMatches.size() + " matches for " + compositeKey + " from cache.");
+            convertAndDisplayMatches(cachedMatches, currentMatchType);
         } else {
-            // Dữ liệu không có trong cache, lấy từ API
-            Log.d("MatchesFragment", "Đang lấy trận đấu cho " + compositeKey + " từ API.");
-            int page = 1; // Mặc định trang 1
-            int pageSize = 50; // Mặc định kích thước trang 50
+            Log.d("MatchesFragment", "Fetching matches for " + compositeKey + " from API.");
+            int page = 1;
+            int pageSize = 50;
 
             Call<MatchResponse> call;
-            if (matchType.equals("club_all")) {
-                // Gọi API để lấy tất cả trận đấu trong ngày
-                call = matchService.getMatchesByDay(dateKey, page, pageSize);
-            } else if (matchType.equals("user_individual")) {
-                // Kiểm tra userId trước khi gọi API cá nhân
-                if (currentUserId == null || currentUserId.isEmpty()) {
-                    Toast.makeText(getContext(), "ID người dùng không khả dụng để tải trận đấu cá nhân.", Toast.LENGTH_SHORT).show();
-                    displayedMatchesList.clear(); // Xóa danh sách hiển thị
-                    matchAdapter.notifyDataSetChanged(); // Cập nhật RecyclerView
-                    return;
-                }
-                // Gọi API để lấy trận đấu của người dùng trong ngày
+            if (viewType.equals("individual") && currentUserId != null) {
                 call = matchService.getMatchesByDayAndUser(dateKey, currentUserId, page, pageSize);
             } else {
-                Log.e("MatchesFragment", "Loại trận đấu không hợp lệ: " + matchType);
-                Toast.makeText(getContext(), "Loại trận đấu được chọn không hợp lệ.", Toast.LENGTH_SHORT).show();
-                displayedMatchesList.clear();
-                matchAdapter.notifyDataSetChanged();
-                return;
+                call = matchService.getMatchesByDay(dateKey, page, pageSize);
             }
 
-            // Thực hiện cuộc gọi API
             call.enqueue(new Callback<MatchResponse>() {
                 @Override
                 public void onResponse(Call<MatchResponse> call, Response<MatchResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         List<Match> fetchedMatches = response.body().getMatches();
-                        allMatchesData.put(compositeKey, fetchedMatches); // Lưu dữ liệu API thô vào cache
-                        convertAndDisplayMatches(fetchedMatches); // Chuyển đổi và hiển thị
-                        Log.d("MatchesFragment", "Đã lấy " + fetchedMatches.size() + " trận đấu cho " + compositeKey + " từ API.");
+                        allMatchesData.put(compositeKey, fetchedMatches);
+                        convertAndDisplayMatches(fetchedMatches, currentMatchType);
+                        Log.d("MatchesFragment", "Fetched " + fetchedMatches.size() + " matches for " + compositeKey + " from API.");
                     } else {
-                        Log.e("MatchesFragment", "Cuộc gọi API thất bại cho " + matchType + ": " + response.message());
-                        Toast.makeText(getContext(), "Tải trận đấu thất bại: " + response.message(), Toast.LENGTH_SHORT).show();
+                        Log.e("MatchesFragment", "API call failed: " + response.message());
+                        Toast.makeText(getContext(), "Failed to load matches: " + response.message(), Toast.LENGTH_SHORT).show();
                         displayedMatchesList.clear();
                         matchAdapter.notifyDataSetChanged();
                     }
@@ -384,8 +324,8 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
 
                 @Override
                 public void onFailure(Call<MatchResponse> call, Throwable t) {
-                    Log.e("MatchesFragment", "Lỗi cuộc gọi API cho " + matchType + ": " + t.getMessage(), t);
-                    Toast.makeText(getContext(), "Lỗi khi tải trận đấu: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("MatchesFragment", "API call error: " + t.getMessage(), t);
+                    Toast.makeText(getContext(), "Error loading matches: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     displayedMatchesList.clear();
                     matchAdapter.notifyDataSetChanged();
                 }
@@ -394,16 +334,16 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
     }
 
     /**
-     * Chuyển đổi các đối tượng Match thô từ API thành đối tượng Matches hiển thị
-     * và cập nhật giao diện người dùng.
-     * @param rawMatches Danh sách các đối tượng Match thô từ API.
+     * Converts raw API Match objects to displayable Matches objects and updates the UI.
+     * @param rawMatches The list of raw Match objects from the API.
+     * @param matchType The current selected match type ("individual" or "doubles").
      */
-    private void convertAndDisplayMatches(List<Match> rawMatches) {
+    private void convertAndDisplayMatches(List<Match> rawMatches, String matchType) {
         List<Matches> convertedMatches = new ArrayList<>();
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        // Định dạng cho dấu thời gian ISO 8601 của API
+        // Define format for API's ISO 8601 timestamp
         SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); // Thời gian API là UTC
+        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); // API time is UTC
 
         for (Match rawMatch : rawMatches) {
             String player1DisplayName = "";
@@ -411,6 +351,11 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
             String scoreDisplay = rawMatch.getTeam1Wins() + "-" + rawMatch.getTeam2Wins();
             String matchTimeDisplay = "N/A";
             String matchStatusDisplay = mapApiStatusToDisplayStatus(rawMatch.getStatus());
+
+            String player1AvatarUrl1 = null;
+            String player1AvatarUrl2 = null;
+            String player2AvatarUrl1 = null;
+            String player2AvatarUrl2 = null;
 
             List<Participant> team1Participants = new ArrayList<>();
             List<Participant> team2Participants = new ArrayList<>();
@@ -423,52 +368,84 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
                 }
             }
 
-            // Sắp xếp người tham gia theo tên đầy đủ để đảm bảo thứ tự nhất quán cho tên đội
+            // Sort participants by full name to ensure consistent order for team display names and avatar assignment
             Collections.sort(team1Participants, Comparator.comparing(Participant::getFullName));
             Collections.sort(team2Participants, Comparator.comparing(Participant::getFullName));
 
-            // Xác định xem đó là trận đấu đơn hay đôi và hiển thị tên phù hợp
-            // Dựa vào số lượng người tham gia trong mỗi đội để quyết định loại trận đấu
-            if (team1Participants.size() == 1 && team2Participants.size() == 1) {
-                player1DisplayName = team1Participants.get(0).getFullName();
-                player2DisplayName = team2Participants.get(0).getFullName();
-            } else { // Trận đấu đôi hoặc phức tạp hơn
-                List<String> team1Names = new ArrayList<>();
-                for (Participant p : team1Participants) {
-                    team1Names.add(p.getFullName());
-                }
-                player1DisplayName = String.join(" & ", team1Names); // Nối tên cho trận đấu đôi
+            boolean currentMatchIsDoubles = false; // Mặc định là đơn
 
-                List<String> team2Names = new ArrayList<>();
-                for (Participant p : team2Participants) {
-                    team2Names.add(p.getFullName());
+            if (matchType.equals("individual")) {
+                if (!team1Participants.isEmpty()) {
+                    player1DisplayName = team1Participants.get(0).getFullName();
+                    player1AvatarUrl1 = team1Participants.get(0).getAvatarUrl(); // Lấy URL avatar
                 }
-                player2DisplayName = String.join(" & ", team2Names); // Nối tên cho trận đấu đôi
+                if (!team2Participants.isEmpty()) {
+                    player2DisplayName = team2Participants.get(0).getFullName();
+                    player2AvatarUrl1 = team2Participants.get(0).getAvatarUrl(); // Lấy URL avatar
+                }
+                currentMatchIsDoubles = false; // Xác định lại loại trận đấu
+            } else if (matchType.equals("doubles")) {
+                if (team1Participants.size() >= 2 && team2Participants.size() >= 2) {
+                    List<String> team1Names = new ArrayList<>();
+                    team1Names.add(team1Participants.get(0).getFullName());
+                    team1Names.add(team1Participants.get(1).getFullName());
+                    player1DisplayName = String.join(" & ", team1Names);
+
+                    player1AvatarUrl1 = team1Participants.get(0).getAvatarUrl(); // Lấy URL avatar người 1 đội 1
+                    player1AvatarUrl2 = team1Participants.get(1).getAvatarUrl(); // Lấy URL avatar người 2 đội 1
+
+                    List<String> team2Names = new ArrayList<>();
+                    team2Names.add(team2Participants.get(0).getFullName());
+                    team2Names.add(team2Participants.get(1).getFullName());
+                    player2DisplayName = String.join(" & ", team2Names);
+
+                    player2AvatarUrl1 = team2Participants.get(0).getAvatarUrl(); // Lấy URL avatar người 1 đội 2
+                    player2AvatarUrl2 = team2Participants.get(1).getAvatarUrl(); // Lấy URL avatar người 2 đội 2
+
+                    currentMatchIsDoubles = true; // Xác định lại loại trận đấu
+                } else {
+                    // If it's supposed to be doubles but doesn't have 2 players per team,
+                    // you might want to skip this match or handle it differently.
+                    // For now, it will be treated as single if not enough participants.
+                    Log.w("MatchesFragment", "Doubles match expected but not enough participants. Match ID: " + rawMatch.getMatchId());
+                    // Fallback to singles display if not enough participants for doubles
+                    if (!team1Participants.isEmpty()) {
+                        player1DisplayName = team1Participants.get(0).getFullName();
+                        player1AvatarUrl1 = team1Participants.get(0).getAvatarUrl();
+                    }
+                    if (!team2Participants.isEmpty()) {
+                        player2DisplayName = team2Participants.get(0).getFullName();
+                        player2AvatarUrl1 = team2Participants.get(0).getAvatarUrl();
+                    }
+                    currentMatchIsDoubles = false; // Treat as single for display
+                }
             }
 
-            // Phân tích và định dạng thời gian trận đấu
+            // Parse and format match time
             if (rawMatch.getStartTime() != null && !rawMatch.getStartTime().isEmpty()) {
                 try {
                     Date date = apiDateFormat.parse(rawMatch.getStartTime());
-                    matchTimeDisplay = timeFormat.format(date); // Định dạng sang giờ địa phương
+                    matchTimeDisplay = timeFormat.format(date); // Format to local time
                 } catch (java.text.ParseException e) {
-                    Log.e("MatchesFragment", "Lỗi phân tích cú pháp thời gian bắt đầu trận đấu: " + rawMatch.getStartTime(), e);
+                    Log.e("MatchesFragment", "Error parsing match start time: " + rawMatch.getStartTime(), e);
                 }
             }
 
-            // Sử dụng avatar_1 làm placeholder vì URL avatar thực tế không có trong phản hồi API
+            // Tạo đối tượng Matches với các URL avatar và trạng thái đấu đôi
             convertedMatches.add(new Matches(player1DisplayName, player2DisplayName,
-                    R.drawable.avatar_1, R.drawable.avatar_1, // Thay bằng avatar thực tế nếu có
-                    scoreDisplay, matchTimeDisplay, matchStatusDisplay));
+                    player1AvatarUrl1, player1AvatarUrl2,
+                    player2AvatarUrl1, player2AvatarUrl2,
+                    scoreDisplay, matchTimeDisplay, matchStatusDisplay,
+                    currentMatchIsDoubles));
         }
 
         displayedMatchesList.clear();
         displayedMatchesList.addAll(convertedMatches);
-        filterMatchesByStatus(currentSelectedFilter); // Áp dụng lại bộ lọc sau khi chuyển đổi dữ liệu
+        filterMatchesByStatus(currentSelectedFilter);
     }
 
     /**
-     * Ánh xạ các chuỗi trạng thái API sang các chuỗi trạng thái tiếng Việt hiển thị.
+     * Ánh xạ các chuỗi trạng thái API sang các chuỗi trạng thái tiếng Việt có thể hiển thị.
      * @param apiStatus Chuỗi trạng thái từ API (ví dụ: "finished", "upcoming", "ongoing").
      * @return Chuỗi trạng thái tiếng Việt tương ứng.
      */
@@ -481,79 +458,107 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
             case "ongoing":
                 return "Đang diễn ra";
             default:
-                return apiStatus; // Trả về nguyên bản nếu không tìm thấy ánh xạ
+                return apiStatus; // Trả về bản gốc nếu không tìm thấy ánh xạ
         }
     }
 
-    /**
-     * Lọc danh sách trận đấu đang hiển thị theo trạng thái.
-     * @param statusFilter Trạng thái để lọc (ví dụ: "Tất cả", "Sắp diễn ra", v.v.).
-     */
     private void filterMatchesByStatus(String statusFilter) {
         List<Matches> filteredList = new ArrayList<>();
-        String compositeKey = currentSelectedDateKey + "_" + currentMatchType;
-        List<Match> rawMatchesForCurrentDateAndType = allMatchesData.get(compositeKey);
+        // Lọc danh sách hiện đã được chuyển đổi và hiển thị
+        if (displayedMatchesList != null) {
+            // Khi lọc, chúng ta nên áp dụng nó cho danh sách *vừa được tìm nạp/chuyển đổi*
+            // cho `currentSelectedDateKey` và `currentViewType`.
+            // Bản đồ `allMatchesData` lưu trữ các đối tượng `Match` API thô.
+            // Chúng ta cần chuyển đổi lại và lọc từ đó.
 
-        if (rawMatchesForCurrentDateAndType != null) {
-            // Luôn chuyển đổi từ dữ liệu thô đã cache để đảm bảo không bị mất dữ liệu
-            List<Matches> tempConvertedList = new ArrayList<>();
-            SimpleDateFormat tempTimeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            SimpleDateFormat tempApiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-            tempApiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+            String compositeKey = currentSelectedDateKey + "_" + currentViewType; // Sử dụng currentViewType
+            List<Match> rawMatchesForCurrentDateAndType = allMatchesData.get(compositeKey);
 
-            for (Match rawMatch : rawMatchesForCurrentDateAndType) {
-                String player1DisplayName = "";
-                String player2DisplayName = "";
-                String scoreDisplay = rawMatch.getTeam1Wins() + "-" + rawMatch.getTeam2Wins();
-                String matchTimeDisplay = "N/A";
-                String matchStatusDisplay = mapApiStatusToDisplayStatus(rawMatch.getStatus());
+            if (rawMatchesForCurrentDateAndType != null) {
+                // Chuyển đổi lại tất cả các trận đấu cho ngày và loại xem hiện tại để có một danh sách mới
+                // trước khi áp dụng bộ lọc trạng thái.
+                List<Matches> allConvertedMatchesForCurrentView = new ArrayList<>();
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+                apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
-                List<Participant> team1Participants = new ArrayList<>();
-                List<Participant> team2Participants = new ArrayList<>();
+                for (Match rawMatch : rawMatchesForCurrentDateAndType) { // Lặp qua dữ liệu thô
+                    String player1DisplayName = "";
+                    String player2DisplayName = "";
+                    String player1AvatarUrl1 = null;
+                    String player1AvatarUrl2 = null;
+                    String player2AvatarUrl1 = null;
+                    String player2AvatarUrl2 = null;
+                    String scoreDisplay = rawMatch.getTeam1Wins() + "-" + rawMatch.getTeam2Wins();
+                    String matchTimeDisplay = "N/A";
+                    String matchStatusDisplay = mapApiStatusToDisplayStatus(rawMatch.getStatus());
 
-                for (Participant p : rawMatch.getParticipants()) {
-                    if (p.getTeam() == 1) {
-                        team1Participants.add(p);
-                    } else if (p.getTeam() == 2) {
-                        team2Participants.add(p);
+                    List<Participant> team1Participants = new ArrayList<>();
+                    List<Participant> team2Participants = new ArrayList<>();
+
+                    for (Participant p : rawMatch.getParticipants()) {
+                        if (p.getTeam() == 1) {
+                            team1Participants.add(p);
+                        } else if (p.getTeam() == 2) {
+                            team2Participants.add(p);
+                        }
                     }
+
+                    Collections.sort(team1Participants, Comparator.comparing(Participant::getFullName));
+                    Collections.sort(team2Participants, Comparator.comparing(Participant::getFullName));
+
+                    boolean isDoublesMatch = team1Participants.size() >= 2 || team2Participants.size() >= 2;
+
+                    // Xử lý tên và avatar cho đội 1
+                    if (!team1Participants.isEmpty()) {
+                        player1DisplayName = team1Participants.get(0).getFullName();
+                        player1AvatarUrl1 = team1Participants.get(0).getAvatarUrl();
+                        if (team1Participants.size() >= 2) {
+                            player1DisplayName += " & " + team1Participants.get(1).getFullName();
+                            player1AvatarUrl2 = team1Participants.get(1).getAvatarUrl();
+                        }
+                        for (int i = 2; i < team1Participants.size(); i++) {
+                            player1DisplayName += " & " + team1Participants.get(i).getFullName();
+                        }
+                    }
+
+                    // Xử lý tên và avatar cho đội 2
+                    if (!team2Participants.isEmpty()) {
+                        player2DisplayName = team2Participants.get(0).getFullName();
+                        player2AvatarUrl1 = team2Participants.get(0).getAvatarUrl();
+                        if (team2Participants.size() >= 2) {
+                            player2DisplayName += " & " + team2Participants.get(1).getFullName();
+                            player2AvatarUrl2 = team2Participants.get(1).getAvatarUrl();
+                        }
+                        for (int i = 2; i < team2Participants.size(); i++) {
+                            player2DisplayName += " & " + team2Participants.get(i).getFullName();
+                        }
+                    }
+
+                    if (rawMatch.getStartTime() != null && !rawMatch.getStartTime().isEmpty()) {
+                        try {
+                            Date date = apiDateFormat.parse(rawMatch.getStartTime());
+                            matchTimeDisplay = timeFormat.format(date);
+                        } catch (java.text.ParseException e) {
+                            Log.e("MatchesFragment", "Lỗi phân tích thời gian bắt đầu trận đấu để lọc: " + rawMatch.getStartTime(), e);
+                        }
+                    }
+                    allConvertedMatchesForCurrentView.add(new Matches(player1DisplayName, player2DisplayName,
+                            player1AvatarUrl1, player1AvatarUrl2,
+                            player2AvatarUrl1, player2AvatarUrl2,
+                            scoreDisplay, matchTimeDisplay, matchStatusDisplay,
+                            isDoublesMatch));
                 }
 
-                Collections.sort(team1Participants, Comparator.comparing(Participant::getFullName));
-                Collections.sort(team2Participants, Comparator.comparing(Participant::getFullName));
-
-                if (team1Participants.size() == 1 && team2Participants.size() == 1) {
-                    player1DisplayName = team1Participants.get(0).getFullName();
-                    player2DisplayName = team2Participants.get(0).getFullName();
+                // Bây giờ áp dụng bộ lọc trạng thái cho danh sách `allConvertedMatchesForCurrentView` mới này
+                if (statusFilter.equals("Tất cả")) {
+                    filteredList.addAll(allConvertedMatchesForCurrentView);
                 } else {
-                    List<String> team1Names = new ArrayList<>();
-                    for (Participant p : team1Participants) {
-                        team1Names.add(p.getFullName());
+                    for (Matches match : allConvertedMatchesForCurrentView) {
+                        if (match.getMatchStatus().equals(statusFilter)) {
+                            filteredList.add(match);
+                        }
                     }
-                    player1DisplayName = String.join(" & ", team1Names);
-
-                    List<String> team2Names = new ArrayList<>();
-                    for (Participant p : team2Participants) {
-                        team2Names.add(p.getFullName());
-                    }
-                    player2DisplayName = String.join(" & ", team2Names);
-                }
-
-                if (rawMatch.getStartTime() != null && !rawMatch.getStartTime().isEmpty()) {
-                    try {
-                        Date date = tempApiDateFormat.parse(rawMatch.getStartTime());
-                        matchTimeDisplay = tempTimeFormat.format(date);
-                    } catch (java.text.ParseException e) {
-                        Log.e("MatchesFragment", "Lỗi phân tích cú pháp thời gian bắt đầu trận đấu (lọc): " + rawMatch.getStartTime(), e);
-                    }
-                }
-                Matches convertedMatch = new Matches(player1DisplayName, player2DisplayName,
-                        R.drawable.avatar_1, R.drawable.avatar_1,
-                        scoreDisplay, matchTimeDisplay, matchStatusDisplay);
-
-                // Áp dụng bộ lọc
-                if (statusFilter.equals("Tất cả") || convertedMatch.getMatchStatus().equals(statusFilter)) {
-                    filteredList.add(convertedMatch);
                 }
             }
         }
