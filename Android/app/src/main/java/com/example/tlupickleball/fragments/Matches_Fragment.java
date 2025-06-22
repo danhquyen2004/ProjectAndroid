@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,18 +26,30 @@ import com.example.tlupickleball.adapters.MatchAdapter;
 import com.example.tlupickleball.model.DateItem;
 import com.example.tlupickleball.model.Matches;
 
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.service.MatchService;
+import com.example.tlupickleball.network.api_model.match.MatchResponse;
+import com.example.tlupickleball.model.Match;
+import com.example.tlupickleball.model.Participant;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSelectedListener {
 
@@ -47,7 +59,8 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
     private MatchAdapter matchAdapter;
     private List<DateItem> datesList;
     private List<Matches> displayedMatchesList;
-    private Map<String, List<Matches>> allMatchesData;
+    // Changed allMatchesData to store network.model.Match to cache raw API data
+    private Map<String, List<Match>> allMatchesData;
 
     private TextView textViewSelectedDate;
     private LinearLayout filterStatusContainer;
@@ -60,6 +73,9 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
 
     private String currentSelectedDateKey;
     private String currentSelectedFilter = "Tất cả";
+
+    // Add MatchService instance
+    private MatchService matchService;
 
     @Nullable
     @Override
@@ -77,6 +93,9 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         item2 = root.findViewById(R.id.item2);
         select = root.findViewById(R.id.select);
         tabContentFrame = root.findViewById(R.id.tab_content_frame);
+
+        // Initialize MatchService using ApiClient
+        matchService = ApiClient.getClient(getContext()).create(MatchService.class);
 
         allMatchesData = new HashMap<>();
         displayedMatchesList = new ArrayList<>();
@@ -234,7 +253,17 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         textViewSelectedDate.setText(selectedDay + " " + selectedMonthDisplay);
 
         Calendar selectedCal = Calendar.getInstance();
-        selectedCal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date.getDayOfMonth()));
+        SimpleDateFormat monthParseFormat = new SimpleDateFormat("MMM", new Locale("vi", "VN"));
+        try {
+            selectedCal.setTime(monthParseFormat.parse(date.getMonth()));
+            selectedCal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date.getDayOfMonth()));
+            Calendar now = Calendar.getInstance();
+            selectedCal.set(Calendar.YEAR, now.get(Calendar.YEAR)); // Explicitly set the current year
+        } catch (java.text.ParseException e) {
+            Log.e("MatchesFragment", "Error parsing month for date selection: " + e.getMessage());
+            selectedCal = Calendar.getInstance(); // Fallback to today's date
+        }
+
         SimpleDateFormat fullDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         currentSelectedDateKey = fullDateFormat.format(selectedCal.getTime());
 
@@ -254,92 +283,179 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
     }
 
     private void loadMatchesForSelectedDate(String dateKey, String matchType) {
-        List<Matches> allMatchesForSelectedDate = new ArrayList<>();
         String compositeKey = dateKey + "_" + matchType;
 
         if (allMatchesData.containsKey(compositeKey)) {
-            allMatchesForSelectedDate.addAll(allMatchesData.get(compositeKey));
-            Log.d("MatchesFragment", "Found " + allMatchesForSelectedDate.size() + " matches for " + compositeKey + " from cache.");
+            // Data is in cache, convert and display
+            List<Match> cachedMatches = allMatchesData.get(compositeKey);
+            Log.d("MatchesFragment", "Found " + cachedMatches.size() + " matches for " + compositeKey + " from cache.");
+            convertAndDisplayMatches(cachedMatches, matchType);
         } else {
-            List<Matches> matchesToLoad = createSampleMatches(dateKey, matchType);
-            allMatchesData.put(compositeKey, matchesToLoad);
-            allMatchesForSelectedDate.addAll(matchesToLoad);
-            Log.d("MatchesFragment", "Generated " + matchesToLoad.size() + " sample matches for " + compositeKey);
-        }
+            // Fetch data from API
+            Log.d("MatchesFragment", "Fetching matches for " + compositeKey + " from API.");
+            int page = 1; // Assuming default page 1
+            int pageSize = 50; // Assuming default page size 50
 
-        displayedMatchesList.clear();
-        displayedMatchesList.addAll(allMatchesForSelectedDate);
-        filterMatchesByStatus(currentSelectedFilter);
+            matchService.getMatchesByDay(dateKey, page, pageSize).enqueue(new Callback<MatchResponse>() {
+                @Override
+                public void onResponse(Call<MatchResponse> call, Response<MatchResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Match> fetchedMatches = response.body().getMatches();
+                        allMatchesData.put(compositeKey, fetchedMatches); // Cache the raw API data
+                        convertAndDisplayMatches(fetchedMatches, matchType);
+                        Log.d("MatchesFragment", "Fetched " + fetchedMatches.size() + " matches for " + compositeKey + " from API.");
+                    } else {
+                        Log.e("MatchesFragment", "API call failed: " + response.message());
+                        Toast.makeText(getContext(), "Failed to load matches: " + response.message(), Toast.LENGTH_SHORT).show();
+                        displayedMatchesList.clear(); // Clear displayed matches if API call fails
+                        matchAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<MatchResponse> call, Throwable t) {
+                    Log.e("MatchesFragment", "API call error: " + t.getMessage(), t);
+                    Toast.makeText(getContext(), "Error loading matches: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    displayedMatchesList.clear(); // Clear displayed matches if API call fails
+                    matchAdapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
     /**
-     * Tạo dữ liệu trận đấu mẫu dựa trên ngày và loại trận đấu (Cá nhân/Tổng quát).
-     *
-     * @param dateKey   Ngày ở định dạng "YYYY-MM-DD".
-     * @param matchType Loại trận đấu ("individual" cho Cá nhân, "doubles" cho Tổng quát).
-     * @return Danh sách các trận đấu mẫu.
+     * Converts raw API Match objects to displayable Matches objects and updates the UI.
+     * @param rawMatches The list of raw Match objects from the API.
+     * @param matchType The current selected match type ("individual" or "doubles").
      */
-    private List<Matches> createSampleMatches(String dateKey, String matchType) {
-        List<Matches> sampleMatches = new ArrayList<>();
-        String statusDefault = "Sắp diễn ra"; // Trạng thái mặc định
-        String myPlayerName = "Người chơi của tôi"; // Tên người chơi giả định
+    private void convertAndDisplayMatches(List<Match> rawMatches, String matchType) {
+        List<Matches> convertedMatches = new ArrayList<>();
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        // Define format for API's ISO 8601 timestamp
+        SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC")); // API time is UTC
 
-        // Sử dụng các avatar khác nhau để hiển thị đa dạng hơn
-        int avatar1 = R.drawable.avatar_1; // Giả định là avatar của người chơi hiện tại
-        int avatar2 = R.drawable.avatar_1;
-        int avatar3 = R.drawable.avatar_1;
-        int avatar4 = R.drawable.avatar_1;
-        int avatar5 = R.drawable.avatar_1;
-        int avatar6 = R.drawable.avatar_1;
-        int avatar7 = R.drawable.avatar_1;
-        int avatar8 = R.drawable.avatar_1;
+        for (Match rawMatch : rawMatches) {
+            String player1DisplayName = "";
+            String player2DisplayName = "";
+            String scoreDisplay = rawMatch.getTeam1Wins() + "-" + rawMatch.getTeam2Wins();
+            String matchTimeDisplay = "N/A";
+            String matchStatusDisplay = mapApiStatusToDisplayStatus(rawMatch.getStatus());
 
-        if (dateKey.contains("06-09")) { // Dữ liệu mẫu cho ngày 09/06
-            if (matchType.equals("individual")) { // Kết quả Cá nhân (của 'Người chơi của tôi')
-                // Trận đấu đơn có người chơi giả định
-                sampleMatches.add(new Matches(myPlayerName, "Đối thủ A", avatar1, avatar2, "2-0", "18:00", "Đã kết thúc"));
-                sampleMatches.add(new Matches("Đối thủ B", myPlayerName, avatar3, avatar1, "1-2", "17:00", "Đã kết thúc"));
-                // Trận đấu đôi có người chơi giả định (tên đội bao gồm tên người chơi)
-                sampleMatches.add(new Matches(myPlayerName + " & Đồng đội C", "Đối thủ D & Đối thủ E", avatar1, avatar4, "N/A", "19:00", "Sắp diễn ra"));
-            } else { // Kết quả Tổng quát (của cả CLB)
-                // Các trận đấu đơn chung
-                sampleMatches.add(new Matches("Hoàng", "Lan", avatar5, avatar6, "N/A", "16:30", "Sắp diễn ra"));
-                sampleMatches.add(new Matches("Minh", "Hà", avatar7, avatar8, "0-2", "14:00", "Đã kết thúc"));
-                // Các trận đấu đôi chung
-                sampleMatches.add(new Matches("Đội Thần Tốc", "Đội Bất Bại", avatar2, avatar3, "N/A", "20:00", "Đang diễn ra"));
-                sampleMatches.add(new Matches("Song Sát", "Đôi Hùng Mạnh", avatar4, avatar5, "2-1", "15:00", "Đã kết thúc"));
+            List<Participant> team1Participants = new ArrayList<>();
+            List<Participant> team2Participants = new ArrayList<>();
+
+            for (Participant p : rawMatch.getParticipants()) {
+                if (p.getTeam() == 1) {
+                    team1Participants.add(p);
+                } else if (p.getTeam() == 2) {
+                    team2Participants.add(p);
+                }
             }
-        } else if (dateKey.contains("06-10")) { // Dữ liệu mẫu cho ngày 10/06
-            if (matchType.equals("individual")) { // Kết quả Cá nhân
-                sampleMatches.add(new Matches(myPlayerName + " & Đồng đội F", "Đối thủ G & Đối thủ H", avatar1, avatar6, "N/A", "09:00", "Sắp diễn ra"));
-            } else { // Kết quả Tổng quát
-                sampleMatches.add(new Matches("Team Phượng Hoàng", "Team Rồng Xanh", avatar7, avatar8, "N/A", "10:00", "Sắp diễn ra"));
-                sampleMatches.add(new Matches("Long", "Mai", avatar1, avatar2, "N/A", "11:00", "Sắp diễn ra")); // Ví dụ trận đấu đơn trong Tổng quát
-            }
-        } else {
-            // Dữ liệu mặc định nếu không có dữ liệu cụ thể cho ngày và loại được chọn
+
+            // Sort participants by full name to ensure consistent order for team display names
+            Collections.sort(team1Participants, Comparator.comparing(Participant::getFullName));
+            Collections.sort(team2Participants, Comparator.comparing(Participant::getFullName));
+
             if (matchType.equals("individual")) {
-                sampleMatches.add(new Matches(myPlayerName, "Đối thủ Mặc định (Cá nhân)", avatar1, avatar2, "N/A", "N/A", statusDefault));
-            } else {
-                sampleMatches.add(new Matches("Tổng quát Team Default 1", "Tổng quát Team Default 2", avatar3, avatar4, "N/A", "N/A", statusDefault));
+                // Assuming individual matches have one participant per team
+                if (!team1Participants.isEmpty()) {
+                    player1DisplayName = team1Participants.get(0).getFullName();
+                }
+                if (!team2Participants.isEmpty()) {
+                    player2DisplayName = team2Participants.get(0).getFullName();
+                }
+            } else if (matchType.equals("doubles")) {
+                // Assuming doubles matches have two participants per team or more
+                List<String> team1Names = new ArrayList<>();
+                for (Participant p : team1Participants) {
+                    team1Names.add(p.getFullName());
+                }
+                player1DisplayName = String.join(" & ", team1Names);
+
+                List<String> team2Names = new ArrayList<>();
+                for (Participant p : team2Participants) {
+                    team2Names.add(p.getFullName());
+                }
+                player2DisplayName = String.join(" & ", team2Names);
             }
+
+            // Parse and format match time
+            if (rawMatch.getStartTime() != null && !rawMatch.getStartTime().isEmpty()) {
+                try {
+                    Date date = apiDateFormat.parse(rawMatch.getStartTime());
+                    matchTimeDisplay = timeFormat.format(date); // Format to local time
+                } catch (java.text.ParseException e) {
+                    Log.e("MatchesFragment", "Error parsing match start time: " + rawMatch.getStartTime(), e);
+                }
+            }
+
+            // Using avatar_1 as placeholder since actual avatar URLs are not in the API response
+            convertedMatches.add(new Matches(player1DisplayName, player2DisplayName,
+                    R.drawable.avatar_1, R.drawable.avatar_1,
+                    scoreDisplay, matchTimeDisplay, matchStatusDisplay));
         }
-        return sampleMatches;
+
+        displayedMatchesList.clear();
+        displayedMatchesList.addAll(convertedMatches);
+        filterMatchesByStatus(currentSelectedFilter); // Re-apply filter after data conversion
     }
 
+    /**
+     * Maps API status strings to displayable Vietnamese status strings.
+     * @param apiStatus The status string from the API (e.g., "finished", "upcoming", "ongoing").
+     * @return The corresponding Vietnamese status string.
+     */
+    private String mapApiStatusToDisplayStatus(String apiStatus) {
+        switch (apiStatus) {
+            case "finished":
+                return "Đã kết thúc";
+            case "upcoming":
+                return "Sắp diễn ra";
+            case "ongoing":
+                return "Đang diễn ra";
+            default:
+                return apiStatus; // Return original if no mapping found
+        }
+    }
 
     private void filterMatchesByStatus(String statusFilter) {
         List<Matches> filteredList = new ArrayList<>();
-        String compositeKey = currentSelectedDateKey + "_" + currentMatchType;
-        List<Matches> matchesForCurrentDateAndType = allMatchesData.get(compositeKey);
-
-        if (matchesForCurrentDateAndType != null) {
+        // Filter the currently converted and displayed list
+        if (displayedMatchesList != null) {
             if (statusFilter.equals("Tất cả")) {
-                filteredList.addAll(matchesForCurrentDateAndType);
+                // To get all matches for current date and type, we need to re-convert from the cached raw data
+                // This ensures filtering always starts from the full set of fetched matches
+                String compositeKey = currentSelectedDateKey + "_" + currentMatchType;
+                List<Match> rawMatchesForCurrentDateAndType = allMatchesData.get(compositeKey);
+                if (rawMatchesForCurrentDateAndType != null) {
+                    // Re-convert all matches and then filter (or just add all if filter is "Tất cả")
+                    // This path means we will re-run convertAndDisplayMatches, which then calls this filter again,
+                    // this would be slightly inefficient. A better way is to cache the *converted* list
+                    // or to filter the `displayedMatchesList` itself based on the raw `allMatchesData`.
+                    // For simplicity and correctness with current logic, let's just re-add all from `displayedMatchesList`
+                    // if it's already updated, or update `displayedMatchesList` from `allMatchesData` first.
+                    // Given `convertAndDisplayMatches` already populates `displayedMatchesList` before calling this,
+                    // `displayedMatchesList` holds all matches for the current date/type.
+                    filteredList.addAll(displayedMatchesList);
+                }
             } else {
-                for (Matches match : matchesForCurrentDateAndType) {
-                    if (match.getMatchStatus().equals(statusFilter)) {
-                        filteredList.add(match);
+                // Iterate through the already converted and potentially filtered list
+                String compositeKey = currentSelectedDateKey + "_" + currentMatchType;
+                List<Match> rawMatchesForCurrentDateAndType = allMatchesData.get(compositeKey);
+                if (rawMatchesForCurrentDateAndType != null) {
+                    List<Matches> allConvertedMatchesForFiltering = new ArrayList<>();
+                    // Re-convert all to apply filter accurately if needed, or filter directly on `rawMatchesForCurrentDateAndType`
+                    // and then convert.
+                    // To avoid reconversion, let's assume `displayedMatchesList` currently holds the complete list
+                    // before the *last* filter was applied. If it's not, we'd need a separate `fullMatchesListForDisplay`
+                    // that always contains all converted matches for the current date/type.
+                    // For current structure, `displayedMatchesList` is set in `convertAndDisplayMatches`
+                    // to all matches of current date/type before this filter.
+                    for (Matches match : displayedMatchesList) { // This `displayedMatchesList` has *all* matches from API for this date/type (if `convertAndDisplayMatches` just ran).
+                        if (match.getMatchStatus().equals(statusFilter)) {
+                            filteredList.add(match);
+                        }
                     }
                 }
             }
