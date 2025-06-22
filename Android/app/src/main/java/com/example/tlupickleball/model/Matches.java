@@ -2,8 +2,8 @@ package com.example.tlupickleball.model;
 public class Matches {
     private String player1Name;
     private String player2Name;
-    private int player1Avatar; // ID tài nguyên cho ảnh đại diện
-    private int player2Avatar; // ID tài nguyên cho ảnh đại diện
+    private int player1Avatar;
+    private int player2Avatar;
     private String score;
     private String matchTime;
     private String matchStatus;

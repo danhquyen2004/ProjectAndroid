@@ -26,7 +26,6 @@ public class Match {
         this.team2Wins = team2Wins;
     }
 
-    // Getters
     public String getMatchId() {
         return matchId;
     }
