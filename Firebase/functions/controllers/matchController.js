@@ -73,14 +73,16 @@ exports.listMonthlyMatches = async (req, res) => {
           .collection("participants").get();
         const participants = await Promise.all(participantsSnap.docs.map(async pDoc => {
           const pData = pDoc.data();
-          // Lấy tên người chơi
+          // Lấy tên và avatar người chơi
           const profileSnap = await admin.firestore()
             .collection("users").doc(pData.userId)
             .collection("profile").doc("info").get();
           const fullName = profileSnap.exists ? (profileSnap.data().fullName || "Unknown") : "Unknown";
+          const avatarUrl = profileSnap.exists ? (profileSnap.data().avatarUrl || "") : "";
           return {
             userId: pData.userId,
             fullName,
+            avatarUrl,
             team: pData.team,
             isConfirmed: pData.isConfirmed
           };
@@ -166,14 +168,16 @@ exports.listMatchesByDay = async (req, res) => {
         .collection("participants").get();
       const participants = await Promise.all(participantsSnap.docs.map(async pDoc => {
         const pData = pDoc.data();
-        // Lấy tên người chơi
+        // Lấy tên và avatar người chơi
         const profileSnap = await admin.firestore()
           .collection("users").doc(pData.userId)
           .collection("profile").doc("info").get();
         const fullName = profileSnap.exists ? (profileSnap.data().fullName || "Unknown") : "Unknown";
+        const avatarUrl = profileSnap.exists ? (profileSnap.data().avatarUrl || "") : "";
         return {
           userId: pData.userId,
           fullName,
+          avatarUrl,
           team: pData.team,
           isConfirmed: pData.isConfirmed
         };
@@ -263,13 +267,16 @@ exports.listUserMatchesByDay = async (req, res) => {
           .collection("participants").get();
         const participants = await Promise.all(allParticipantsSnap.docs.map(async pDoc => {
           const pData = pDoc.data();
+          // Lấy tên và avatar người chơi
           const profileSnap = await admin.firestore()
             .collection("users").doc(pData.userId)
             .collection("profile").doc("info").get();
           const fullName = profileSnap.exists ? (profileSnap.data().fullName || "Unknown") : "Unknown";
+          const avatarUrl = profileSnap.exists ? (profileSnap.data().avatarUrl || "") : "";
           return {
             userId: pData.userId,
             fullName,
+            avatarUrl,
             team: pData.team,
             isConfirmed: pData.isConfirmed
           };
@@ -476,7 +483,7 @@ exports.createMatch = async (req, res) => {
             type: "penalty_incurred",
             amount: penaltyAmount,
             matchId,
-            description: `Phạt thua trận ${matchId}`,
+            description: `Phạt thua trận `,
             createdAt: nowTs
           });
         });
@@ -688,6 +695,72 @@ exports.deleteMatch = async (req, res) => {
   } catch (e) {
     console.error("deleteMatch error:", e);
     return res.status(500).json({ error: "Failed to delete match", message: e.message });
+  }
+};
+
+// Lấy chi tiết 1 trận đấu (match detail)
+exports.getMatchDetail = async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    if (!matchId) {
+      return res.status(400).json({ error: "Missing matchId" });
+    }
+    const matchRef = admin.firestore().collection("matches").doc(matchId);
+    const matchDoc = await matchRef.get();
+    if (!matchDoc.exists) {
+      return res.status(404).json({ error: "Match not found" });
+    }
+    const match = matchDoc.data();
+    // Lấy startTime chuẩn kiểu Date
+    let startTime = null;
+    if (match.startTime) {
+      if (typeof match.startTime.toDate === "function") {
+        startTime = match.startTime.toDate();
+      } else {
+        startTime = new Date(match.startTime);
+      }
+    }
+    // Lấy danh sách người tham gia
+    const participantsSnap = await matchRef.collection("participants").get();
+    const participants = await Promise.all(participantsSnap.docs.map(async pDoc => {
+      const pData = pDoc.data();
+      // Lấy tên và avatar người chơi
+      const profileSnap = await admin.firestore()
+        .collection("users").doc(pData.userId)
+        .collection("profile").doc("info").get();
+      const fullName = profileSnap.exists ? (profileSnap.data().fullName || "Unknown") : "Unknown";
+      const avatarUrl = profileSnap.exists ? (profileSnap.data().avatarUrl || "") : "";
+      return {
+        userId: pData.userId,
+        fullName,
+        avatarUrl,
+        team: pData.team,
+        isConfirmed: pData.isConfirmed
+      };
+    }));
+    // Lấy kết quả set
+    const setResultsSnap = await matchRef.collection("setResults").get();
+    const setResults = setResultsSnap.docs.map(doc => doc.data());
+    // Tính số set thắng của mỗi đội
+    let team1Wins = 0, team2Wins = 0;
+    setResults.forEach(set => {
+      if (set.team1Score > set.team2Score) team1Wins++;
+      else if (set.team2Score > set.team1Score) team2Wins++;
+    });
+    return res.status(200).json({
+      matchId: match.matchId,
+      status: match.status,
+      type: match.type,
+      setCount: match.setCount,
+      startTime: startTime ? toVietnamTime(startTime) : null,
+      participants,
+      setResults,
+      team1Wins,
+      team2Wins
+    });
+  } catch (e) {
+    console.error("getMatchDetail error:", e);
+    return res.status(500).json({ error: "Failed to get match detail", message: e.message });
   }
 };
 

@@ -16,5 +16,7 @@ router.put("/:matchId/scores", verifyToken, requireAdmin, matchController.update
 router.post("/", verifyToken, requireAdmin, matchController.createMatch);
 // Xóa 1 trận đấu (chỉ cho admin)
 router.delete("/:matchId", verifyToken, requireAdmin, matchController.deleteMatch);
+// Lấy chi tiết 1 trận đấu
+router.get("/detail/:matchId", verifyToken, matchController.getMatchDetail);
 
 module.exports = router;

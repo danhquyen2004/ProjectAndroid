@@ -3,6 +3,7 @@ package com.example.tlupickleball.activities;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +26,13 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.base.BaseActivity;
 import com.example.tlupickleball.adapters.UserAdapter;
+import com.example.tlupickleball.network.core.SessionManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 
-public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+public class UserActivity extends BaseActivity implements TabLayout.OnTabSelectedListener {
 
     public DrawerLayout drawerLayout; // public để fragment truy cập
     public NavigationView navigationView;
@@ -169,6 +172,7 @@ public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         btnDiaLogOK.setOnClickListener(v -> {
             // Xử lý logic phê duyệt/từ chối
+            LogOut();
             isDialogShowing = false; // Đánh dấu dialog đã đóng
             dialogForm.dismiss();
         });
@@ -184,5 +188,18 @@ public class UserActivity extends AppCompatActivity implements TabLayout.OnTabSe
         });
 
         dialogForm.show();
+    }
+
+    private void LogOut() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(KEY_REMEMBER, false);
+        editor.apply();
+        SessionManager.clearSession(this);
+        // Tạo intent để về màn hình login
+        Intent intent = new Intent(UserActivity.this, LoginActivity.class);
+        // Xóa toàn bộ activity stack
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

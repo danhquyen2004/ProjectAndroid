@@ -342,12 +342,13 @@ exports.getPendingUsers = async (req, res) => {
     const snapshot = await query.get();
 
     // Lấy dữ liệu profile tương ứng
-    const users = await Promise.all(snapshot.docs.map(async doc => {
+    const users = [];
+    for (const doc of snapshot.docs) {
       const uid = doc.id;
       const data = doc.data();
-
       let fullName = null;
       let avatarUrl = null;
+      let hasProfile = false;
       try {
         const profileSnap = await admin.firestore()
           .collection("users")
@@ -355,22 +356,22 @@ exports.getPendingUsers = async (req, res) => {
           .collection("profile")
           .doc("info")
           .get();
-
         if (profileSnap.exists) {
           fullName = profileSnap.data().fullName || null;
           avatarUrl = profileSnap.data().avatarUrl || null;
+          hasProfile = true;
         }
       } catch (_) { }
-
-      return {
+      if (!hasProfile) continue; // Bỏ qua user thiếu info
+      users.push({
         uid,
         email: data.email || null,
         createdAt: data.createdAt?.toDate().toISOString() || null,
         fullName,
         avatarUrl,
         approvalStatus: data.approvalStatus || null
-      };
-    }));
+      });
+    }
 
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
     const nextPageToken = lastDoc ? lastDoc.id : null;
@@ -407,12 +408,14 @@ exports.getApprovedUsers = async (req, res) => {
 
     const snapshot = await query.get();
 
-    const users = await Promise.all(snapshot.docs.map(async doc => {
+    // Lấy dữ liệu profile tương ứng
+    const users = [];
+    for (const doc of snapshot.docs) {
       const uid = doc.id;
       const data = doc.data();
-
       let fullName = null;
       let avatarUrl = null;
+      let hasProfile = false;
       try {
         const profileSnap = await admin.firestore()
           .collection("users")
@@ -420,22 +423,22 @@ exports.getApprovedUsers = async (req, res) => {
           .collection("profile")
           .doc("info")
           .get();
-
         if (profileSnap.exists) {
           fullName = profileSnap.data().fullName || null;
           avatarUrl = profileSnap.data().avatarUrl || null;
+          hasProfile = true;
         }
       } catch (_) { }
-
-      return {
+      if (!hasProfile) continue; // Bỏ qua user thiếu info
+      users.push({
         uid,
         email: data.email || null,
         createdAt: data.createdAt?.toDate().toISOString() || null,
         fullName,
         avatarUrl,
         approvalStatus: data.approvalStatus || null
-      };
-    }));
+      });
+    }
 
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
     const nextPageToken = lastDoc ? lastDoc.id : null;
