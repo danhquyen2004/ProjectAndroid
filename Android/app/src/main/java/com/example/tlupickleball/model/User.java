@@ -1,13 +1,57 @@
 package com.example.tlupickleball.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class User {
+    @SerializedName("uid")
     private String uid;
-    private String name;
-    private String dob;
+    @SerializedName("fullName")
+    private String fullName;
+    @SerializedName("birthDate")
+    private String birthDate;
+    @SerializedName("gender")
     private String gender;
+    @SerializedName("email")
+    private String email;
+    @SerializedName("role")
+    private String role;
+    @SerializedName("approved")
+    private boolean approved;
+    @SerializedName("profileImageUrl")
+    private String profileImageUrl; // Thêm trường ảnh đại diện nếu cần
+    @SerializedName("currentSingleScore")
+    private int currentSingleScore;
+    @SerializedName("currentDoubleScore")
+    private int currentDoubleScore;
+    @SerializedName("createdAt")
+    private String createdAt; // có thể dùng Timestamp nếu parse từ Firestore
+
+    public int getCurrentSingleScore() {
+        return currentSingleScore;
+    }
+
+    public void setCurrentSingleScore(int currentSingleScore) {
+        this.currentSingleScore = currentSingleScore;
+    }
+
+    public int getCurrentDoubleScore() {
+        return currentDoubleScore;
+    }
+
+    public void setCurrentDoubleScore(int currentDoubleScore) {
+        this.currentDoubleScore = currentDoubleScore;
+    }
 
     public boolean isApproved() {
         return approved;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void setApproved(boolean approved) {
@@ -22,12 +66,12 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public String getDob() {
-        return dob;
+    public String getBirthDate() {
+        return birthDate;
     }
 
-    public void setDob(String dob) {
-        this.dob = dob;
+    public void setBirthDate(String birthDate) {
+        this.birthDate = birthDate;
     }
 
     public String getEmail() {
@@ -46,12 +90,12 @@ public class User {
         this.gender = gender;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getRole() {
@@ -70,23 +114,21 @@ public class User {
         this.uid = uid;
     }
 
-    private String email;
-    private String role;
-    private boolean approved;
-    private String createdAt; // có thể dùng Timestamp nếu parse từ Firestore
-
     // Constructors
     public User() {}
 
-    public User(String uid, String name, String dob, String gender, String email,
-                String role, boolean approved, String createdAt) {
+    public User(String uid, String fullName, String birthDate, String gender, String email,
+                String role, boolean approved, String profileImageUrl, int currentSingleScore, int currentDoubleScore, String createdAt) {
         this.uid = uid;
-        this.name = name;
-        this.dob = dob;
+        this.fullName = fullName;
+        this.birthDate = birthDate;
         this.gender = gender;
         this.email = email;
         this.role = role;
         this.approved = approved;
+        this.profileImageUrl = profileImageUrl;
+        this.currentSingleScore = currentSingleScore;
+        this.currentDoubleScore = currentDoubleScore;
         this.createdAt = createdAt;
     }
 }

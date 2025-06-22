@@ -13,6 +13,7 @@ import com.example.tlupickleball.network.api_model.auth.GenericResponse;
 import com.example.tlupickleball.network.core.ApiClient;
 import com.example.tlupickleball.network.core.SessionManager;
 import com.example.tlupickleball.network.service.AuthService;
+import com.example.tlupickleball.network.service.UserService;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,6 +21,7 @@ import retrofit2.Response;
 
 public class AuthActivity extends BaseActivity{
     protected AuthService authService;
+    protected UserService userService;
     protected static final long COOLDOWN_MS = 60 * 1000;
     private static final String PREF_NAME = "cooldown_prefs";
     private static final String PREF_KEY_LAST_SENT = "last_verification_email_sent";
@@ -30,6 +32,7 @@ public class AuthActivity extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         authService = ApiClient.getClient(this).create(AuthService.class);
+        userService = ApiClient.getClient(this).create(UserService.class);
     }
     protected void resendVerificationEmail(Context context, Runnable onSuccess , Runnable onFail) {
         showLoading();
