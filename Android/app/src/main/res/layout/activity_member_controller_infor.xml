@@ -182,5 +182,5 @@
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-    <include layout="@layout/loading_overlay" />
+    <include layout="@layout/blind_loading_overlay" />
 </FrameLayout>

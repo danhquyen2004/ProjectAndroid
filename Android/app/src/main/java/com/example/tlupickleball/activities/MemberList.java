@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.base.BaseActivity;
 import com.example.tlupickleball.adapters.ApproveMemberAdapter;
 import com.example.tlupickleball.adapters.MemberListAdapter;
 import com.example.tlupickleball.model.Player;
@@ -26,7 +27,7 @@ import java.util.List;
 
 import retrofit2.Call;
 
-public class MemberList extends AppCompatActivity {
+public class MemberList extends BaseActivity {
     private RecyclerView recyclerView;
     private MemberListAdapter adapter;
     private List<User> lstUser;
@@ -48,6 +49,7 @@ public class MemberList extends AppCompatActivity {
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> onBackPressed());
 
+        showLoading();
         fetchMembers();
         setupRecyclerView();
 
@@ -212,13 +214,16 @@ public class MemberList extends AppCompatActivity {
                     lstUser.clear();
                     lstUser.addAll(users);
                     adapter.notifyDataSetChanged();
+                    hideLoading();
                 } else {
                     Toast.makeText(MemberList.this, "Failed to load members", Toast.LENGTH_SHORT).show();
+                    hideLoading();
                 }
             }
             @Override
             public void onFailure(Call<UserListResponse> call, Throwable t) {
                 Toast.makeText(MemberList.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                hideLoading();
             }
         });
     }
@@ -228,6 +233,7 @@ public class MemberList extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new MemberListAdapter(this, lstUser);
         recyclerView.setAdapter(adapter);
+        //hideLoading();
     }
 
     private void tuChoiThanhVien(int position) {

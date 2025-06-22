@@ -83,7 +83,12 @@ public class User {
     }
 
     public String getGender() {
-        return gender;
+        if(gender.equals("male")){
+            return "Nam";
+        }
+        else {
+            return "Nữ";
+        }
     }
 
     public void setGender(String gender) {
