@@ -100,6 +100,18 @@
           "path": ["matches", "{{matchId}}"]
         }
       }
+    },
+    {
+      "name": "Get Match Detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/matches/detail/{{matchId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["matches", "detail", "{{matchId}}"]
+        }
+      }
     }
   ],
   "variable": [
