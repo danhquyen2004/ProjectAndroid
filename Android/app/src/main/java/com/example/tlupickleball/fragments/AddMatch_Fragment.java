@@ -450,7 +450,7 @@ public class AddMatch_Fragment extends Fragment {
             dialog.dismiss(); // Đóng dialog
             // Khi người dùng xác nhận thoát, chúng ta chỉ cần gọi onBackPressed()
             // Callback đã được thiết lập ở onViewCreated sẽ tự động xử lý phần còn lại.
-            requireActivity().onBackPressed();
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
 
         btnCancelExit.setOnClickListener(v -> {

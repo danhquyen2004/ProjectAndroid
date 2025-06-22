@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:hint="Thời gian"
         android:focusable="false"
-        android:drawableEnd="@drawable/ic_calender" />
+        android:drawableEnd="@drawable/ic_calendar" />
 
     <Button
         android:id="@+id/btnConfirm"

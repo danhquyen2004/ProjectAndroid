@@ -13,7 +13,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <include layout="@layout/view_top_nav_bar" />
+            <include
+                android:id="@+id/include"
+                layout="@layout/view_top_nav_bar" />
 
 
             <LinearLayout
@@ -21,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
                 android:orientation="horizontal"
-                app:layout_constraintBottom_toTopOf="@+id/imageView2"
+                app:layout_constraintBottom_toTopOf="@+id/id_info_cards"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.064"
                 app:layout_constraintStart_toStartOf="parent">
@@ -30,7 +32,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
-                    android:text="Hi, "
+                    android:text="Nguyen Văn A"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
                     app:layout_constraintBottom_toTopOf="@+id/imageView"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.064"
@@ -48,28 +52,16 @@
                     app:layout_constraintStart_toStartOf="parent" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="167dp"
-                android:layout_height="242dp"
-                android:src="@drawable/avt_home"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.102"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.265" />
-
             <LinearLayout
+                android:id="@+id/id_info_cards"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.933"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.282">
+                app:layout_constraintVertical_bias="0.234">
 
                 <include layout="@layout/view_info_card_single" />
 
@@ -77,24 +69,6 @@
 
                 <include layout="@layout/view_info_wallet" />
             </LinearLayout>
-
-            <Button
-                android:id="@+id/id_record_match"
-                style="@style/Base.Theme.Button.White"
-                android:layout_marginBottom="256dp"
-                android:text="Ghi nhận trận đấu"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <Button
-                android:id="@+id/id_manage_member"
-                style="@style/Base.Theme.Button.White"
-                android:layout_marginBottom="188dp"
-                android:text="Quản lý hội viên"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
