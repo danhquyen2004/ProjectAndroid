@@ -10,19 +10,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.model.Player;
+import com.example.tlupickleball.model.User;
+import com.example.tlupickleball.model.UserRank;
 
 import java.util.List;
 
-public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder> {
-    private List<Player> playerList;
+public class UserRankAdapter extends RecyclerView.Adapter<UserRankAdapter.PlayerViewHolder> {
+    private List<UserRank> users;
     private Context context;
 
-    public PlayerAdapter(Context context,List<Player> playerList)
+    public UserRankAdapter(Context context, List<UserRank> users)
     {
         this.context = context;
-        this.playerList = playerList;
+        this.users = users;
     }
 
     @NonNull
@@ -34,16 +37,24 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
 
     @Override
     public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position) {
-        Player player = playerList.get(position);
-        holder.txtName.setText(player.getName());
-        holder.txtScore.setText(String.valueOf(player.getSoloPoint()));
-        holder.imgAvatar.setImageResource(player.getAvatarResourceId());
+        UserRank user = users.get(position);
+        holder.txtName.setText(user.getFullName());
+        holder.txtScore.setText(String.valueOf(user.getPoint()));
+        Glide.with(context)
+                .load(user.getAvatarUrl())
+                .placeholder(R.drawable.avatar_1) // ảnh mặc định nếu chưa có
+                .into(holder.imgAvatar);
         holder.txtRank.setText((String.valueOf(position + 4)));
+    }
+
+    public void setUsers(List<UserRank> users) {
+        this.users = users;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return playerList.size();
+        return users.size();
     }
 
     public static class PlayerViewHolder extends RecyclerView.ViewHolder {

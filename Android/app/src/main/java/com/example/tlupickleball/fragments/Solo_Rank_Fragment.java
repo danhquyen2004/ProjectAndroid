@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.MemberControllerInfor;
 import com.example.tlupickleball.activities.base.BaseFragment;
 import com.example.tlupickleball.adapters.UserRankAdapter;
 import com.example.tlupickleball.model.Player;
@@ -31,7 +32,8 @@ import java.util.List;
 import retrofit2.Call;
 
 
-public class Duo_Rank_Fragment extends Fragment {
+public class Solo_Rank_Fragment extends Fragment {
+
     private RecyclerView recyclerView;
     private UserRankAdapter adapter;
     private List<UserRank> topUser;
@@ -58,7 +60,6 @@ public class Duo_Rank_Fragment extends Fragment {
 
         return rootView;
     }
-
     public void showLoading() {
         if (loadingOverlay != null) loadingOverlay.show();
     }
@@ -66,7 +67,6 @@ public class Duo_Rank_Fragment extends Fragment {
     public void hideLoading() {
         if (loadingOverlay != null) loadingOverlay.hide();
     }
-
     private void setupTopThree() {
         View top3Layout = rootView.findViewById(R.id.top3Layout);
         topThreeViewHolder = new TopThreeViewHolder(top3Layout);
@@ -88,7 +88,7 @@ public class Duo_Rank_Fragment extends Fragment {
     // Example in your fragment or activity
     private void fetchTopPlayers() {
         showLoading();
-        userService.getTopDuoRank().enqueue(new retrofit2.Callback<List<UserRank>>() {
+        userService.getTopSingleRank().enqueue(new retrofit2.Callback<List<UserRank>>() {
             @Override
             public void onResponse(Call<List<UserRank>> call, retrofit2.Response<List<UserRank>> response) {
                 if (response.isSuccessful() && response.body() != null) {

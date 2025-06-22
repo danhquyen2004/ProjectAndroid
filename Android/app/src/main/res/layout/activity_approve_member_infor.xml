@@ -1,155 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:fillViewport="true">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+    android:background="@color/white">
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        tools:context=".activities.ApproveMemberInfor">
-        <ImageButton
-            android:id="@+id/btn_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/white"
-            android:src="@drawable/ic_back"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.033"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Thông tin hội viên"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/imgAvatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/avatar_1"
-            android:layout_marginTop="24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
-
-        <LinearLayout
-            android:id="@+id/infoContainer"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/imgAvatar">
+            android:padding="16dp"
+            tools:context=".activities.ApproveMemberInfor">
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="@color/white"
+                android:src="@drawable/ic_back"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.033"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tvPlayerName"
-            style="@style/LabelInforTextViewStyle"
-            android:text="Họ và tên"
-            app:layout_constraintStart_toStartOf="parent"/>
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Thông tin hội viên"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tvPlayerNameInfor"
-            style="@style/InforTextViewStyle"
-            android:text="Nguyen Van A"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerName" />
+            <ImageView
+                android:id="@+id/imgAvatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/avatar_1"
+                android:layout_marginTop="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
-        <TextView
-            android:id="@+id/tvPlayerGender"
-            style="@style/LabelInforTextViewStyle"
-            android:text="Giới tính"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerNameInfor"
-            app:layout_constraintStart_toStartOf="parent"/>
+            <LinearLayout
+                android:id="@+id/infoContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/imgAvatar">
 
-        <TextView
-            android:id="@+id/tvGenderInfor"
-            style="@style/InforTextViewStyle"
-            android:text="Nam"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerGender"/>
+            <TextView
+                android:id="@+id/tvPlayerName"
+                style="@style/LabelInforTextViewStyle"
+                android:text="Họ và tên"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvPlayerNameInfor"
+                style="@style/InforTextViewStyle"
+                android:text="Nguyen Van A"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerName" />
+
+            <TextView
+                android:id="@+id/tvPlayerGender"
+                style="@style/LabelInforTextViewStyle"
+                android:text="Giới tính"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerNameInfor"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvGenderInfor"
+                style="@style/InforTextViewStyle"
+                android:text="Nam"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerGender"/>
 
 
-        <TextView
-            android:id="@+id/tvPlayerDob"
-            style="@style/LabelInforTextViewStyle"
-            android:text="Ngày sinh"
-            app:layout_constraintTop_toBottomOf="@+id/tvGenderInfor"
-            app:layout_constraintStart_toStartOf="parent"/>
+            <TextView
+                android:id="@+id/tvPlayerDob"
+                style="@style/LabelInforTextViewStyle"
+                android:text="Ngày sinh"
+                app:layout_constraintTop_toBottomOf="@+id/tvGenderInfor"
+                app:layout_constraintStart_toStartOf="parent"/>
 
-        <TextView
-            android:id="@+id/tvDobInfor"
-            style="@style/InforTextViewStyle"
-            android:text="04/03/2004"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerDob"/>
+            <TextView
+                android:id="@+id/tvDobInfor"
+                style="@style/InforTextViewStyle"
+                android:text="04/03/2004"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerDob"/>
 
-        <TextView
-            android:id="@+id/tvPlayerEmail"
-            style="@style/LabelInforTextViewStyle"
-            android:text="Email"
-            app:layout_constraintTop_toBottomOf="@+id/tvDobInfor"
-            app:layout_constraintStart_toStartOf="parent"/>
+            <TextView
+                android:id="@+id/tvPlayerEmail"
+                style="@style/LabelInforTextViewStyle"
+                android:text="Email"
+                app:layout_constraintTop_toBottomOf="@+id/tvDobInfor"
+                app:layout_constraintStart_toStartOf="parent"/>
 
-        <TextView
-            android:id="@+id/tvPlayerEmailWData"
-            style="@style/InforTextViewStyle"
-            android:text="sadfasf@gmail.com"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerEmail"/>
+            <TextView
+                android:id="@+id/tvPlayerEmailWData"
+                style="@style/InforTextViewStyle"
+                android:text="sadfasf@gmail.com"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerEmail"/>
 
-        </LinearLayout>
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="5dp"
-            android:orientation="vertical"
-            android:gravity="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/infoContainer"
-            app:layout_constraintVertical_bias="0.228">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/infoContainer"
+                app:layout_constraintVertical_bias="0.228">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_approve"
-                style="@style/Base.Theme.Button.Blue"
-                android:layout_width="230dp"
-                android:layout_height="0dp"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="1"
-                android:backgroundTint="#0CE952"
-                android:text="Phê duyệt" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_approve"
+                    style="@style/Base.Theme.Button.Blue"
+                    android:layout_width="230dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#0CE952"
+                    android:text="Phê duyệt" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_reject"
-                style="@style/Base.Theme.Button.White"
-                android:layout_width="230dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="1"
-                android:text="Từ chối" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_reject"
+                    style="@style/Base.Theme.Button.White"
+                    android:layout_width="230dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="1"
+                    android:text="Từ chối" />
 
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+    <include layout="@layout/blind_loading_overlay" />
+</FrameLayout>

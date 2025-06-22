@@ -23,12 +23,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:animateLayoutChanges="true"> <TextView
+            android:animateLayoutChanges="true">
+
+            <TextView
             android:id="@+id/item1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Cá nhân" android:textColor="@android:color/black"
+            android:text="Cá nhân"
+            android:textColor="@android:color/white"
             android:gravity="center"/>
 
             <TextView
@@ -36,7 +39,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="Tổng quát" android:textColor="@android:color/black"
+                android:text="Tổng quát"
+                android:textColor="@android:color/black"
                 android:gravity="center"/>
         </LinearLayout>
     </FrameLayout>

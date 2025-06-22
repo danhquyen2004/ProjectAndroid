@@ -46,10 +46,11 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Ap
                 .into(holder.imgAvatar);
 
         holder.itemView.setOnClickListener(v -> {
-            Context context = v.getContext();
-            Intent intent = new Intent(context, MemberControllerInfor.class);
-            intent.putExtra("uid", user.getUid());
-            context.startActivity(intent);
+//            Context context = v.getContext();
+//            Intent intent = new Intent(context, MemberControllerInfor.class);
+//            intent.putExtra("uid", user.getUid());
+//            context.startActivity(intent);
+           listener.onMemberClick(user);
         });
     }
 
@@ -68,5 +69,16 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Ap
             txtName = itemView.findViewById(R.id.txtName);
             txtEmail = itemView.findViewById(R.id.txtEmail);
         }
+    }
+    public interface OnMemberClickListener {
+        void onMemberClick(User user);
+    }
+
+    private OnMemberClickListener listener;
+
+    public MemberListAdapter(Context context, List<User> users, OnMemberClickListener listener) {
+        this.context = context;
+        this.users = users;
+        this.listener = listener;
     }
 }

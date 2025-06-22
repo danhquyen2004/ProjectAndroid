@@ -11,20 +11,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.ApproveMemberInfor;
-import com.example.tlupickleball.model.Player;
+import com.example.tlupickleball.activities.MemberControllerInfor;
+import com.example.tlupickleball.model.User;
 
 import java.util.List;
 
 public class ApproveMemberAdapter extends RecyclerView.Adapter<ApproveMemberAdapter.ApprovePlayerViewHolder> {
-    private List<Player> playerList;
+    private List<User> lstUser;
     private Context context;
 
-    public ApproveMemberAdapter(Context context, List<Player> playerList)
+    public ApproveMemberAdapter(Context context, List<User> lstUser)
     {
         this.context = context;
-        this.playerList = playerList;
+        this.lstUser = lstUser;
     }
 
     @NonNull
@@ -36,24 +38,26 @@ public class ApproveMemberAdapter extends RecyclerView.Adapter<ApproveMemberAdap
 
     @Override
     public void onBindViewHolder(@NonNull ApprovePlayerViewHolder holder, int position) {
-        Player player = playerList.get(position);
-        holder.txtName.setText(player.getName());
-        holder.txtEmail.setText(String.valueOf(player.getEmail()));
-        holder.imgAvatar.setImageResource(player.getAvatarResourceId());
+        User user = lstUser.get(position);
+        holder.txtName.setText(user.getFullName());
+        holder.txtEmail.setText(String.valueOf(user.getEmail()));
+        Glide.with(context)
+                .load(user.getAvatarUrl())
+                .placeholder(R.drawable.avatar_1) // ảnh mặc định nếu chưa có
+                .into(holder.imgAvatar);
 
         holder.itemView.setOnClickListener(v -> {
-            Context context = v.getContext();
-            Intent intent = new Intent(context, ApproveMemberInfor.class);
-            intent.putExtra("name", player.getName());
-            intent.putExtra("email", player.getEmail());
-            intent.putExtra("avatar", player.getAvatarResourceId());
-            context.startActivity(intent);
+//            Context context = v.getContext();
+//            Intent intent = new Intent(context, ApproveMemberInfor.class);
+//            intent.putExtra("uid", user.getUid());
+//            context.startActivity(intent);
+            listener.onMemberClick(user);
         });
     }
 
     @Override
     public int getItemCount() {
-        return playerList.size();
+        return lstUser.size();
     }
 
     public static class ApprovePlayerViewHolder extends RecyclerView.ViewHolder {
@@ -66,5 +70,18 @@ public class ApproveMemberAdapter extends RecyclerView.Adapter<ApproveMemberAdap
             txtName = itemView.findViewById(R.id.txtName);
             txtEmail = itemView.findViewById(R.id.txtEmail);
         }
+    }
+
+    // Thêm vào MemberListAdapter.java
+    public interface OnMemberClickListener {
+        void onMemberClick(User user);
+    }
+
+    private OnMemberClickListener listener;
+
+    public ApproveMemberAdapter(Context context, List<User> users, OnMemberClickListener listener) {
+        this.context = context;
+        this.lstUser = users;
+        this.listener = listener;
     }
 }

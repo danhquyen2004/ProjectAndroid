@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toolbar;
 
 import com.example.tlupickleball.R;
@@ -18,12 +19,17 @@ import com.google.android.material.navigation.NavigationView;
 
 
 public class Home_Fragment extends Fragment {
+    TextView txtName, txtSoloPoint, txtDoublePoint;
     private View rootView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
+
+        txtName = rootView.findViewById(R.id.txtName);
+        txtSoloPoint = rootView.findViewById(R.id.id_SingleRank);
+        txtDoublePoint = rootView.findViewById(R.id.id_DuoRank);
 
         // Ví dụ: Button mở drawer
         View btnOpenDrawer = rootView.findViewById(R.id.btnMenu);

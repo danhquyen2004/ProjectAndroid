@@ -1,13 +1,13 @@
 package com.example.tlupickleball.model;
 
 public class Player {
-   private String name;
-   private String gender;
-   private String dob;
-   private String email;
-   private double soloPoint;
-   private double douPoint;
-   private int avatarResourceId;
+    private String name;
+    private String gender;
+    private String dob;
+    private String email;
+    private double soloPoint;
+    private double douPoint;
+    private int avatarResourceId;
     public Player(String name, double soloPoint, int avatarResourceId) {
         this.name = name;
         this.soloPoint = soloPoint;
