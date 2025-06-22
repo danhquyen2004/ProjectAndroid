@@ -138,49 +138,11 @@ module.exports = {
    */
   getClubFundBalance: async (req, res) => {
     try {
-      let totalIncome = 0;
-      let totalExpense = 0;
-      // Lấy toàn bộ user
-      const usersSnap = await admin.firestore().collection("users").get();
-      for (const userDoc of usersSnap.docs) {
-        const userId = userDoc.id;
-        // 1. Quỹ cố định đã đóng
-        const fixedSnap = await admin.firestore()
-          .collection("users").doc(userId)
-          .collection("paymentRequests")
-          .where("type", "==", "fixed")
-          .where("status", "==", "paid")
-          .get();
-        fixedSnap.docs.forEach(doc => {
-          totalIncome += doc.data().amount || 0;
-        });
-        // 2. Phạt đã đóng
-        const penaltySnap = await admin.firestore()
-          .collection("users").doc(userId)
-          .collection("paymentRequests")
-          .where("type", "==", "penalty")
-          .where("status", "==", "paid")
-          .get();
-        penaltySnap.docs.forEach(doc => {
-          totalIncome += doc.data().amount || 0;
-        });
-        // 3. Ủng hộ
-        const donationSnap = await admin.firestore()
-          .collection("users").doc(userId)
-          .collection("transactions")
-          .where("type", "==", "donation")
-          .get();
-        donationSnap.docs.forEach(doc => {
-          totalIncome += doc.data().amount || 0;
-        });
+      const doc = await admin.firestore().collection("clubStats").doc("fundBalance").get();
+      if (!doc.exists) {
+        return res.status(200).json({ clubFundBalance: 0, totalIncome: 0, totalExpense: 0 });
       }
-      // 4. Tổng chi (expenses) - giả sử expenses là collection toàn cục
-      const expensesSnap = await admin.firestore().collection("expenses").get();
-      expensesSnap.docs.forEach(doc => {
-        totalExpense += doc.data().amount || 0;
-      });
-      const clubFundBalance = totalIncome - totalExpense;
-      return res.status(200).json({ clubFundBalance, totalIncome, totalExpense });
+      return res.status(200).json(doc.data());
     } catch (e) {
       console.error("getClubFundBalance error:", e);
       return res.status(500).json({ error: "Failed to get club fund balance", message: e.message });
@@ -201,59 +163,21 @@ module.exports = {
       }
       const monthInt = parseInt(month);
       const yearInt = parseInt(year);
-      const startDate = new Date(yearInt, monthInt - 1, 1, 0, 0, 0);
-      const endDate = new Date(yearInt, monthInt, 0, 23, 59, 59, 999);
-      let totalIncome = 0;
-      let totalExpense = 0;
-      // Lấy toàn bộ user
-      const usersSnap = await admin.firestore().collection("users").get();
-      for (const userDoc of usersSnap.docs) {
-        const userId = userDoc.id;
-        // 1. Quỹ cố định đã đóng trong tháng
-        const fixedSnap = await admin.firestore()
-          .collection("users").doc(userId)
-          .collection("paymentRequests")
-          .where("type", "==", "fixed")
-          .where("status", "==", "paid")
-          .where("forMonth", ">=", new Date(yearInt, monthInt - 1, 1))
-          .where("forMonth", "<=", new Date(yearInt, monthInt - 1, 31))
-          .get();
-        fixedSnap.docs.forEach(doc => {
-          totalIncome += doc.data().amount || 0;
-        });
-        // 2. Phạt đã đóng trong tháng
-        const penaltySnap = await admin.firestore()
-          .collection("users").doc(userId)
-          .collection("paymentRequests")
-          .where("type", "==", "penalty")
-          .where("status", "==", "paid")
-          .where("createdAt", ">=", startDate)
-          .where("createdAt", "<=", endDate)
-          .get();
-        penaltySnap.docs.forEach(doc => {
-          totalIncome += doc.data().amount || 0;
-        });
-        // 3. Ủng hộ trong tháng
-        const donationSnap = await admin.firestore()
-          .collection("users").doc(userId)
-          .collection("transactions")
-          .where("type", "==", "donation")
-          .where("createdAt", ">=", startDate)
-          .where("createdAt", "<=", endDate)
-          .get();
-        donationSnap.docs.forEach(doc => {
-          totalIncome += doc.data().amount || 0;
-        });
+      // Đọc dữ liệu tổng hợp từ Firestore, không tính toán lại
+      const docId = `${yearInt}-${String(monthInt).padStart(2, "0")}`;
+      const doc = await admin.firestore()
+        .collection("clubStats").doc("monthlySummary")
+        .collection("financeSummaryByMonth").doc(docId).get();
+      if (!doc.exists) {
+        return res.status(200).json({ month: monthInt, year: yearInt, totalIncome: 0, totalExpense: 0 });
       }
-      // 4. Tổng chi (expenses) trong tháng
-      const expensesSnap = await admin.firestore().collection("expenses")
-        .where("createdAt", ">=", startDate)
-        .where("createdAt", "<=", endDate)
-        .get();
-      expensesSnap.docs.forEach(doc => {
-        totalExpense += doc.data().amount || 0;
+      const data = doc.data();
+      return res.status(200).json({
+        month: data.month,
+        year: data.year,
+        totalIncome: data.totalIncome,
+        totalExpense: data.totalExpense
       });
-      return res.status(200).json({ month: monthInt, year: yearInt, totalIncome, totalExpense });
     } catch (e) {
       console.error("getClubFinanceSummaryByMonth error:", e);
       return res.status(500).json({ error: "Failed to get club finance summary", message: e.message });
@@ -407,6 +331,39 @@ module.exports = {
         createdBy
       };
       const docRef = await admin.firestore().collection("expenses").add(expenseData);
+      // === Cập nhật clubStats/fundBalance ===
+      const fundRef = admin.firestore().collection("clubStats").doc("fundBalance");
+      await admin.firestore().runTransaction(async (t) => {
+        const doc = await t.get(fundRef);
+        let { totalIncome = 0, totalExpense = 0 } = doc.exists ? doc.data() : {};
+        totalExpense += Number(amount);
+        t.set(fundRef, {
+          totalIncome,
+          totalExpense,
+          clubFundBalance: totalIncome - totalExpense,
+        }, { merge: true });
+      });
+      // === Cập nhật tổng hợp tháng (monthlySummary/financeSummaryByMonth) ===
+      const d = new Date(createdAt);
+      const year = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const docId = `${year}-${String(month).padStart(2, "0")}`;
+      const summaryRef = admin.firestore()
+        .collection("clubStats").doc("monthlySummary")
+        .collection("financeSummaryByMonth").doc(docId);
+      await admin.firestore().runTransaction(async (t) => {
+        const doc = await t.get(summaryRef);
+        let { totalIncome = 0, totalExpense = 0 } = doc.exists ? doc.data() : {};
+        totalExpense += Number(amount);
+        t.set(summaryRef, {
+          month,
+          year,
+          totalIncome,
+          totalExpense,
+          updatedAt: new Date()
+        }, { merge: true });
+      });
+      // === END ===
       return res.status(201).json({ expenseId: docRef.id, ...expenseData });
     } catch (e) {
       console.error("createExpense error:", e);
