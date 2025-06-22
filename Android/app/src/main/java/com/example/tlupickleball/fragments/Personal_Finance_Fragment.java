@@ -14,26 +14,38 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.Activity_payment;
 import com.example.tlupickleball.adapters.Transaction_PersonalAdapter;
+import com.example.tlupickleball.model.MemberFund1;
 import com.example.tlupickleball.model.Transaction_Personal;
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.core.SessionManager;
+import com.example.tlupickleball.network.service.FinanceService;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 
 public class Personal_Finance_Fragment extends Fragment {
 
+    private TextView tvName, tvFund, tvDonate, txTotalPenalty, txTotalPenaltyUnpaid, txTotalPenaltyPaid;
     private View rootView;
     private LinearLayout btnClick;
-
     private Spinner spinnerMonth;
     List<String> monthList = new ArrayList<>();
     int year = Calendar.getInstance().get(Calendar.YEAR);
-
+    private FinanceService financeService;
     private RecyclerView rvTransactions_Personal;
     private Transaction_PersonalAdapter transactionPersonalAdapter;
     private List<Transaction_Personal> transactionPersonalList;
@@ -43,14 +55,22 @@ public class Personal_Finance_Fragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView =  inflater.inflate(R.layout.fragment_personal_finance, container, false);
+        financeService = ApiClient.getClient(requireContext()).create(FinanceService.class);
         initViews();
         setupListeners();
         setupMonthSpinner();
         setupRecyclerView();
+        loadFinanceStatus(SessionManager.getUid(requireContext()));
         return rootView;
     }
 
     private void initViews() {
+        tvName = rootView.findViewById(R.id.tvName);
+        tvFund = rootView.findViewById(R.id.id_fund);
+        tvDonate = rootView.findViewById(R.id.id_donate);
+        txTotalPenalty = rootView.findViewById(R.id.id_penalty);
+        txTotalPenaltyUnpaid = rootView.findViewById(R.id.id_penalty_missing);
+        txTotalPenaltyPaid = rootView.findViewById(R.id.id_penalty_done);
         btnClick = rootView.findViewById(R.id.btn_click_pay);
     }
 
@@ -134,4 +154,28 @@ public class Personal_Finance_Fragment extends Fragment {
         transactionPersonalAdapter.setData(filteredList); // Cập nhật danh sách đã lọc
     }
 
+    private void loadFinanceStatus(String userId) {
+
+        financeService.financeStatus(userId).enqueue(new Callback<MemberFund1>() {
+            @Override
+            public void onResponse(Call<MemberFund1> call, Response<MemberFund1> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MemberFund1 data = response.body();
+                    tvFund.setText(String.valueOf(data.getFixedFund().getAmount()));
+                    tvDonate.setText(String.valueOf(data.getTotalDonation()));
+                    txTotalPenalty.setText(String.valueOf(data.getTotalPenalty()));
+                    txTotalPenaltyUnpaid.setText(String.valueOf(data.getTotalPenaltyUnpaid()));
+                    txTotalPenaltyPaid.setText(String.valueOf(data.getTotalPenaltyPaid()));
+                    Toast.makeText(requireContext(), "Tải dữ liệu thành công", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(requireContext(), "Không thể tải dữ liệu tài chính", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MemberFund1> call, Throwable t) {
+                Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }

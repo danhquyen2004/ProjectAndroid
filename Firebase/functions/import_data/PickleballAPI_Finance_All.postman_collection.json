@@ -1,0 +1,133 @@
+{
+  "info": {
+    "_postman_id": "finance-apis-collection-2025",
+    "name": "PickleballAPI_Finance_All",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection các API tài chính cho dự án Pickleball"
+  },
+  "item": [
+    {
+      "name": "User Fund Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{id_token}}"}
+        ],
+        "url": {
+          "raw": "{{base_url}}/finance/fund-status/:userId?month=6&year=2025",
+          "host": ["{{base_url}}"],
+          "path": ["finance", "fund-status", ":userId"],
+          "query": [
+            {"key": "month", "value": "6"},
+            {"key": "year", "value": "2025"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "User Finance Logs",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{id_token}}"}
+        ],
+        "url": {
+          "raw": "{{base_url}}/finance/finance-logs/:userId?month=6&year=2025",
+          "host": ["{{base_url}}"],
+          "path": ["finance", "finance-logs", ":userId"],
+          "query": [
+            {"key": "month", "value": "6"},
+            {"key": "year", "value": "2025"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Club Fund Balance",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{id_token}}"}
+        ],
+        "url": {
+          "raw": "{{base_url}}/finance/club/balance",
+          "host": ["{{base_url}}"],
+          "path": ["finance", "club", "balance"]
+        }
+      }
+    },
+    {
+      "name": "Club Summary",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{id_token}}"}
+        ],
+        "url": {
+          "raw": "{{base_url}}/finance/club/summary?month=6&year=2025",
+          "host": ["{{base_url}}"],
+          "path": ["finance", "club", "summary"],
+          "query": [
+            {"key": "month", "value": "6"},
+            {"key": "year", "value": "2025"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Club Expenses",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{id_token}}"}
+        ],
+        "url": {
+          "raw": "{{base_url}}/finance/club/expenses?month=6&year=2025",
+          "host": ["{{base_url}}"],
+          "path": ["finance", "club", "expenses"],
+          "query": [
+            {"key": "month", "value": "6"},
+            {"key": "year", "value": "2025"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "All User Fund Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{id_token}}"}
+        ],
+        "url": {
+          "raw": "{{base_url}}/finance/fund-status-all?month=6&year=2025",
+          "host": ["{{base_url}}"],
+          "path": ["finance", "fund-status-all"],
+          "query": [
+            {"key": "month", "value": "6"},
+            {"key": "year", "value": "2025"}
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Expense (Admin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{id_token}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"Buy new balls\",\n  \"amount\": 500000,\n  \"createdAt\": \"2025-06-22T10:00:00.000Z\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/finance/club/expense",
+          "host": ["{{base_url}}"],
+          "path": ["finance", "club", "expense"]
+        }
+      }
+    }
+  ]
+}
