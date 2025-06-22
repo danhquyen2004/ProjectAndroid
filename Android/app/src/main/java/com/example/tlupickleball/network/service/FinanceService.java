@@ -13,8 +13,8 @@ public interface FinanceService {
     @GET("finance/fund-status/{userId}?month=5&year=2025")
     Call<MemberFund1> financeStatus(@Path("userId") String userId);
 
-//    @GET("finance/finance-logs/:userId?month=5&year=2025")
-//    Call<Void> financeHistory(@Path("uid") String uid);
+    @GET("finance/finance-logs/{userId}?month=5&year=2025")
+    Call<Void> financeHistory(@Path("userId") String userId);
 //
 //    @GET("finance/club/balance")
 //    Call<Void> financeTotal(@Path("uid") String uid);
