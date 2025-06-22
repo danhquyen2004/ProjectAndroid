@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+
+
 public class CreateMatchRequest {
     @SerializedName("startDate")
     private String startDate;
@@ -42,7 +44,7 @@ public class CreateMatchRequest {
         @SerializedName("team1")
         private List<String> team1; // List of player UUIDs
         @SerializedName("team2")
-        private List<String> team2; // List of player UUIDs
+        private List<String> team2;
 
         public Teams(List<String> team1, List<String> team2) {
             this.team1 = team1;
