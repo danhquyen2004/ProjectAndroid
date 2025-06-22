@@ -1,7 +1,6 @@
 package com.example.tlupickleball.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,22 +10,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.model.Transaction_Personal;
+import com.example.tlupickleball.model.logs;
 
 import java.util.List;
 
 public class Transaction_PersonalAdapter extends RecyclerView.Adapter<Transaction_PersonalAdapter.TransactionViewHolder> {
 
     private final Context context;
-    private List<Transaction_Personal> transactionPersonals;
+    private List<logs> logList;
 
-    public Transaction_PersonalAdapter(Context context, List<Transaction_Personal> transactionPersonals) {
+    public Transaction_PersonalAdapter(Context context, List<logs> logList) {
         this.context = context;
-        this.transactionPersonals = transactionPersonals;
+        this.logList = logList;
     }
 
     public static class TransactionViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitle, tvAmount, tvTime, tvStatus;
+        TextView tvTitle, tvAmount, tvTime;
 
         public TransactionViewHolder(View itemView) {
             super(itemView);
@@ -46,30 +45,21 @@ public class Transaction_PersonalAdapter extends RecyclerView.Adapter<Transactio
 
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
-        Transaction_Personal transactionPersonal = transactionPersonals.get(position);
-        holder.tvTitle.setText(transactionPersonal.getTitle());
-        holder.tvAmount.setText(transactionPersonal.getAmount());
-        holder.tvTime.setText(transactionPersonal.getTime());
+        logs log = logList.get(position);
+        holder.tvTitle.setText(log.getDescription());
+        holder.tvAmount.setText(log.getAmount() + "đ");
+        holder.tvTime.setText(log.getCreatedAt());
 
-        // Màu tiền
-        if (transactionPersonal.isIncome()) {
-            holder.tvAmount.setTextColor(Color.parseColor("#009900")); // xanh
-        } else {
-            holder.tvAmount.setTextColor(Color.parseColor("#FF0000")); // đỏ
-        }
     }
 
     @Override
     public int getItemCount() {
-        return transactionPersonals.size();
+        return logList != null ? logList.size() : 0;
     }
 
-    public void setData(List<Transaction_Personal> newList) {
-        this.transactionPersonals = newList;
+    public void setData(List<logs> logList) {
+        this.logList = logList;
         notifyDataSetChanged();
     }
-
-
-
 }
 
