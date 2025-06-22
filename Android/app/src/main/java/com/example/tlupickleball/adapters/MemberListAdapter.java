@@ -11,20 +11,21 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.MemberControllerInfor;
-import com.example.tlupickleball.model.Player;
+import com.example.tlupickleball.model.User;
 
 import java.util.List;
 
 public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.ApprovePlayerViewHolder> {
-    private List<Player> playerList;
+    private List<User> users;
     private Context context;
 
-    public MemberListAdapter(Context context, List<Player> playerList)
+    public MemberListAdapter(Context context, List<User> users)
     {
         this.context = context;
-        this.playerList = playerList;
+        this.users = users;
     }
 
     @NonNull
@@ -36,24 +37,25 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Ap
 
     @Override
     public void onBindViewHolder(@NonNull ApprovePlayerViewHolder holder, int position) {
-        Player player = playerList.get(position);
-        holder.txtName.setText(player.getName());
-        holder.txtEmail.setText(String.valueOf(player.getEmail()));
-        holder.imgAvatar.setImageResource(player.getAvatarResourceId());
+        User user = users.get(position);
+        holder.txtName.setText(user.getFullName());
+        holder.txtEmail.setText(String.valueOf(user.getEmail()));
+        Glide.with(context)
+                .load(user.getAvatarUrl())
+                .placeholder(R.drawable.avatar_1) // ảnh mặc định nếu chưa có
+                .into(holder.imgAvatar);
 
         holder.itemView.setOnClickListener(v -> {
             Context context = v.getContext();
             Intent intent = new Intent(context, MemberControllerInfor.class);
-            intent.putExtra("name", player.getName());
-            intent.putExtra("email", player.getEmail());
-            intent.putExtra("avatar", player.getAvatarResourceId());
+            intent.putExtra("uid", user.getUid());
             context.startActivity(intent);
         });
     }
 
     @Override
     public int getItemCount() {
-        return playerList.size();
+        return users.size();
     }
 
     public static class ApprovePlayerViewHolder extends RecyclerView.ViewHolder {
