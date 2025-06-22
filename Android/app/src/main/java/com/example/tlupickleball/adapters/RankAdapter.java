@@ -7,7 +7,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.tlupickleball.fragments.Duo_Rank_Fragment;
-import com.example.tlupickleball.fragments.Solo_Rank_Fragment;
+import com.example.tlupickleball.fragments.Top_Rank_Fragment;
 
 public class RankAdapter extends FragmentStateAdapter {
     public RankAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
@@ -21,7 +21,7 @@ public class RankAdapter extends FragmentStateAdapter {
             case 1:
                 return new Duo_Rank_Fragment();
         }
-        return new Solo_Rank_Fragment();
+        return new Top_Rank_Fragment();
     }
 
     @Override

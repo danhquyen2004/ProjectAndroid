@@ -13,12 +13,10 @@ import android.widget.Toast;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.base.AuthActivity;
-import com.example.tlupickleball.activities.base.BaseActivity;
 import com.example.tlupickleball.model.Account;
+import com.example.tlupickleball.model.User;
 import com.example.tlupickleball.network.api_model.auth.LoginResponse;
-import com.example.tlupickleball.network.core.ApiClient;
-import com.example.tlupickleball.network.service.AuthService;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.tlupickleball.network.service.UserService;
 import com.example.tlupickleball.network.core.*;
 
 import retrofit2.Call;
@@ -71,7 +69,7 @@ public class LoginActivity extends AuthActivity {
                     {
                         Log.d("TOKEN", "TOKEN : " + body.getIdToken());
                         Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                        checkUserProfileAndRedirect(LoginActivity.this, body.getUid());
+                        checkUserProfileAndRedirect(LoginActivity.this, body.getUid(), userService);
                     }
 
                 } else {
@@ -91,24 +89,26 @@ public class LoginActivity extends AuthActivity {
         });
     }
 
-    private static void checkUserProfileAndRedirect(Context context, String uid) {
-        FirebaseFirestore.getInstance().collection("users")
-                .document(uid)
-                .get()
-                .addOnSuccessListener(document -> {
-                    if (!document.exists() ||
-                            !document.contains("name") ||
-                            !document.contains("dob") ||
-                            !document.contains("gender")) {
+    private static void checkUserProfileAndRedirect(Context context, String uid, UserService userService) {
+        userService.getUserProfileById(uid).enqueue(new retrofit2.Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+                if (!response.isSuccessful() || response.body() == null ||
+                        response.body().getFullName() == null ||
+                        response.body().getBirthDate() == null ||
+                        response.body().getGender() == null) {
 
-                        context.startActivity(new Intent(context, ProfileActivity.class));
-                    } else {
-                        context.startActivity(new Intent(context, MainActivity.class));
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(context, "Không thể truy vấn hồ sơ người dùng", Toast.LENGTH_SHORT).show();
-                });
+                    context.startActivity(new Intent(context, ProfileActivity.class));
+                } else {
+                    context.startActivity(new Intent(context, UserActivity.class));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(context, "Không thể truy vấn hồ sơ người dùng", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

@@ -14,6 +14,12 @@ public class Player {
         this.avatarResourceId = avatarResourceId;
     }
 
+    public Player(String name, String email, int avatarResourceId){
+        this.name = name;
+        this.email = email;
+        this.avatarResourceId = avatarResourceId;
+    }
+
     public String getName() {
         return name;
     }

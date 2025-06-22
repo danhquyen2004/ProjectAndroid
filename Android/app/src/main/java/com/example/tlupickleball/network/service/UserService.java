@@ -17,8 +17,8 @@ public interface UserService {
     Call<Void> updateUser(@Path("uid") String uid, @Body UserUpdateRequest request);
 
     // Lấy thông tin user
-    @GET("user/{uid}")
-    Call<User> getUserById(@Path("uid") String uid);
+    @GET("user/{uid}/profile")
+    Call<User> getUserProfileById(@Path("uid") String uid);
 
     // Lấy danh sách toàn bộ user
     @GET("user")

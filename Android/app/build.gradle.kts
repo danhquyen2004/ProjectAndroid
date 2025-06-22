@@ -55,7 +55,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson.v290)
 
-    implementation ("com.google.android.material:material:1.11.0")
+    implementation ("com.google.android.material:material:1.12.0")
     implementation ("androidx.viewpager:viewpager:1.0.0")
     implementation ("androidx.recyclerview:recyclerview:1.3.2")
+    implementation ("it.xabaras.android:recyclerview-swipedecorator:1.4")
 }

@@ -29,6 +29,39 @@
         <item name="android:padding">12dp</item>
     </style>
 
+    <style name="Base.Theme.Button.Gray" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">255dp</item>
+        <item name="android:layout_height">54dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#939393</item>
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
+    <style name="Base.Theme.Button.Red" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">255dp</item>
+        <item name="android:layout_height">54dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#E90C10</item>
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
+    <style name="Base.Theme.Button.Green" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">255dp</item>
+        <item name="android:layout_height">54dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#95C786</item>
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12dp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
     <style name="Base.Theme.Button.White" parent="Widget.AppCompat.Button">
         <item name="android:layout_width">255dp</item>
         <item name="android:layout_height">54dp</item>
@@ -54,13 +87,18 @@
     </style>
 
     <style name="StatusPending" parent="StatusBase">
-        <item name="android:textColor">#E7564F</item>
-        <item name="android:drawableStart">@drawable/ic_status_red</item>
+        <item name="android:textColor">#CF0000</item>
+        <item name="android:background">#FFDDDD</item>
     </style>
 
     <style name="StatusDone" parent="StatusBase">
-        <item name="android:textColor">#26BF3D</item>
-        <item name="android:drawableStart">@drawable/ic_status_green</item>
+        <item name="android:textColor">#126C35</item>
+        <item name="android:background">#00CF00</item>
+    </style>
+
+    <style name="Status" parent="StatusBase">
+        <item name="android:textColor">#FFB120</item>
+        <item name="android:background">#FFE2AC</item>
     </style>
 
 
@@ -139,4 +177,43 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">10sp</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    //style cho TextView Thong tin
+    <style name="InforTextViewStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/underline</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#80000000</item>
+        <item name="android:layout_marginLeft">35dp</item>
+        <item name="android:layout_marginRight">35dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+    </style>
+
+    //Style cho TextView Label Thong tin
+    <style name="LabelInforTextViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginStart">35dp</item>
+        <item name="android:layout_marginTop">30dp</item>
+    </style>
+
+    //style cho EditText Thong tin
+    <style name="EditTextStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/edit_text_color</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_marginLeft">35dp</item>
+        <item name="android:layout_marginRight">35dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+    </style>
 </resources>

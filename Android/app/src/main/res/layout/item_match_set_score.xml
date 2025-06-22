@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="4dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <TextView
+        android:id="@+id/textViewSetLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set 1"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_marginEnd="16dp"/>
+
+    <EditText
+        android:id="@+id/editTextScoreTeam1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:inputType="number"
+        android:background="@drawable/rounded_edittext_background"
+        android:padding="8dp"
+        android:gravity="center"
+        android:maxLength="2"
+        android:layout_marginEnd="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=":"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:layout_marginEnd="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextScoreTeam2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:inputType="number"
+        android:background="@drawable/rounded_edittext_background"
+        android:padding="8dp"
+        android:gravity="center"
+        android:maxLength="2"/>
+
+</LinearLayout>

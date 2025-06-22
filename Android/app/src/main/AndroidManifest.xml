@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -15,7 +15,47 @@
         android:theme="@style/Theme.TLUPickleball"
         tools:targetApi="31">
         <activity
+            android:name=".activities.Change_Password"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ApproveMemberInfor"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ApproveMember"
+            android:exported="false"></activity>
+        <activity
+            android:name=".activities.MemberList"
+            android:exported="false"></activity>
+        <activity
+            android:name=".activities.DisableMemberList"
+            android:exported="false"></activity>
+        <activity
+            android:name=".activities.MemberControllerInfor"
+            android:exported="false"></activity>
+        <activity
+            android:name=".activities.MemberInfor"
+            android:exported="false"></activity>
+        <activity
+            android:name=".activities.EditMemberInfor"
+            android:exported="false"></activity>
+        <activity
+            android:name=".activities.DisableMemberInfor"
+            android:exported="false"></activity>
+        <activity
+            android:name=".activities.UserActivity"
+            android:exported="false">
+        </activity>
+        <activity
             android:name=".activities.EmailVerificationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.notification"
+            android:exported="false"></activity>
+        <activity
+            android:name=".activities.wait_home"
+            android:exported="false" />
+        <activity
+            android:name=".activities.activity_home"
             android:exported="false" />
         <activity
             android:name=".activities.LoginActivity"
@@ -34,6 +74,18 @@
             android:exported="false" />
         <activity
             android:name=".activities.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.member_fundpersonal"
+            android:exported="false" />
+        <activity
+            android:name=".activities.member_fund_manager"
+            android:exported="false" />
+        <activity
+            android:name=".activities.donate"
+            android:exported="false" />
+        <activity
+            android:name=".activities.Activity_payment"
             android:exported="false" />
     </application>
 
