@@ -1,41 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/emailEditText"
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Banner image -->
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="285dp"
+                    android:layout_marginBottom="7dp"
+                    android:src="@drawable/img_pickleball"
+                    android:scaleType="fitXY"/>
+
+                <!-- Main register form -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="46dp"
+                    android:layout_marginBottom="1dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:textColor="#2F3739"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="45dp"
+                        android:layout_marginStart="33dp"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:text="Đăng ký" />
+
+                    <!-- Email -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginEnd="49dp"
+                        android:layout_marginStart="49dp"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="23dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="11dp"
+                            android:src="@drawable/mail" />
+                        <EditText
+                            android:id="@+id/emailEditText"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:textSize="15sp"
+                            android:hint="Email"/>
+                    </LinearLayout>
+
+                    <!-- Password -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginEnd="49dp"
+                        android:layout_marginStart="49dp"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="23dp"
+                            android:layout_marginEnd="11dp"
+                            android:src="@drawable/ic_lock"
+                            android:layout_gravity="center_vertical"/>
+
+                        <EditText
+                            android:id="@+id/passwordEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Mật khẩu"
+                            android:inputType="textPassword"
+                            android:textSize="15sp" />
+                    </LinearLayout>
+
+                    <!-- Confirm Password -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginEnd="49dp"
+                        android:layout_marginStart="49dp"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="23dp"
+                            android:layout_marginEnd="11dp"
+                            android:src="@drawable/ic_lock"
+                            android:layout_gravity="center_vertical"/>
+                        <EditText
+                            android:id="@+id/confirmPasswordEditText"
+                            android:textSize="15sp"
+                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:hint="Xác nhận mật khẩu"
+                            android:inputType="textPassword"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/registerButton"
+                        style="@style/Base.Theme.Button.Blue"
+                        android:layout_width="230dp"
+                        android:layout_height="0dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#0CE952"
+                        android:layout_gravity="center"
+                        android:text="Đăng ký" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+        <LinearLayout
+            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email" />
-
-        <EditText
-            android:id="@+id/passwordEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword" />
-
-        <EditText
-            android:id="@+id/confirmPasswordEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Confirm Password"
-            android:inputType="textPassword" />
-
-        <Button
-            android:id="@+id/registerButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Register" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="30dp"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <TextView
+                android:id="@+id/goToLoginText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đã có tài khoản? Đăng nhập" />
+        </LinearLayout>
     </LinearLayout>
-
     <include layout="@layout/loading_overlay" />
-
 </FrameLayout>
+

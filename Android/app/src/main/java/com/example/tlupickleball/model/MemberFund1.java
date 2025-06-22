@@ -26,6 +26,9 @@ public class MemberFund1 {
     }
 
     public FixedFund getFixedFund() {
+        if(fixedFund == null) {
+            fixedFund = new FixedFund(0,"paid");
+        }
         return fixedFund;
     }
 

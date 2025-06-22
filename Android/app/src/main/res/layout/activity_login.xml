@@ -30,7 +30,7 @@
                     android:scaleType="fitXY"/>
 
                 <!-- Main login form -->
-                <LinearLayout
+                v<LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="46dp"
@@ -55,12 +55,13 @@
                         android:layout_marginEnd="49dp"
                         android:layout_marginStart="49dp"
                         android:orientation="horizontal">
+
                         <ImageView
                             android:layout_width="18dp"
                             android:layout_height="23dp"
+                            android:layout_gravity="center_vertical"
                             android:layout_marginEnd="11dp"
-                            android:src="@drawable/ic_lock"
-                            android:layout_gravity="center_vertical"/>
+                            android:src="@drawable/mail" />
 
                         <EditText
                             android:id="@+id/emailEditText"
