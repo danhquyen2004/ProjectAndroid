@@ -47,8 +47,8 @@ public class ProfileActivity extends BaseActivity {
     private void saveUserProfile(String name, String dob, String gender)
     {
         User user = new User();
-        user.setName(name);
-        user.setDob(dob);
+        user.setFullName(name);
+        user.setBirthDate(dob);
         user.setGender(gender);
 
         service.submitProfile(user).enqueue(new Callback<Void>() {
