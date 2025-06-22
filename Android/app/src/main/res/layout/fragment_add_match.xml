@@ -106,19 +106,28 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="8dp"/>
 
-            <Spinner
-                android:id="@+id/setCountSpinner"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/spinner_background_add_match"
-                android:backgroundTint="#FFFFFF"
-                android:entries="@array/set_count_options"
-                android:foregroundTint="#101010"
-                android:padding="12dp"
-                android:popupBackground="@android:color/white" />
+                android:layout_marginEnd="16dp">
 
+                <Spinner
+                    android:id="@+id/setCountSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/spinner_border"  android:entries="@array/set_count_options"
+                    android:padding="12dp"
+                    android:popupBackground="@android:color/white"
+                    android:spinnerMode="dropdown" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_down"
+                    android:layout_gravity="center_vertical|end"
+                    android:paddingEnd="12dp" />
+            </FrameLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
