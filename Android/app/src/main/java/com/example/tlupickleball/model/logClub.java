@@ -14,6 +14,10 @@ public class logClub {
     @SerializedName("createdAt")
     private String createdAt;
 
+    public logClub() {
+        // Default constructor
+    }
+
     public logClub(String expenseId, String reason, long amount, String createdBy, String createdAt) {
         this.expenseId = expenseId;
         this.reason = reason;

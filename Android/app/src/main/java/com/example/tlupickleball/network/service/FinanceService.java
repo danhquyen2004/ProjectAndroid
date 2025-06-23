@@ -4,8 +4,10 @@ import com.example.tlupickleball.model.ClubFundBalanceResponse;
 import com.example.tlupickleball.model.ClubSummaryResponse;
 import com.example.tlupickleball.model.MemberFund1;
 import com.example.tlupickleball.model.User;
+import com.example.tlupickleball.model.logClub;
 import com.example.tlupickleball.network.api_model.finance.FinanceClubListResponse;
 import com.example.tlupickleball.network.api_model.finance.FinanceListResponse;
+import com.example.tlupickleball.network.api_model.finance.FinanceUserFundStatus;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -43,4 +45,13 @@ public interface FinanceService {
             @Query("month") int month,
             @Query("year") int year
     );
+
+    @GET("finance/fund-status-all")
+    Call<FinanceUserFundStatus> financeStatusAll(
+            @Query("month") int month,
+            @Query("year") int year
+    );
+
+    @POST("finance/club/expense")
+    Call<Void> financeClubExpense(@Body logClub logclub);
 }

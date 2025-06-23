@@ -8,6 +8,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,11 +19,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.adapters.MemberFundAdapter;
+import com.example.tlupickleball.model.FundStatusAll;
 import com.example.tlupickleball.model.MemberFund;
+import com.example.tlupickleball.network.api_model.finance.FinanceUserFundStatus;
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.service.FinanceService;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class member_fund_manager extends AppCompatActivity {
     private ImageButton btnBack;
@@ -29,10 +39,11 @@ public class member_fund_manager extends AppCompatActivity {
     private RecyclerView rvMemberFund;
     private Spinner spinnerMonth;
     private MemberFundAdapter adapter;
-    private List<MemberFund> memberList = new ArrayList<>();
+    private List<FundStatusAll> fundStatusList = new ArrayList<>();
     private List<String> monthList = new ArrayList<>();
     private int selectedMonthNumber;
     private final int year = Calendar.getInstance().get(Calendar.YEAR);
+    private FinanceService financeService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,22 +108,25 @@ public class member_fund_manager extends AppCompatActivity {
         rvMemberFund.setLayoutManager(new LinearLayoutManager(this));
         rvMemberFund.setAdapter(adapter);
 
-        updateDataForMonth(Calendar.getInstance().get(Calendar.MONTH) + 1); // Load mặc định
+        updateDataForMonth(Calendar.getInstance().get(Calendar.MONTH) + 1);
     }
 
     private void updateDataForMonth(int month) {
-        memberList = generateSampleData(month);
-        adapter.setData(memberList);
+        financeService = ApiClient.getClient(this).create(FinanceService.class);
+        Call<FinanceUserFundStatus> call = financeService.financeStatusAll(month, year);
+        call.enqueue(new Callback<FinanceUserFundStatus>() {
+            @Override
+            public void onResponse(Call<FinanceUserFundStatus> call, Response<FinanceUserFundStatus> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    fundStatusList = response.body().getResults();
+                    adapter.setData(fundStatusList);
+                }
+            }
+            @Override
+            public void onFailure(Call<FinanceUserFundStatus> call, Throwable t) {
+                Toast.makeText(member_fund_manager.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private List<MemberFund> generateSampleData(int month) {
-        List<MemberFund> list = new ArrayList<>();
-        list.add(new MemberFund("Nguyễn Văn A", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Nguyễn Giang Đông", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Nguyễn Danh Quyền", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Chu Mạnh Hữu", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Phạm Đỗ Anh", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Trần Thị B", 0, 0, 100_000)); // Chưa đóng
-        return list;
-    }
 }

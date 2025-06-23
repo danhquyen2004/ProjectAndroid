@@ -75,7 +75,6 @@ public class Club_Finance_Fragment extends Fragment {
         return rootView;
     }
 
-
     private void initViews() {
         btnAddExpense = rootView.findViewById(R.id.btnAddExpense);
         txtFund = rootView.findViewById(R.id.tvFund);
@@ -92,7 +91,6 @@ public class Club_Finance_Fragment extends Fragment {
 
         btnAddExpense.setOnClickListener(v -> showAddExpensePopup());
     }
-
 
     private void setupRecyclerView() {
         rvTransactions = rootView.findViewById(R.id.recyclerFundClubHistory);
@@ -133,6 +131,7 @@ public class Club_Finance_Fragment extends Fragment {
 
 
                 fetchClubSummary(selectedMonthNumber, selectedYear); // Lấy tổng thu chi câu lạc bộ từ API
+                fetchClubFundBalance(); // Cập nhật số dư quỹ câu lạc bộ
                 fetchClubHistory(selectedMonthNumber, year);
                 filterTransactionsByMonth(selectedMonthNumber);
             }
@@ -167,6 +166,7 @@ public class Club_Finance_Fragment extends Fragment {
         View view = getLayoutInflater().inflate(R.layout.dialog_add_expense, null);
         dialog.setContentView(view);
 
+        // Lấy EditText từ view của dialog
         EditText edtDescription = view.findViewById(R.id.edtDescription);
         EditText edtAmount = view.findViewById(R.id.edtAmount);
         EditText edtDate = view.findViewById(R.id.edtDate);
@@ -192,21 +192,53 @@ public class Club_Finance_Fragment extends Fragment {
         });
 
         btnConfirm.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), "Clicked!", Toast.LENGTH_SHORT).show();
             String desc = edtDescription.getText().toString().trim();
-            String amount = edtAmount.getText().toString().trim();
+            String amountStr = edtAmount.getText().toString().trim();
             String date = edtDate.getText().toString();
 
-            if (desc.isEmpty() || amount.isEmpty()) {
+            if (desc.isEmpty() || amountStr.isEmpty()) {
                 Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // TODO: Gọi API thêm chi tiêu ở đây (nếu có)
-            // Sau khi thêm thành công, gọi lại fetchClubHistory để cập nhật dữ liệu từ API
-            fetchClubHistory(selectedMonthNumber, year);
-            dialog.dismiss();
+            long amount = Long.parseLong(amountStr.replace(".", "").replace("đ", ""));
+            // Chuyển ngày sang định dạng ISO cho API
+            String isoDate = "";
+            try {
+                isoDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                        .format(new SimpleDateFormat("dd/MM/yyyy").parse(date));
+            } catch (Exception e) {
+                Toast.makeText(requireContext(), "Lỗi định dạng ngày", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            logClub newExpense = new logClub();
+            newExpense.setReason(desc);
+            newExpense.setAmount(amount);
+            newExpense.setCreatedAt(isoDate);
+            // Thêm các trường khác nếu cần
+
+            financeService.financeClubExpense(newExpense).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(requireContext(), "Thêm chi tiêu thành công", Toast.LENGTH_SHORT).show();
+                        fetchClubFundBalance(); // Cập nhật lại số dư quỹ
+                        setupMonthSpinner(); // Cập nhật lại danh sách tháng
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(requireContext(), "Lỗi khi thêm chi tiêu", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
-        dialog.show();
+        dialog.show(); // Make sure to show the dialog
     }
 
 

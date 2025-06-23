@@ -1,6 +1,7 @@
 package com.example.tlupickleball.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.model.logs;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class Transaction_PersonalAdapter extends RecyclerView.Adapter<Transaction_PersonalAdapter.TransactionViewHolder> {
 
@@ -47,8 +50,11 @@ public class Transaction_PersonalAdapter extends RecyclerView.Adapter<Transactio
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         logs log = logList.get(position);
         holder.tvTitle.setText(log.getDescription());
-        holder.tvAmount.setText(log.getAmount() + "đ");
+        holder.tvAmount.setText(formatCurrency(log.getAmount()));
         holder.tvTime.setText(log.getCreatedAt());
+
+        // Set text color based on the type of transaction
+        holder.tvAmount.setTextColor(Color.parseColor("#000000"));
 
     }
 
@@ -60,6 +66,11 @@ public class Transaction_PersonalAdapter extends RecyclerView.Adapter<Transactio
     public void setData(List<logs> logList) {
         this.logList = logList;
         notifyDataSetChanged();
+    }
+
+    private String formatCurrency(long amount) {
+        NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
+        return nf.format(amount) + "đ";
     }
 }
 

@@ -193,12 +193,12 @@ public class Personal_Finance_Fragment extends Fragment {
                         tvFund.setBackgroundResource(R.drawable.button_light_red_bg);
                         tvFund.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_Dong));
                     }
-                    tvFund.setText("Quỹ: " + data.getFixedFund().getAmount() + "đ");
+                    tvFund.setText("Quỹ: " + formatCurrency(data.getFixedFund().getAmount()));
 
                     // Ủng hộ: luôn màu xanh
                     tvDonate.setBackgroundResource(R.drawable.button_light_green_bg);
                     tvDonate.setTextColor(ContextCompat.getColor(requireContext(), R.color.green_Dong));
-                    tvDonate.setText("Ủng hộ: " + data.getTotalDonation() + "đ");
+                    tvDonate.setText("Ủng hộ: " + formatCurrency(data.getTotalDonation()));
 
                     // Đóng phạt
                     long total = data.getTotalPenalty();
@@ -237,9 +237,9 @@ public class Personal_Finance_Fragment extends Fragment {
                         txTotalPenaltyUnpaid.setTextColor(ContextCompat.getColor(requireContext(), R.color.red_Dong));
                     }
 
-                    txTotalPenalty.setText("Tổng: " + total + "đ");
-                    txTotalPenaltyUnpaid.setText("Còn thiếu: " + unpaid + "đ");
-                    txTotalPenaltyPaid.setText("Đã đóng: " + paid + "đ");
+                    txTotalPenalty.setText("Tổng: " + formatCurrency(total));
+                    txTotalPenaltyUnpaid.setText("Còn thiếu: " + formatCurrency(unpaid));
+                    txTotalPenaltyPaid.setText("Đã đóng: " + formatCurrency(paid));
 
                     Toast.makeText(requireContext(), "Tải dữ liệu thành công", Toast.LENGTH_SHORT).show();
                 } else {
@@ -270,5 +270,7 @@ public class Personal_Finance_Fragment extends Fragment {
         });
     }
 
-
+    private String formatCurrency(long amount) {
+        return String.format("%,d", amount).replace(',', '.') + "đ";
+    }
 }
