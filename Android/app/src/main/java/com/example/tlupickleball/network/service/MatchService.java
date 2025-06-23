@@ -1,9 +1,10 @@
 package com.example.tlupickleball.network.service;
 
-import com.example.tlupickleball.model.Matches;
-import com.example.tlupickleball.network.api_model.match.MatchResponse;
+import com.example.tlupickleball.model.Match;
 import com.example.tlupickleball.network.api_model.match.CreateMatchRequest;
 import com.example.tlupickleball.network.api_model.match.CreateMatchResponse;
+import com.example.tlupickleball.network.api_model.match.MatchResponse;
+import com.example.tlupickleball.network.api_model.match.UpdateScoresRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -11,8 +12,8 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
-import retrofit2.http.Query;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface MatchService {
 
@@ -31,13 +32,18 @@ public interface MatchService {
             @Query("pageSize") int pageSize
     );
 
-    // Endpoint để tạo trận đấu
     @POST("matches")
     Call<CreateMatchResponse> createMatch(@Body CreateMatchRequest request);
 
-    @PUT("matches/{matchId}/scores")
-    Call<Void> updateMatchScores(@Path("matchId") String matchId, Matches match);
+    @GET("matches/detail/{matchId}")
+    Call<Match> getMatchDetail(@Path("matchId") String matchId);
 
     @DELETE("matches/{matchId}")
     Call<Void> deleteMatch(@Path("matchId") String matchId);
+
+    @PUT("matches/{matchId}/scores")
+    Call<Void> updateMatchScores(
+            @Path("matchId") String matchId,
+            @Body UpdateScoresRequest request
+    );
 }

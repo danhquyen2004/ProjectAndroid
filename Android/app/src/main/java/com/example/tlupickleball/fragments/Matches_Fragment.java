@@ -46,7 +46,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSelectedListener {
+public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSelectedListener, MatchAdapter.OnMatchClickListener {
 
     private RecyclerView recyclerViewDates;
     private DateAdapter dateAdapter;
@@ -63,7 +63,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
     private FrameLayout tabContentFrame;
     private String currentViewType = "individual";
     private String currentSelectedDateKey;
-    private String currentSelectedFilter = "Tất cả"; // GIÁ TRỊ MẶC ĐỊNH
+    private String currentSelectedFilter = "Tất cả";
     private MatchService matchService;
     private String currentUserId;
 
@@ -93,14 +93,14 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         select = root.findViewById(R.id.select);
         tabContentFrame = root.findViewById(R.id.tab_content_frame);
 
-        // Cập nhật giao diện chữ cho filter ngay từ đầu
         textFilter.setText(currentSelectedFilter);
 
         matchService = ApiClient.getClient(getContext()).create(MatchService.class);
         currentUserId = SessionManager.getUid(getContext());
         allMatchesData = new HashMap<>();
         displayedMatchesList = new ArrayList<>();
-        matchAdapter = new MatchAdapter(displayedMatchesList);
+
+        matchAdapter = new MatchAdapter(displayedMatchesList, this);
         recyclerViewMatches.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewMatches.setAdapter(matchAdapter);
 
@@ -127,6 +127,22 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
 
         setupTabLayout();
         return root;
+    }
+
+    @Override
+    public void onMatchClicked(Matches match) {
+        if (btnAddMatch != null) {
+            btnAddMatch.setVisibility(View.GONE);
+        }
+        AddMatch_Fragment detailFragment = new AddMatch_Fragment();
+        Bundle args = new Bundle();
+        args.putString("match_id", match.getMatchId());
+        detailFragment.setArguments(args);
+
+        getParentFragmentManager().beginTransaction()
+                .add(R.id.matchFragmentRoot, detailFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
@@ -251,8 +267,10 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         String currentMonth = new SimpleDateFormat("MMM", new Locale("vi", "VN")).format(todayCalendar.getTime());
         for (int i = 0; i < datesList.size(); i++) {
             if (datesList.get(i).getDayOfMonth().equals(currentDay) && datesList.get(i).getMonth().equals(currentMonth)) {
-                dateAdapter.setSelectedPosition(i);
-                recyclerViewDates.scrollToPosition(i);
+                if (dateAdapter != null) {
+                    dateAdapter.setSelectedPosition(i);
+                    recyclerViewDates.scrollToPosition(i);
+                }
                 onDateSelected(datesList.get(i));
                 break;
             }
@@ -357,6 +375,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
             }
 
             convertedMatches.add(new Matches(
+                    rawMatch.getMatchId(),
                     p1Name, p2Name,
                     p1Avatar1, p1Avatar2, p2Avatar1, p2Avatar2,
                     rawMatch.getTeam1Wins() + "-" + rawMatch.getTeam2Wins(),

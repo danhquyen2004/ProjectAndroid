@@ -1,3 +1,4 @@
+// File: com.example.tlupickleball.adapters.MatchAdapter.java
 package com.example.tlupickleball.adapters;
 
 import android.view.LayoutInflater;
@@ -9,19 +10,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.tlupickleball.R;
-import com.example.tlupickleball.model.Matches;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-
+import com.example.tlupickleball.R;
+import com.example.tlupickleball.model.Matches;
 import java.util.List;
 
 public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHolder> {
 
     private List<Matches> matches;
+    private OnMatchClickListener listener;
 
-    public MatchAdapter(List<Matches> matches) {
+    public interface OnMatchClickListener {
+        void onMatchClicked(Matches match);
+    }
+
+    public MatchAdapter(List<Matches> matches, OnMatchClickListener listener) {
         this.matches = matches;
+        this.listener = listener;
     }
 
     @NonNull
@@ -38,36 +44,18 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
 
         String[] team1Names = match.getPlayer1Name().split(" & ");
         holder.tvPlayer1_p1_fullname.setText(getAbbreviatedName(team1Names.length > 0 ? team1Names[0] : ""));
-
         String[] team2Names = match.getPlayer2Name().split(" & ");
         holder.tvPlayer2_p1_fullname.setText(getAbbreviatedName(team2Names.length > 0 ? team2Names[0] : ""));
-
-        Glide.with(holder.itemView.getContext())
-                .load(match.getPlayer1AvatarUrl1())
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(holder.imageTeam1Player1Avatar);
-
-        Glide.with(holder.itemView.getContext())
-                .load(match.getPlayer2AvatarUrl1())
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(holder.imageTeam2Player1Avatar);
+        Glide.with(holder.itemView.getContext()).load(match.getPlayer1AvatarUrl1()).circleCrop().into(holder.imageTeam1Player1Avatar);
+        Glide.with(holder.itemView.getContext()).load(match.getPlayer2AvatarUrl1()).circleCrop().into(holder.imageTeam2Player1Avatar);
 
         if (match.isDoublesMatch()) {
             holder.layoutTeam1Player2.setVisibility(View.VISIBLE);
             holder.layoutTeam2Player2.setVisibility(View.VISIBLE);
-
             holder.tvPlayer1_p2_fullname.setText(team1Names.length > 1 ? getAbbreviatedName(team1Names[1]) : "");
             holder.tvPlayer2_p2_fullname.setText(team2Names.length > 1 ? getAbbreviatedName(team2Names[1]) : "");
-
-            Glide.with(holder.itemView.getContext())
-                    .load(match.getPlayer1AvatarUrl2())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(holder.imageTeam1Player2Avatar);
-
-            Glide.with(holder.itemView.getContext())
-                    .load(match.getPlayer2AvatarUrl2())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(holder.imageTeam2Player2Avatar);
+            Glide.with(holder.itemView.getContext()).load(match.getPlayer1AvatarUrl2()).circleCrop().into(holder.imageTeam1Player2Avatar);
+            Glide.with(holder.itemView.getContext()).load(match.getPlayer2AvatarUrl2()).circleCrop().into(holder.imageTeam2Player2Avatar);
         } else {
             holder.layoutTeam1Player2.setVisibility(View.GONE);
             holder.layoutTeam2Player2.setVisibility(View.GONE);
@@ -83,28 +71,28 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
                 statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.green);
                 break;
             case "Sắp diễn ra":
-                // Dùng màu cam (orange) vì màu vàng (yellow) thường khó đọc trên nền trắng
                 statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.orange);
                 break;
             case "Đã kết thúc":
                 statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.red);
                 break;
             default:
-                // Màu mặc định nếu trạng thái không khớp
-                statusColor = ContextCompat.getColor(holder.itemView.getContext(), R.color.black);
+                statusColor = ContextCompat.getColor(holder.itemView.getContext(), android.R.color.black);
                 break;
         }
         holder.tvMatchStatus.setTextColor(statusColor);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onMatchClicked(match);
+            }
+        });
     }
 
     private String getAbbreviatedName(String fullName) {
-        if (fullName == null || fullName.isEmpty()) {
-            return "";
-        }
+        if (fullName == null || fullName.isEmpty()) return "";
         String[] parts = fullName.trim().split("\\s+");
-        if (parts.length == 0) {
-            return "";
-        }
+        if (parts.length == 0) return "";
         StringBuilder abbreviated = new StringBuilder();
         for (int i = 0; i < parts.length - 1; i++) {
             if (!parts[i].isEmpty()) {
@@ -115,29 +103,21 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
         return abbreviated.toString();
     }
 
-    @Override
-    public int getItemCount() {
-        return matches.size();
-    }
-
     public void updateMatches(List<Matches> newMatches) {
         this.matches.clear();
         this.matches.addAll(newMatches);
         notifyDataSetChanged();
     }
 
+    @Override
+    public int getItemCount() {
+        return matches.size();
+    }
+
     public static class MatchViewHolder extends RecyclerView.ViewHolder {
-        TextView tvPlayer1_p1_fullname, tvPlayer1_p2_fullname;
-        ImageView imageTeam1Player1Avatar, imageTeam1Player2Avatar;
-        LinearLayout layoutTeam1Player2;
-
-        TextView tvScore;
-
-        TextView tvPlayer2_p1_fullname, tvPlayer2_p2_fullname;
-        ImageView imageTeam2Player1Avatar, imageTeam2Player2Avatar;
-        LinearLayout layoutTeam2Player2;
-
-        TextView tvMatchTime, tvMatchStatus;
+        TextView tvPlayer1_p1_fullname, tvPlayer1_p2_fullname, tvScore, tvPlayer2_p1_fullname, tvPlayer2_p2_fullname, tvMatchTime, tvMatchStatus;
+        ImageView imageTeam1Player1Avatar, imageTeam1Player2Avatar, imageTeam2Player1Avatar, imageTeam2Player2Avatar;
+        LinearLayout layoutTeam1Player2, layoutTeam2Player2;
 
         public MatchViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -146,15 +126,12 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
             layoutTeam1Player2 = itemView.findViewById(R.id.layout_team1_player2);
             tvPlayer1_p2_fullname = itemView.findViewById(R.id.tvPlayer1_p2_fullname);
             imageTeam1Player2Avatar = itemView.findViewById(R.id.image_team1_player2_avatar);
-
             tvScore = itemView.findViewById(R.id.tvScore);
-
             tvPlayer2_p1_fullname = itemView.findViewById(R.id.tvPlayer2_p1_fullname);
             imageTeam2Player1Avatar = itemView.findViewById(R.id.image_team2_player1_avatar);
             layoutTeam2Player2 = itemView.findViewById(R.id.layout_team2_player2);
             tvPlayer2_p2_fullname = itemView.findViewById(R.id.tvPlayer2_p2_fullname);
             imageTeam2Player2Avatar = itemView.findViewById(R.id.image_team2_player2_avatar);
-
             tvMatchTime = itemView.findViewById(R.id.tvMatchTime);
             tvMatchStatus = itemView.findViewById(R.id.tvMatchStatus);
         }
