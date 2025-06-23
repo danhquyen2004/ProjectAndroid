@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
@@ -25,24 +26,32 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.base.BaseActivity;
+import com.example.tlupickleball.activities.base.BaseMember;
 import com.example.tlupickleball.adapters.UserAdapter;
+import com.example.tlupickleball.model.User;
 import com.example.tlupickleball.network.core.SessionManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 
-public class UserActivity extends BaseActivity implements TabLayout.OnTabSelectedListener {
+import retrofit2.Call;
+
+public class UserActivity extends BaseMember implements TabLayout.OnTabSelectedListener {
 
     public DrawerLayout drawerLayout; // public để fragment truy cập
     public NavigationView navigationView;
     public Toolbar toolbar;
-
+    private TextView txtName;
+    private ImageView imgAvatar;
     private ImageButton closeBtn; // Nút đóng drawer, nếu cần
     private LinearLayout logoutLayout, userProfileLayout;
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
     private boolean isDialogShowing;
+    private String uid;
     Dialog dialogForm;
 
     @Override
@@ -55,6 +64,10 @@ public class UserActivity extends BaseActivity implements TabLayout.OnTabSelecte
         closeBtn = findViewById(R.id.close_drawer_button);
         logoutLayout = findViewById(R.id.log_out_btn);
         userProfileLayout = findViewById(R.id.user_profile_btn);
+        txtName = findViewById(R.id.member_name);
+        imgAvatar = findViewById(R.id.avatarImage);
+
+        uid = SessionManager.getUid(this);
 
         closeBtn.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.END));
 
@@ -66,14 +79,14 @@ public class UserActivity extends BaseActivity implements TabLayout.OnTabSelecte
         userProfileLayout.setOnClickListener(v -> {
             Context context = v.getContext();
             Intent intent = new Intent(context, MemberInfor.class);
-//            intent.putExtra("name", player.getName());
-//            intent.putExtra("email", player.getEmail());
-//            intent.putExtra("avatar", player.getAvatarResourceId());
+            intent.putExtra("uid", uid);
             context.startActivity(intent);
             drawerLayout.closeDrawer(GravityCompat.END);
         });
 
         tabLayout = findViewById(R.id.tabLayout);
+
+        LoadUserProfile(this, uid);
 
         // Thiết lập cũ
 //        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -140,6 +153,32 @@ public class UserActivity extends BaseActivity implements TabLayout.OnTabSelecte
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
 
+    }
+
+    private void LoadUserProfile(Context context, String uid) {
+        userService.getUserProfileById(uid).enqueue(new retrofit2.Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    txtName.setText( response.body().getFullName());
+                    Glide.with(context)
+                            .load(response.body().getAvatarUrl())
+                            .placeholder(R.drawable.default_avatar)
+                            .circleCrop()
+                            .diskCacheStrategy(DiskCacheStrategy.NONE) // Bỏ qua cache trên đĩa
+                            .skipMemoryCache(true) // Bỏ qua cache trong bộ nhớ
+                            .into(imgAvatar);
+                    hideLoading();
+                } else {
+                    Toast.makeText(context, "Không có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(context, "Không thể truy vấn hồ sơ người dùng", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showDialogForm() {

@@ -1,175 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main">
-    <androidx.drawerlayout.widget.DrawerLayout
+    android:fitsSystemWindows="true">
+
+    <!-- Nội dung chính của Activity -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:orientation="vertical">
 
-        <!-- Nội dung chính của Activity -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/main_content"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/tabLayoutContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewPager2"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toTopOf="@+id/tabLayoutContainer"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <FrameLayout
+            android:id="@+id/tabLayoutContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <FrameLayout
-                android:id="@+id/tabLayoutContainer"
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent">
+                android:background="@drawable/bg_homenavbar"
+                android:layout_marginBottom="8dp"
+                app:tabIndicatorColor="#0C8CE9"
+                app:tabIndicatorGravity="top"
+                app:tabTextColor="@color/tab_icon_color"
+                app:tabIconTint="@color/tab_icon_color"
+                app:tabMode="fixed"
+                app:tabGravity="fill"
+                app:tabMaxWidth="0dp"
+                app:tabMinWidth="0dp"
+                app:tabTextAppearance="@style/CustomTabTextAppearance" />
+        </FrameLayout>
 
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_homenavbar"
-                    android:layout_marginBottom="8dp"
-                    app:tabIndicatorColor="#0C8CE9"
-                    app:tabIndicatorGravity="top"
-                    app:tabTextColor="@color/tab_icon_color"
-                    app:tabIconTint="@color/tab_icon_color"
-                    app:tabMode="fixed"
-                    app:tabGravity="fill"
-                    app:tabMaxWidth="0dp"
-                    app:tabMinWidth="0dp"
-                    app:tabTextAppearance="@style/CustomTabTextAppearance" />
-            </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Drawer Layout xuất hiện từ phải sang trái -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@android:color/white"
+        android:fitsSystemWindows="true">
 
-        <!-- Drawer Layout xuất hiện từ phải sang trái -->
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/navigation_view"
-            android:layout_width="300dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:background="@android:color/white"
-            android:fitsSystemWindows="true">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <RelativeLayout
+            <!-- Header -->
+            <LinearLayout
+                android:id="@+id/headerLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="180dp"
+                android:orientation="vertical"
+                android:background="#E3E3E3"
+                android:padding="16dp">
 
-                <!-- Header -->
+                <ImageButton
+                    android:id="@+id/close_drawer_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_close"
+                    android:backgroundTint="#E3E3E3"
+                    android:layout_gravity="end">
+                </ImageButton>
+
                 <LinearLayout
-                    android:id="@+id/headerLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:orientation="vertical"
-                    android:background="#E3E3E3"
-                    android:padding="16dp">
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
-                    <ImageButton
-                        android:id="@+id/close_drawer_button"
+                    <!-- Avatar -->
+                    <ImageView
+                        android:id="@+id/avatarImage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_close"
-                        android:backgroundTint="#E3E3E3"
-                        android:layout_gravity="end">
-                    </ImageButton>
+                        android:src="@drawable/default_avatar"
+                        android:background="@drawable/bg_circle"
+                        android:scaleType="centerCrop"
+                        android:layout_gravity="center_vertical" />
 
+                    <!-- Info -->
                     <LinearLayout
                         android:layout_width="match_parent"
+                        android:layout_weight="1"
                         android:layout_height="match_parent"
-                        android:orientation="horizontal">
+                        android:orientation="vertical"
+                        android:layout_marginLeft="10dp">
 
-                        <!-- Avatar -->
-                        <ImageView
-                            android:id="@+id/avatarImage"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:src="@drawable/avatar_1"
-                            android:background="@drawable/bg_avatar_circle"
-                            android:scaleType="centerCrop"
-                            android:layout_gravity="start" />
+                        <TextView
+                            android:id="@+id/member_name"
+                            android:text="Nguyễn Văn A"
+                            android:textStyle="bold"
+                            android:textSize="25sp"
+                            android:textColor="#000000"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
 
-                        <!-- Info -->
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_weight="1"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:layout_marginLeft="10dp">
+                            android:id="@+id/user_profile_btn"
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:elevation="2dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground">
 
                             <TextView
-                                android:id="@+id/member_name"
-                                android:text="Nguyễn Văn A"
-                                android:textStyle="bold"
-                                android:textSize="25sp"
-                                android:textColor="#000000"
+                                android:text="Hồ sơ người dùng      >"
+                                android:textColor="#888888"
+                                android:textSize="14sp"
+                                android:textStyle="normal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" />
-
-                            <LinearLayout
-                                android:id="@+id/user_profile_btn"
-                                android:orientation="horizontal"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:elevation="2dp"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:foreground="?attr/selectableItemBackground">
-
-                                <TextView
-                                    android:text="Hồ sơ người dùng      >"
-                                    android:textColor="#888888"
-                                    android:textSize="14sp"
-                                    android:textStyle="normal"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" />
-                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
+            </LinearLayout>
 
-                <!-- Logout button ở dưới -->
-                <LinearLayout
-                    android:id="@+id/log_out_btn"
-                    android:layout_alignParentBottom="true"
-                    android:layout_width="match_parent"
+            <!-- Logout button ở dưới -->
+            <LinearLayout
+                android:id="@+id/log_out_btn"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="50dp"
+                android:padding="30dp"
+                android:gravity="center_vertical"
+                android:elevation="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_sign_out"
+                    android:layout_marginEnd="20dp" />
+
+                <TextView
+                    android:id="@+id/btnLogout"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginBottom="50dp"
-                    android:padding="30dp"
-                    android:gravity="center_vertical"
-                    android:elevation="2dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
+                    android:text="Đăng xuất"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </RelativeLayout>
+    </com.google.android.material.navigation.NavigationView>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_sign_out"
-                        android:layout_marginEnd="20dp" />
 
-                    <TextView
-                        android:id="@+id/btnLogout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Đăng xuất"
-                        android:textStyle="bold"
-                        android:textColor="#000000"
-                        android:textSize="16sp" />
-                </LinearLayout>
-            </RelativeLayout>
-        </com.google.android.material.navigation.NavigationView>
-    </androidx.drawerlayout.widget.DrawerLayout>
-    <include layout="@layout/blind_loading_overlay"/>
-</FrameLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

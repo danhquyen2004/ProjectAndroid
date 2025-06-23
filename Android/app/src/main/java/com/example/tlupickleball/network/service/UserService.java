@@ -5,6 +5,7 @@ import com.example.tlupickleball.model.UserRank;
 import com.example.tlupickleball.network.api_model.user.UserListResponse;
 import com.example.tlupickleball.network.api_model.user.UserUpdateRequest;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -15,21 +16,25 @@ public interface UserService {
     @POST("user/submit")
     Call<Void> submitProfile(@Body User user);
     // Cập nhật user (admin)
-    @PUT("user/{uid}")
-    Call<Void> updateUser(@Path("uid") String uid, @Body UserUpdateRequest request);
+    @PATCH("user/{uid}/profile")
+    Call<Void> updateUser(@Path("uid") String uid, @Body User user);
+    // Cập nhật avatar
+    @Multipart
+    @POST("user/{uid}/avatar")
+    Call<Void> updateAvatar(@Path("uid") String uid, @Part MultipartBody.Part avatar);
 
     // Lấy thông tin user
     @GET("user/{uid}/profile")
     Call<User> getUserProfileById(@Path("uid") String uid);
 
     // Lấy danh sách phê duyệt user
-    @GET("user/pending-users?limit=0")
+    @GET("user/pending-users?limit=50")
     Call<UserListResponse> getPendingUsers();
     // Lấy danh sách vo hieu hoa
-    @GET("user/disabled-users?limit=0")
+    @GET("user/disabled-users?limit=50")
     Call<UserListResponse> getDisableUsers();
     // Lấy danh sách toàn bộ user
-    @GET("user/approved-users?limit=0")
+    @GET("user/approved-users?limit=50")
     Call<UserListResponse> getAllUsers();
     // Phê duyệt user
     @POST("user/{uid}/approve")

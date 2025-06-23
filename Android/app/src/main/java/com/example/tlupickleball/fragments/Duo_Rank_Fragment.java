@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,7 @@ public class Duo_Rank_Fragment extends Fragment {
     private TopThreeViewHolder topThreeViewHolder;
     UserService userService;
     private FragmentLoadingOverlay loadingOverlay;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,12 +51,15 @@ public class Duo_Rank_Fragment extends Fragment {
 
         userService = ApiClient.getClient(requireContext()).create(UserService.class);
 
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+
         if (topUser == null) topUser = new ArrayList<>();
 
         fetchTopPlayers();
-
         setupTopThree();
         setupRecyclerView();
+
+        swipeRefreshLayout.setOnRefreshListener(this::fetchTopPlayers);
 
         return rootView;
     }
@@ -87,7 +92,9 @@ public class Duo_Rank_Fragment extends Fragment {
     }
     // Example in your fragment or activity
     private void fetchTopPlayers() {
-        showLoading();
+        if (!swipeRefreshLayout.isRefreshing()) {
+            showLoading();
+        }
         userService.getTopDuoRank().enqueue(new retrofit2.Callback<List<UserRank>>() {
             @Override
             public void onResponse(Call<List<UserRank>> call, retrofit2.Response<List<UserRank>> response) {
@@ -104,9 +111,11 @@ public class Duo_Rank_Fragment extends Fragment {
                     adapter.setUsers(remainingPlayers);
                     adapter.notifyDataSetChanged();
                     hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 } else {
                     Toast.makeText(requireContext(), "Không có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
                     hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
 
@@ -115,6 +124,7 @@ public class Duo_Rank_Fragment extends Fragment {
                 Toast.makeText(requireContext(), "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 t.printStackTrace();
                 hideLoading();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }

@@ -12,6 +12,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.base.BaseMember;
@@ -34,6 +35,8 @@ public class DisableMemberList extends BaseMember {
     private final float buttonTotalWidth = ACTION_BUTTON_WIDTH * 2;
     private static final int REQUEST_CODE_MEMBER_DETAIL = 1001;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     private boolean isSwipeEnabled = false; // Biến để kiểm soát việc vuốt
 
     @Override
@@ -45,9 +48,12 @@ public class DisableMemberList extends BaseMember {
 
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> onBackPressed());
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
         fetchMembers();
         setupRecyclerView();
+
+        swipeRefreshLayout.setOnRefreshListener(this::fetchMembers);
 
 //        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,
 //                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -189,7 +195,9 @@ public class DisableMemberList extends BaseMember {
     }
 
     private void fetchMembers() {
-        showLoading();
+        if (!swipeRefreshLayout.isRefreshing()) {
+            showLoading();
+        }
         userService.getDisableUsers().enqueue(new retrofit2.Callback<UserListResponse>() {
             @Override
             public void onResponse(Call<UserListResponse> call, retrofit2.Response<UserListResponse> response) {
@@ -199,15 +207,18 @@ public class DisableMemberList extends BaseMember {
                     lstUser.addAll(users);
                     adapter.notifyDataSetChanged();
                     hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 } else {
                     Toast.makeText(DisableMemberList.this, "Failed to load members", Toast.LENGTH_SHORT).show();
                     hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
             @Override
             public void onFailure(Call<UserListResponse> call, Throwable t) {
                 Toast.makeText(DisableMemberList.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 hideLoading();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -216,7 +227,7 @@ public class DisableMemberList extends BaseMember {
         recyclerView = findViewById(R.id.playerList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DisableMemberListAdapter(this, lstUser, user -> {
-            Intent intent = new Intent(this, MemberControllerInfor.class);
+            Intent intent = new Intent(this, DisableMemberInfor.class);
             intent.putExtra("uid", user.getUid());
             startActivityForResult(intent, REQUEST_CODE_MEMBER_DETAIL);
         });

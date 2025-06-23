@@ -18,6 +18,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.base.BaseMember;
 import com.example.tlupickleball.model.User;
@@ -82,7 +83,10 @@ public class DisableMemberInfor extends BaseMember {
                     tvEmail.setText(response.body().getEmail());
                     Glide.with(context)
                             .load(response.body().getAvatarUrl())
-                            .placeholder(R.drawable.avatar_1)
+                            .placeholder(R.drawable.default_avatar)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE) // Bỏ qua cache trên đĩa
+                            .skipMemoryCache(true) // Bỏ qua cache trong bộ nhớ
+                            .circleCrop()
                             .into(ivAvatar);
                     hideLoading();
                 } else {

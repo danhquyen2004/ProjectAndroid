@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.base.BaseMember;
@@ -31,6 +32,7 @@ public class MemberList extends BaseMember {
     private static final float ACTION_BUTTON_WIDTH = 200;
     private final float buttonTotalWidth = ACTION_BUTTON_WIDTH * 2;
     private static final int REQUEST_CODE_MEMBER_DETAIL = 1001;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private boolean isSwipeEnabled = false; // Biến để kiểm soát việc vuốt
 
@@ -43,9 +45,11 @@ public class MemberList extends BaseMember {
 
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> onBackPressed());
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
         fetchMembers();
         setupRecyclerView();
+        swipeRefreshLayout.setOnRefreshListener(this::fetchMembers);
 
 //        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,
 //                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -187,7 +191,9 @@ public class MemberList extends BaseMember {
     }
 
     private void fetchMembers() {
-        showLoading();
+        if (!swipeRefreshLayout.isRefreshing()) {
+            showLoading();
+        }
         userService.getAllUsers().enqueue(new retrofit2.Callback<UserListResponse>() {
             @Override
             public void onResponse(Call<UserListResponse> call, retrofit2.Response<UserListResponse> response) {
@@ -197,15 +203,18 @@ public class MemberList extends BaseMember {
                     lstUser.addAll(users);
                     adapter.notifyDataSetChanged();
                     hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 } else {
                     Toast.makeText(MemberList.this, "Failed to load members", Toast.LENGTH_SHORT).show();
                     hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
             @Override
             public void onFailure(Call<UserListResponse> call, Throwable t) {
                 Toast.makeText(MemberList.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 hideLoading();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.MemberControllerInfor;
 import com.example.tlupickleball.model.User;
@@ -42,7 +43,10 @@ public class MemberListAdapter extends RecyclerView.Adapter<MemberListAdapter.Ap
         holder.txtEmail.setText(String.valueOf(user.getEmail()));
         Glide.with(context)
                 .load(user.getAvatarUrl())
-                .placeholder(R.drawable.avatar_1) // ảnh mặc định nếu chưa có
+                .placeholder(R.drawable.default_avatar) // ảnh mặc định nếu chưa có
+                .diskCacheStrategy(DiskCacheStrategy.NONE) // Bỏ qua cache trên đĩa
+                .skipMemoryCache(true) // Bỏ qua cache trong bộ nhớ
+                .circleCrop()
                 .into(holder.imgAvatar);
 
         holder.itemView.setOnClickListener(v -> {
