@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.model.Player;
 import com.example.tlupickleball.model.User;
@@ -42,7 +43,10 @@ public class UserRankAdapter extends RecyclerView.Adapter<UserRankAdapter.Player
         holder.txtScore.setText(String.valueOf(user.getPoint()));
         Glide.with(context)
                 .load(user.getAvatarUrl())
-                .placeholder(R.drawable.avatar_1) // ảnh mặc định nếu chưa có
+                .placeholder(R.drawable.default_avatar)
+                .diskCacheStrategy(DiskCacheStrategy.NONE) // Bỏ qua cache trên đĩa
+                .skipMemoryCache(true) // Bỏ qua cache trong bộ nhớ
+                .circleCrop()
                 .into(holder.imgAvatar);
         holder.txtRank.setText((String.valueOf(position + 4)));
     }

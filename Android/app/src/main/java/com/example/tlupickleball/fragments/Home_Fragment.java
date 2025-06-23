@@ -1,5 +1,6 @@
 package com.example.tlupickleball.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -22,10 +23,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.MainActivity;
 import com.example.tlupickleball.activities.UserActivity;
+import com.example.tlupickleball.model.User;
+import com.example.tlupickleball.network.api_model.user.UserRankAndStatus;
+import com.example.tlupickleball.network.core.SessionManager;
+import com.example.tlupickleball.network.service.UserService;
 import com.google.android.material.navigation.NavigationView;
 import com.example.tlupickleball.adapters.MatchAdapter;
 import com.example.tlupickleball.model.Match;
@@ -48,13 +56,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClickListener {
-    TextView txtName, txtSoloPoint, txtDoublePoint;
+    TextView txtName, txtSoloPoint, txtDoublePoint, txtStatusFund;
     private View rootView;
 
     // ===== BIẾN MỚI ĐƯỢC THÊM VÀO =====
     private RecyclerView recyclerViewTodayMatches;
     private MatchAdapter matchAdapter;
     private List<Matches> todayMatchesList = new ArrayList<>();
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     @Override
@@ -62,9 +71,13 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        txtName = rootView.findViewById(R.id.txtName);
+        txtName = rootView.findViewById(R.id.id_Name);
         txtSoloPoint = rootView.findViewById(R.id.id_SingleRank);
         txtDoublePoint = rootView.findViewById(R.id.id_DuoRank);
+        txtStatusFund = rootView.findViewById(R.id.id_status_fund);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(this::fetchData);
 
         // Ví dụ: Button mở drawer
         View btnOpenDrawer = rootView.findViewById(R.id.btnMenu);
@@ -101,7 +114,8 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         setupRecyclerView();
 
         // Gọi API để lấy dữ liệu
-        fetchTodayMatches();
+//        fetchTodayMatches();
+        fetchData();
     }
 
     // ===== CÁC PHƯƠNG THỨC MỚI ĐƯỢC THÊM VÀO =====
@@ -111,6 +125,58 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         matchAdapter = new MatchAdapter(todayMatchesList, this);
         recyclerViewTodayMatches.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewTodayMatches.setAdapter(matchAdapter);
+    }
+
+    private void fetchData() {
+        // Gọi các phương thức để lấy dữ liệu người dùng và trận đấu
+        fetchPlayerInfor();
+        fetchTodayMatches();
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void fetchPlayerInfor() {
+        if (getContext() == null) return;
+
+        // Tạo service và gọi API
+        UserService userService = ApiClient.getClient(getContext()).create(UserService.class);
+        // Cập nhật tên người dùng
+        Call<User> callUser = userService.getUserProfileById(SessionManager.getUid(requireContext()));
+        callUser.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    txtName.setText(response.body().getFullName());
+                } else {
+                    Toast.makeText(getContext(), "Không có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("Home_Fragment_API", "API call failed", t);
+            }
+        });
+
+        Call<UserRankAndStatus> call = userService.getUserProfileByIdInHome(SessionManager.getUid(requireContext()));
+        call.enqueue(new Callback<UserRankAndStatus>() {
+            @Override
+            public void onResponse(@NonNull Call<UserRankAndStatus> call, @NonNull Response<UserRankAndStatus> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    txtSoloPoint.setText(String.valueOf(response.body().getSingleRank()));
+                    txtDoublePoint.setText(String.valueOf(response.body().getDoubleRank()));
+                    txtStatusFund.setText(response.body().getFundStatus());
+                } else {
+                    Toast.makeText(getContext(), "Không có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UserRankAndStatus> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("Home_Fragment_API", "API call failed", t);
+            }
+        });
     }
 
     private void fetchTodayMatches() {

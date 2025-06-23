@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.base.BaseFragment;
 import com.example.tlupickleball.adapters.UserRankAdapter;
@@ -166,7 +167,10 @@ public class Duo_Rank_Fragment extends Fragment {
             score.setText(String.valueOf(user.getPoint()));
             Glide.with(rootView.getContext())
                     .load(user.getAvatarUrl())
-                    .placeholder(R.drawable.avatar_1)
+                    .placeholder(R.drawable.default_avatar)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE) // Bỏ qua cache trên đĩa
+                    .skipMemoryCache(true) // Bỏ qua cache trong bộ nhớ
+                    .circleCrop()
                     .into(image);
         }
     }

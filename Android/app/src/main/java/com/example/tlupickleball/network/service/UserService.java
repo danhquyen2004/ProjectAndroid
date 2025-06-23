@@ -3,6 +3,7 @@ package com.example.tlupickleball.network.service;
 import com.example.tlupickleball.model.User;
 import com.example.tlupickleball.model.UserRank;
 import com.example.tlupickleball.network.api_model.user.UserListResponse;
+import com.example.tlupickleball.network.api_model.user.UserRankAndStatus;
 import com.example.tlupickleball.network.api_model.user.UserUpdateRequest;
 
 import okhttp3.MultipartBody;
@@ -26,6 +27,10 @@ public interface UserService {
     // Lấy thông tin user
     @GET("user/{uid}/profile")
     Call<User> getUserProfileById(@Path("uid") String uid);
+
+    // Lấy thông tin user trong Home
+    @GET("user/{uid}/rank-and-fund-status")
+    Call<UserRankAndStatus> getUserProfileByIdInHome(@Path("uid") String uid);
 
     // Lấy danh sách phê duyệt user
     @GET("user/pending-users?limit=50")
