@@ -25,6 +25,7 @@
             android:contentDescription="Quay lại" />
 
         <TextView
+            android:id="@+id/add_match_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -158,6 +159,7 @@
             </LinearLayout>
 
             <FrameLayout
+                android:id="@+id/view_pickleball_court_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -182,6 +184,36 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <Button
+        android:id="@+id/confirmChangesButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="Xác nhận thay đổi"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/blue"
+        android:paddingVertical="12dp"
+        android:textSize="18sp"
+        app:cornerRadius="8dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/cancelMatchButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="Hủy trận"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/red"
+        android:paddingVertical="12dp"
+        android:textSize="18sp"
+        app:cornerRadius="8dp"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/confirmButton"
