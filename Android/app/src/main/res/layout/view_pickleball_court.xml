@@ -28,17 +28,31 @@
         app:layout_constraintTop_toTopOf="@+id/imageView3"
         app:layout_constraintVertical_bias="0.117" />
 
-    <TextView
-        android:id="@+id/id_txtslot1"
+    <LinearLayout
+        android:id="@+id/player1_team1_name_container"
         android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:textSize="12dp"
-        android:gravity="center"
-        android:textColor="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="6dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/imageView3"
-        app:layout_constraintTop_toBottomOf="@+id/player1_team1_add_button" />
+        app:layout_constraintTop_toBottomOf="@+id/player1_team1_add_button">
+
+        <ImageView
+            android:id="@+id/player1_team1_avatar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="centerCrop"
+            android:layout_marginEnd="8dp" /> <TextView
+        android:id="@+id/player1_team1_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="14dp"
+        android:textAlignment="center"
+        android:textColor="@color/white" />
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/player2_team2_add_button"
@@ -53,17 +67,32 @@
         app:layout_constraintTop_toTopOf="@+id/imageView3"
         app:layout_constraintVertical_bias="0.117" />
 
-    <TextView
-        android:id="@+id/id_txtslot2"
+    <LinearLayout
+        android:id="@+id/player2_team2_name_container"
         android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:gravity="center"
-        android:textColor="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="6dp"
         app:layout_constraintEnd_toEndOf="@+id/imageView3"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/imageView3"
-        app:layout_constraintTop_toBottomOf="@+id/player2_team1_add_button" />
+        app:layout_constraintTop_toBottomOf="@+id/player2_team2_add_button">
+
+        <ImageView
+            android:id="@+id/player2_team2_avatar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="centerCrop"
+            android:layout_marginEnd="8dp" /> <TextView
+        android:id="@+id/player2_team2_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="14dp"
+        android:textAlignment="center"
+        android:textColor="@color/white" />
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/player2_team1_add_button"
@@ -78,20 +107,35 @@
         app:layout_constraintTop_toTopOf="@+id/imageView3"
         app:layout_constraintVertical_bias="0.752" />
 
-    <TextView
-        android:id="@+id/id_txtslot3"
+    <LinearLayout
+        android:id="@+id/player2_team1_name_container"
         android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:gravity="center"
-        android:textColor="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="6dp"
         app:layout_constraintEnd_toEndOf="@+id/imageView3"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/imageView3"
-        app:layout_constraintTop_toBottomOf="@+id/player1_team2_add_button" />
+        app:layout_constraintTop_toBottomOf="@+id/player2_team1_add_button">
+
+        <ImageView
+            android:id="@+id/player2_team1_avatar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="centerCrop"
+            android:layout_marginEnd="8dp" /> <TextView
+        android:id="@+id/player2_team1_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="14dp"
+        android:textAlignment="center"/>
+    </LinearLayout>
 
     <ImageButton
-        android:id="@+id/player1_team2_add_button" android:layout_width="wrap_content"
+        android:id="@+id/player1_team2_add_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#2A77DB"
         android:src="@drawable/ic_add"
@@ -102,16 +146,31 @@
         app:layout_constraintTop_toTopOf="@+id/imageView3"
         app:layout_constraintVertical_bias="0.752" />
 
-    <TextView
-        android:id="@+id/id_txtslot4"
+    <LinearLayout
+        android:id="@+id/player1_team2_name_container"
         android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:gravity="center"
-        android:textColor="@color/white"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="6dp"
         app:layout_constraintEnd_toEndOf="@+id/imageView3"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/imageView3"
-        app:layout_constraintTop_toBottomOf="@+id/player2_team2_add_button" />
+        app:layout_constraintTop_toBottomOf="@+id/player1_team2_add_button">
+
+        <ImageView
+            android:id="@+id/player1_team2_avatar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:scaleType="centerCrop"
+            android:layout_marginEnd="8dp" /> <TextView
+        android:id="@+id/player1_team2_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="14dp"
+        android:textAlignment="center"
+        android:textColor="@color/white" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

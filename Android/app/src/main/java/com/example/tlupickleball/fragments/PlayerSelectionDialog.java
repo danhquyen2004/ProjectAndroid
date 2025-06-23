@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log; // Import Log
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.example.tlupickleball.network.api_model.user.UserListResponse;
 import com.example.tlupickleball.network.core.ApiClient;
 import com.example.tlupickleball.network.service.UserService;
 
+import java.io.IOException; // Import IOException
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,31 +36,28 @@ import retrofit2.Response;
 public class PlayerSelectionDialog extends DialogFragment implements PlayerSelectionAdapter.OnPlayerSelectedListener {
 
     private RecyclerView playersRecyclerView;
-    private EditText playerSearchEditText;
     private PlayerSelectionAdapter playerSelectionAdapter;
-    private List<User> allUsers = new ArrayList<>();
-    private PlayerSelectedListener listener;
-    private UserService userService;
+    private EditText playerSearchEditText;
+    private List<User> allUsers = new ArrayList<>(); // To store all users fetched from API
+    private OnPlayerSelectedInDialogListener listener;
+    private int playerSlot;
 
-    public interface PlayerSelectedListener {
+    // Interface để gửi kết quả về Fragment cha
+    public interface OnPlayerSelectedInDialogListener {
         void onPlayerSelected(User player, int playerSlot);
     }
 
-    private static final String ARG_PLAYER_SLOT = "player_slot";
-
-    public static PlayerSelectionDialog newInstance(int playerSlot) {
-        PlayerSelectionDialog dialog = new PlayerSelectionDialog();
-        Bundle args = new Bundle();
-        args.putInt(ARG_PLAYER_SLOT, playerSlot);
-        dialog.setArguments(args);
-        return dialog;
+    public void setOnPlayerSelectedInDialogListener(OnPlayerSelectedInDialogListener listener) {
+        this.listener = listener;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userService = ApiClient.getClient(getContext()).create(UserService.class);
-        fetchAllUsers();
+        // Lấy playerSlot từ arguments
+        if (getArguments() != null) {
+            playerSlot = getArguments().getInt("playerSlot", -1);
+        }
     }
 
     @NonNull
@@ -66,19 +65,23 @@ public class PlayerSelectionDialog extends DialogFragment implements PlayerSelec
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_add_player, null);
-        builder.setView(view);
+        View view = inflater.inflate(R.layout.dialog_add_player, null); // Sử dụng dialog_add_player.xml
 
         playersRecyclerView = view.findViewById(R.id.playersRecyclerView);
         playerSearchEditText = view.findViewById(R.id.playerSearchEditText);
 
-        playerSelectionAdapter = new PlayerSelectionAdapter(new ArrayList<>(), this);
+        playerSelectionAdapter = new PlayerSelectionAdapter(new ArrayList<>(), this); // this fragment is the listener
         playersRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         playersRecyclerView.setAdapter(playerSelectionAdapter);
 
+        // Fetch users when the dialog is created
+        fetchPlayers();
+
+        // Setup search functionality
         playerSearchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not used
             }
 
             @Override
@@ -88,43 +91,61 @@ public class PlayerSelectionDialog extends DialogFragment implements PlayerSelec
 
             @Override
             public void afterTextChanged(Editable s) {
+                // Not used
             }
         });
 
+        builder.setView(view)
+                .setTitle("Chọn người chơi");
         return builder.create();
     }
 
-    public void setPlayerSelectedListener(PlayerSelectedListener listener) {
-        this.listener = listener;
-    }
+    private void fetchPlayers() {
+        // Đảm bảo getContext() không null trước khi gọi
+        if (getContext() == null) {
+            Log.e("PlayerSelectionDialog", "Context is null, cannot fetch players.");
+            return;
+        }
 
-    private void fetchAllUsers() {
+        // Đã sửa lỗi: Sử dụng getClient(getContext()) thay vì getRetrofitInstance()
+        UserService userService = ApiClient.getClient(getContext()).create(UserService.class);
         userService.getAllUsers().enqueue(new Callback<UserListResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserListResponse> call, @NonNull Response<UserListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    allUsers = response.body().getUsers();
-                    if (playerSelectionAdapter != null) {
-                        playerSelectionAdapter.updateList(allUsers);
-                    }
+                    allUsers.clear();
+                    allUsers.addAll(response.body().getUsers());
+                    playerSelectionAdapter.updateList(allUsers); // Cập nhật adapter với danh sách đầy đủ
                 } else {
-                    Toast.makeText(getContext(), "Không thể lấy danh sách người dùng: " + response.code(), Toast.LENGTH_SHORT).show();
+                    // Xử lý lỗi API, ví dụ: hiển thị Toast hoặc Log
+                    String errorBody = "Không có chi tiết lỗi.";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorBody = response.errorBody().string();
+                        }
+                    } catch (IOException e) {
+                        Log.e("PlayerSelectionDialog", "Lỗi đọc errorBody: " + e.getMessage());
+                    }
+                    Log.e("PlayerSelectionDialog", "Lỗi phản hồi API: " + response.code() + " - " + errorBody);
+                    Toast.makeText(getContext(), "Không thể lấy danh sách người dùng: " + response.code() + " - " + errorBody, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<UserListResponse> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Lỗi khi lấy danh sách người dùng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                // Xử lý lỗi mạng hoặc lỗi không mong muốn
+                Log.e("PlayerSelectionDialog", "Lỗi khi lấy danh sách người dùng (mạng hoặc không mong muốn): " + t.getMessage(), t); // Log cả Throwable
+                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     @Override
     public void onPlayerSelected(User player) {
-        if (listener != null && getArguments() != null) {
-            int playerSlot = getArguments().getInt(ARG_PLAYER_SLOT, -1);
-            listener.onPlayerSelected(player, playerSlot);
+        // Callback từ Adapter khi một người chơi được chọn
+        if (listener != null) {
+            listener.onPlayerSelected(player, playerSlot); // Truyền playerSlot về Fragment cha
         }
-        dismiss();
+        dismiss(); // Đóng dialog sau khi chọn
     }
 }

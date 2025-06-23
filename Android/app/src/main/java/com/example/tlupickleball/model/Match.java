@@ -16,14 +16,28 @@ public class Match {
     private int team1Wins;
     @SerializedName("team2Wins")
     private int team2Wins;
+    // Thêm các trường khác nếu có, ví dụ: type, setCount, setResults từ API
+    @SerializedName("type")
+    private String type; // e.g., "single" or "double"
+    @SerializedName("setCount")
+    private int setCount;
+    @SerializedName("setResults")
+    private List<MatchSet> setResults; // Dùng MatchSet đã tạo
 
-    public Match(String matchId, String status, String startTime, List<Participant> participants, int team1Wins, int team2Wins) {
+    public Match(String matchId, String status, String startTime, List<Participant> participants, int team1Wins, int team2Wins, String type, int setCount, List<MatchSet> setResults) {
         this.matchId = matchId;
         this.status = status;
         this.startTime = startTime;
         this.participants = participants;
         this.team1Wins = team1Wins;
         this.team2Wins = team2Wins;
+        this.type = type;
+        this.setCount = setCount;
+        this.setResults = setResults;
+    }
+
+    public Match() {
+        // Constructor mặc định cho Gson
     }
 
     public String getMatchId() {
@@ -49,6 +63,11 @@ public class Match {
     public int getTeam2Wins() {
         return team2Wins;
     }
+    public String getType() { return type; }
+    public int getSetCount() { return setCount; }
+    public List<MatchSet> getSetResults() { return setResults; }
+
+
     public void setMatchId(String matchId) {
         this.matchId = matchId;
     }
@@ -72,4 +91,7 @@ public class Match {
     public void setTeam2Wins(int team2Wins) {
         this.team2Wins = team2Wins;
     }
+    public void setType(String type) { this.type = type; }
+    public void setSetCount(int setCount) { this.setCount = setCount; }
+    public void setSetResults(List<MatchSet> setResults) { this.setResults = setResults; }
 }
