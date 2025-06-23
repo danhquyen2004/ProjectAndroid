@@ -1,40 +1,197 @@
 package com.example.tlupickleball.fragments;
 
 import android.os.Bundle;
-
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toolbar;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.activities.MainActivity;
 import com.example.tlupickleball.activities.UserActivity;
-import com.google.android.material.navigation.NavigationView;
+import com.example.tlupickleball.adapters.MatchAdapter;
+import com.example.tlupickleball.model.Match;
+import com.example.tlupickleball.model.Matches;
+import com.example.tlupickleball.model.Participant;
+import com.example.tlupickleball.network.api_model.match.MatchResponse;
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.service.MatchService;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
-public class Home_Fragment extends Fragment {
+public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClickListener {
+
+    // ===== BIẾN CÓ SẴN =====
     private View rootView;
+
+    // ===== BIẾN MỚI ĐƯỢC THÊM VÀO =====
+    private RecyclerView recyclerViewTodayMatches;
+    private MatchAdapter matchAdapter;
+    private List<Matches> todayMatchesList = new ArrayList<>();
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Giữ nguyên việc inflate layout
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        return rootView;
+    }
 
-        // Ví dụ: Button mở drawer
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // ===== LOGIC MỞ DRAWER CÓ SẴN CỦA BẠN (được chuyển vào đây cho gọn) =====
         View btnOpenDrawer = rootView.findViewById(R.id.btnMenu);
         btnOpenDrawer.setOnClickListener(v -> {
-            // Truy cập Drawer từ MainActivity
-            DrawerLayout drawerLayout = ((UserActivity) requireActivity()).drawerLayout;
-            if (drawerLayout != null) {
-                drawerLayout.openDrawer(GravityCompat.END);
+            // Truy cập Drawer từ Activity chứa fragment này
+            if (getActivity() instanceof UserActivity) {
+                DrawerLayout drawerLayout = ((UserActivity) requireActivity()).drawerLayout;
+                if (drawerLayout != null) {
+                    drawerLayout.openDrawer(GravityCompat.END);
+                }
             }
         });
 
-        return rootView;
+        // ===== LOGIC MỚI ĐỂ HIỂN THỊ DANH SÁCH TRẬN ĐẤU =====
+        // Khởi tạo RecyclerView và Adapter
+        recyclerViewTodayMatches = view.findViewById(R.id.recyclerViewTodayMatches);
+        setupRecyclerView();
+
+        // Gọi API để lấy dữ liệu
+        fetchTodayMatches();
+    }
+
+    // ===== CÁC PHƯƠNG THỨC MỚI ĐƯỢC THÊM VÀO =====
+
+    private void setupRecyclerView() {
+        // Sử dụng lại MatchAdapter đã có
+        matchAdapter = new MatchAdapter(todayMatchesList, this);
+        recyclerViewTodayMatches.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewTodayMatches.setAdapter(matchAdapter);
+    }
+
+    private void fetchTodayMatches() {
+        if (getContext() == null) return;
+
+        // Lấy ngày hôm nay và định dạng lại thành "yyyy-MM-dd"
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String todayDateString = dateFormat.format(new Date());
+
+        // Tạo service và gọi API
+        MatchService matchService = ApiClient.getClient(getContext()).create(MatchService.class);
+        Call<MatchResponse> call = matchService.getMatchesByDay(todayDateString, 1, 50);
+
+        call.enqueue(new Callback<MatchResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<MatchResponse> call, @NonNull Response<MatchResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Matches> convertedMatches = convertApiMatchesToDisplayable(response.body().getMatches());
+                    matchAdapter.updateMatches(convertedMatches);
+                } else {
+                    Toast.makeText(getContext(), "Không thể tải danh sách trận đấu", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<MatchResponse> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("Home_Fragment_API", "API call failed", t);
+            }
+        });
+    }
+
+    private List<Matches> convertApiMatchesToDisplayable(List<Match> rawMatches) {
+        List<Matches> convertedMatches = new ArrayList<>();
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+
+        for (Match rawMatch : rawMatches) {
+            List<Participant> team1 = new ArrayList<>();
+            List<Participant> team2 = new ArrayList<>();
+            if (rawMatch.getParticipants() != null) {
+                for (Participant p : rawMatch.getParticipants()) {
+                    if (p.getTeam() == 1) team1.add(p);
+                    else team2.add(p);
+                }
+            }
+            Collections.sort(team1, Comparator.comparing(Participant::getFullName));
+            Collections.sort(team2, Comparator.comparing(Participant::getFullName));
+
+            String p1Name = !team1.isEmpty() ? team1.get(0).getFullName() : "";
+            if (team1.size() > 1) p1Name += " & " + team1.get(1).getFullName();
+
+            String p2Name = !team2.isEmpty() ? team2.get(0).getFullName() : "";
+            if (team2.size() > 1) p2Name += " & " + team2.get(1).getFullName();
+
+            String p1Avatar1 = !team1.isEmpty() ? team1.get(0).getAvatarUrl() : null;
+            String p1Avatar2 = team1.size() > 1 ? team1.get(1).getAvatarUrl() : null;
+            String p2Avatar1 = !team2.isEmpty() ? team2.get(0).getAvatarUrl() : null;
+            String p2Avatar2 = team2.size() > 1 ? team2.get(1).getAvatarUrl() : null;
+
+            String time = "N/A";
+            if (rawMatch.getStartTime() != null) {
+                try {
+                    time = timeFormat.format(apiDateFormat.parse(rawMatch.getStartTime()));
+                } catch (Exception e) { /* ignore */ }
+            }
+
+            convertedMatches.add(new Matches(
+                    rawMatch.getMatchId(),
+                    p1Name, p2Name,
+                    p1Avatar1, p1Avatar2, p2Avatar1, p2Avatar2,
+                    rawMatch.getTeam1Wins() + "-" + rawMatch.getTeam2Wins(),
+                    time,
+                    mapApiStatusToDisplayStatus(rawMatch.getStatus()),
+                    "DOUBLES".equalsIgnoreCase(rawMatch.getType())
+            ));
+        }
+        return convertedMatches;
+    }
+
+    private String mapApiStatusToDisplayStatus(String apiStatus) {
+        if (apiStatus == null) return "";
+        switch (apiStatus) {
+            case "finished": return "Đã kết thúc";
+            case "upcoming":
+            case "pending": return "Sắp diễn ra";
+            case "ongoing":
+            case "in_progress": return "Đang diễn ra";
+            default: return apiStatus;
+        }
+    }
+
+    @Override
+    public void onMatchClicked(Matches match) {
+        AddMatch_Fragment detailFragment = new AddMatch_Fragment();
+        Bundle args = new Bundle();
+        args.putString("match_id", match.getMatchId());
+        detailFragment.setArguments(args);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.main, detailFragment) // R.id.main là id của FrameLayout gốc trong fragment_home.xml
+                .addToBackStack(null)
+                .commit();
     }
 }

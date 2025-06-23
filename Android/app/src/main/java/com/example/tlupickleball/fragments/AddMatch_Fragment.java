@@ -2,11 +2,16 @@ package com.example.tlupickleball.fragments;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -45,6 +50,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import android.widget.Button;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -82,6 +88,7 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
                 isDetailMode = true;
             }
         }
+
     }
 
     @Nullable
@@ -143,6 +150,22 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         player1Team2Avatar = view.findViewById(R.id.player1_team2_avatar);
     }
 
+    // =================================================================================
+    // ===== BẮT ĐẦU VÙNG CODE SỬA ĐỔI ==================================================
+    // =================================================================================
+
+    /**
+     * Gửi tín hiệu cần refresh về fragment trước đó rồi đóng fragment hiện tại.
+     */
+    private void navigateBackAndRefresh() {
+        if (isAdded()) {
+            Bundle result = new Bundle();
+            result.putBoolean("needsRefresh", true);
+            getParentFragmentManager().setFragmentResult("requestKey", result);
+            getParentFragmentManager().popBackStack();
+        }
+    }
+
     private void setupListeners() {
         backButton.setOnClickListener(v -> handleBackPress());
         cancelMatchButton.setOnClickListener(v -> showCancelConfirmationDialog());
@@ -174,9 +197,122 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         if (!isDetailMode && hasUnsavedData()) {
             showExitConfirmationDialog();
         } else {
-            getParentFragmentManager().popBackStack();
+            // Sửa ở đây
+            navigateBackAndRefresh();
         }
     }
+
+    private void saveScoreChanges() {
+        if (getContext() == null || matchId == null) return;
+        List<CreateMatchRequest.SetResult> setResults = new ArrayList<>();
+        int numberOfSets = layoutMatchSetScoresContainer.getChildCount();
+
+        for (int i = 0; i < numberOfSets; i++) {
+            View setView = layoutMatchSetScoresContainer.getChildAt(i);
+            EditText team1ScoreEt = setView.findViewById(R.id.editTextScoreTeam1);
+            EditText team2ScoreEt = setView.findViewById(R.id.editTextScoreTeam2);
+            try {
+                int team1Score = Integer.parseInt(team1ScoreEt.getText().toString());
+                int team2Score = Integer.parseInt(team2ScoreEt.getText().toString());
+                setResults.add(new CreateMatchRequest.SetResult(i + 1, team1Score, team2Score));
+            } catch (NumberFormatException e) {
+                Toast.makeText(getContext(), "Vui lòng nhập điểm số hợp lệ cho tất cả các set.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        if (setResults.size() != numberOfSets) {
+            Toast.makeText(getContext(), "Vui lòng điền đủ tỉ số cho tất cả các set.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        UpdateScoresRequest request = new UpdateScoresRequest(setResults);
+        MatchService service = ApiClient.getClient(getContext()).create(MatchService.class);
+        service.updateMatchScores(matchId, request).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Cập nhật tỉ số thành công!", Toast.LENGTH_SHORT).show();
+                    // Sửa ở đây
+                    navigateBackAndRefresh();
+                } else {
+                    String errorMsg = "Cập nhật thất bại: " + response.code();
+                    try {
+                        if (response.errorBody() != null) {
+                            errorMsg += " - " + response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        Log.e("SaveScoreChanges", "Error parsing error body", e);
+                    }
+                    Log.e("SaveScoreChanges", errorMsg);
+                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Log.e("SaveScoreChanges", "Lỗi mạng", t);
+                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void deleteMatch() {
+        if (matchId == null || getContext() == null) return;
+        MatchService service = ApiClient.getClient(getContext()).create(MatchService.class);
+        service.deleteMatch(matchId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Đã hủy trận đấu thành công", Toast.LENGTH_SHORT).show();
+                    // Sửa ở đây
+                    navigateBackAndRefresh();
+                } else {
+                    String errorMsg = "Hủy trận đấu thất bại: " + response.code();
+                    Log.e("DeleteMatch", errorMsg);
+                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Log.e("DeleteMatch", "Lỗi mạng", t);
+                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void showExitConfirmationDialog() {
+        new AlertDialog.Builder(getContext())
+                .setMessage("Trận đấu của bạn sẽ kết thúc\nDữ liệu chưa lưu sẽ bị mất.")
+                // Sửa ở đây
+                .setPositiveButton("Xác nhận", (dialog, which) -> navigateBackAndRefresh())
+                .setNegativeButton("Quay lại", null).show();
+    }
+
+    private void sendRequestToServer(CreateMatchRequest request) {
+        if (getContext() == null) return;
+        MatchService matchService = ApiClient.getClient(getContext()).create(MatchService.class);
+        matchService.createMatch(request).enqueue(new Callback<CreateMatchResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<CreateMatchResponse> call, @NonNull Response<CreateMatchResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Toast.makeText(getContext(), "Trận đấu đã được tạo thành công!", Toast.LENGTH_SHORT).show();
+                    // Sửa ở đây
+                    navigateBackAndRefresh();
+                } else {
+                    Toast.makeText(getContext(), "Tạo trận đấu thất bại: " + response.code(), Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<CreateMatchResponse> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    // =================================================================================
+    // ===== KẾT THÚC VÙNG CODE SỬA ĐỔI ================================================
+    // =================================================================================
+
 
     private void configureUiForMode(boolean forDetails, @Nullable Match match) {
         inputTimeButton.setEnabled(!forDetails);
@@ -252,7 +388,11 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
             // Handle error
         }
 
-        isSinglesMatch = "SINGLES".equalsIgnoreCase(match.getType());
+        if (match.getParticipants() != null && match.getParticipants().size() > 2) {
+            isSinglesMatch = false;
+        } else {
+            isSinglesMatch = true;
+        }
         frameLayoutTabContainer.post(() -> selectTab(isSinglesMatch));
 
         ArrayAdapter<CharSequence> adapter = (ArrayAdapter<CharSequence>) setCountSpinner.getAdapter();
@@ -319,74 +459,32 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         }
     }
 
-    private void saveScoreChanges() {
-        if (getContext() == null || matchId == null) return;
-        List<CreateMatchRequest.SetResult> setResults = new ArrayList<>();
-        int numberOfSets = layoutMatchSetScoresContainer.getChildCount();
-
-        for (int i = 0; i < numberOfSets; i++) {
-            View setView = layoutMatchSetScoresContainer.getChildAt(i);
-            EditText team1ScoreEt = setView.findViewById(R.id.editTextScoreTeam1);
-            EditText team2ScoreEt = setView.findViewById(R.id.editTextScoreTeam2);
-            try {
-                int team1Score = Integer.parseInt(team1ScoreEt.getText().toString());
-                int team2Score = Integer.parseInt(team2ScoreEt.getText().toString());
-                setResults.add(new CreateMatchRequest.SetResult(i + 1, team1Score, team2Score));
-            } catch (NumberFormatException e) {
-                Toast.makeText(getContext(), "Vui lòng nhập điểm số hợp lệ cho tất cả các set.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
-        if (setResults.size() != numberOfSets) {
-            Toast.makeText(getContext(), "Vui lòng điền đủ tỉ số cho tất cả các set.", Toast.LENGTH_SHORT).show();
+    private void showCancelConfirmationDialog() {
+        if (getContext() == null) {
             return;
         }
 
-        UpdateScoresRequest request = new UpdateScoresRequest(setResults);
-        MatchService service = ApiClient.getClient(getContext()).create(MatchService.class);
-        service.updateMatchScores(matchId, request).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Cập nhật tỉ số thành công!", Toast.LENGTH_SHORT).show();
-                    getParentFragmentManager().popBackStack();
-                } else {
-                    Toast.makeText(getContext(), "Cập nhật thất bại: " + response.code(), Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+        final Dialog dialog = new Dialog(getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_match_delete_confirmation);
 
-    private void showCancelConfirmationDialog() {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Xác nhận hủy trận")
-                .setMessage("Bạn có chắc chắn muốn hủy trận đấu này? Hành động này không thể hoàn tác.")
-                .setPositiveButton("Xác nhận", (dialog, which) -> deleteMatch())
-                .setNegativeButton("Quay lại", null).show();
-    }
+        Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
+        Button btnCancel = dialog.findViewById(R.id.btnCancel);
 
-    private void deleteMatch() {
-        if (matchId == null || getContext() == null) return;
-        MatchService service = ApiClient.getClient(getContext()).create(MatchService.class);
-        service.deleteMatch(matchId).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Đã hủy trận đấu thành công", Toast.LENGTH_SHORT).show();
-                    getParentFragmentManager().popBackStack();
-                } else {
-                    Toast.makeText(getContext(), "Hủy trận đấu thất bại", Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
-            }
+        btnConfirm.setOnClickListener(v -> {
+            deleteMatch();
+            dialog.dismiss();
         });
+
+        btnCancel.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        dialog.show();
     }
 
     private boolean hasUnsavedData() {
@@ -404,13 +502,6 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
             }
         }
         return false;
-    }
-
-    private void showExitConfirmationDialog() {
-        new AlertDialog.Builder(getContext())
-                .setMessage("Trận đấu của bạn sẽ kết thúc\nDữ liệu chưa lưu sẽ bị mất.")
-                .setPositiveButton("Xác nhận", (dialog, which) -> getParentFragmentManager().popBackStack())
-                .setNegativeButton("Quay lại", null).show();
     }
 
     @Override
@@ -449,8 +540,8 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
     private void animateTabIndicator(boolean isSingles) { if (frameLayoutTabContainer == null || tabIndicator == null) return; int totalWidth = frameLayoutTabContainer.getWidth(); if (totalWidth == 0) { frameLayoutTabContainer.post(() -> animateTabIndicator(isSingles)); return; } int tabWidth = totalWidth / 2; ViewGroup.LayoutParams params = tabIndicator.getLayoutParams(); params.width = tabWidth; tabIndicator.setLayoutParams(params); float targetX = isSingles ? 0f : tabWidth; tabIndicator.animate().translationX(targetX).setDuration(300).start(); }
     private void updateCourtView() { if (isSinglesMatch) { player2Team1Name.setVisibility(View.GONE); player1Team2Name.setVisibility(View.GONE); if (!isDetailMode) { player2Team1AddButton.setVisibility(View.GONE); player1Team2AddButton.setVisibility(View.GONE); } player2Team1Avatar.setVisibility(View.GONE); player1Team2Avatar.setVisibility(View.GONE); if (!isDetailMode) { player2Team1Name.setText(""); player1Team2Name.setText(""); selectedPlayer2Team1 = null; selectedPlayer1Team2 = null;} } else { player2Team1Name.setVisibility(View.VISIBLE); player1Team2Name.setVisibility(View.VISIBLE); if (!isDetailMode) { player2Team1AddButton.setVisibility(View.VISIBLE); player1Team2AddButton.setVisibility(View.VISIBLE); } player2Team1Avatar.setVisibility(View.VISIBLE); player1Team2Avatar.setVisibility(View.VISIBLE); } }
     private void showPlayerSelectionDialog() { PlayerSelectionDialog dialog = new PlayerSelectionDialog(); Bundle args = new Bundle(); args.putInt("playerSlot", currentSelectedPlayerSlot); dialog.setArguments(args); dialog.setOnPlayerSelectedInDialogListener(this); dialog.show(getParentFragmentManager(), "PlayerSelectionDialog"); }
-    private void recordMatch() { Date matchDateTime = selectedDateTime.getTime(); String matchType = isSinglesMatch ? "SINGLES" : "DOUBLES"; int numOfSets = selectedSetCount; List<String> team1PlayerIds = new ArrayList<>(); List<String> team2PlayerIds = new ArrayList<>(); if (selectedPlayer1Team1 != null) team1PlayerIds.add(selectedPlayer1Team1.getUid()); if (!isSinglesMatch && selectedPlayer2Team1 != null) team1PlayerIds.add(selectedPlayer2Team1.getUid()); if (selectedPlayer2Team2 != null) team2PlayerIds.add(selectedPlayer2Team2.getUid()); if (!isSinglesMatch && selectedPlayer1Team2 != null) team2PlayerIds.add(selectedPlayer1Team2.getUid()); if (isSinglesMatch) { if (team1PlayerIds.size() != 1 || team2PlayerIds.size() != 1) { Toast.makeText(requireContext(), "Vui lòng chọn đủ 2 người chơi cho trận đấu đơn.", Toast.LENGTH_SHORT).show(); return; } } else { if (team1PlayerIds.size() != 2 || team2PlayerIds.size() != 2) { Toast.makeText(requireContext(), "Vui lòng chọn đủ 4 người chơi cho trận đấu đôi.", Toast.LENGTH_SHORT).show(); return; } } CreateMatchRequest.Teams teams = new CreateMatchRequest.Teams(team1PlayerIds, team2PlayerIds); List<CreateMatchRequest.SetResult> setResults = new ArrayList<>(); boolean allScoresFilled = true; int filledSetCount = 0; for (int i = 0; i < layoutMatchSetScoresContainer.getChildCount(); i++) { View setView = layoutMatchSetScoresContainer.getChildAt(i); EditText team1ScoreEt = setView.findViewById(R.id.editTextScoreTeam1); EditText team2ScoreEt = setView.findViewById(R.id.editTextScoreTeam2); String score1Str = team1ScoreEt.getText().toString(); String score2Str = team2ScoreEt.getText().toString(); if (!score1Str.isEmpty() && !score2Str.isEmpty()) { try { int team1Score = Integer.parseInt(score1Str); int team2Score = Integer.parseInt(score2Str); setResults.add(new CreateMatchRequest.SetResult(i + 1, team1Score, team2Score)); filledSetCount++; } catch (NumberFormatException e) { allScoresFilled = false; } } else { allScoresFilled = false; } } if (filledSetCount != numOfSets) { allScoresFilled = false; } CreateMatchRequest request; if (Calendar.getInstance().getTime().before(matchDateTime)) { request = new CreateMatchRequest(formatDate(matchDateTime), formatTime(matchDateTime), matchType, numOfSets, teams, new ArrayList<>()); } else if (allScoresFilled) { request = new CreateMatchRequest(formatDate(matchDateTime), formatTime(matchDateTime), matchType, numOfSets, teams, setResults); } else { request = new CreateMatchRequest(formatDate(matchDateTime), formatTime(matchDateTime), matchType, numOfSets, teams, setResults); } sendRequestToServer(request); }
+    private void recordMatch() { Date matchDateTime = selectedDateTime.getTime(); String matchType = isSinglesMatch ? "single" : "double"; int numOfSets = selectedSetCount; List<String> team1PlayerIds = new ArrayList<>(); List<String> team2PlayerIds = new ArrayList<>(); if (selectedPlayer1Team1 != null) team1PlayerIds.add(selectedPlayer1Team1.getUid()); if (!isSinglesMatch && selectedPlayer2Team1 != null) team1PlayerIds.add(selectedPlayer2Team1.getUid()); if (selectedPlayer2Team2 != null) team2PlayerIds.add(selectedPlayer2Team2.getUid()); if (!isSinglesMatch && selectedPlayer1Team2 != null) team2PlayerIds.add(selectedPlayer1Team2.getUid()); if (isSinglesMatch) { if (team1PlayerIds.size() != 1 || team2PlayerIds.size() != 1) { Toast.makeText(requireContext(), "Vui lòng chọn đủ 2 người chơi cho trận đấu đơn.", Toast.LENGTH_SHORT).show(); return; } } else { if (team1PlayerIds.size() != 2 || team2PlayerIds.size() != 2) { Toast.makeText(requireContext(), "Vui lòng chọn đủ 4 người chơi cho trận đấu đôi.", Toast.LENGTH_SHORT).show(); return; } } CreateMatchRequest.Teams teams = new CreateMatchRequest.Teams(team1PlayerIds, team2PlayerIds); List<CreateMatchRequest.SetResult> setResults = new ArrayList<>(); boolean allScoresFilled = true; int filledSetCount = 0; for (int i = 0; i < layoutMatchSetScoresContainer.getChildCount(); i++) { View setView = layoutMatchSetScoresContainer.getChildAt(i); EditText team1ScoreEt = setView.findViewById(R.id.editTextScoreTeam1); EditText team2ScoreEt = setView.findViewById(R.id.editTextScoreTeam2); String score1Str = team1ScoreEt.getText().toString(); String score2Str = team2ScoreEt.getText().toString(); if (!score1Str.isEmpty() && !score2Str.isEmpty()) { try { int team1Score = Integer.parseInt(score1Str); int team2Score = Integer.parseInt(score2Str); setResults.add(new CreateMatchRequest.SetResult(i + 1, team1Score, team2Score)); filledSetCount++; } catch (NumberFormatException e) { allScoresFilled = false; } } else { allScoresFilled = false; } } if (filledSetCount != numOfSets) { allScoresFilled = false; } CreateMatchRequest request; if (Calendar.getInstance().getTime().before(matchDateTime)) { request = new CreateMatchRequest(formatDate(matchDateTime), formatTime(matchDateTime), matchType, numOfSets, teams, new ArrayList<>()); } else if (allScoresFilled) { request = new CreateMatchRequest(formatDate(matchDateTime), formatTime(matchDateTime), matchType, numOfSets, teams, setResults); } else { request = new CreateMatchRequest(formatDate(matchDateTime), formatTime(matchDateTime), matchType, numOfSets, teams, setResults); } sendRequestToServer(request); }
     private String formatDate(Date date) { SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); return dateFormat.format(date); }
     private String formatTime(Date date) { SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault()); return timeFormat.format(date); }
-    private void sendRequestToServer(CreateMatchRequest request) { if (getContext() == null) return; MatchService matchService = ApiClient.getClient(getContext()).create(MatchService.class); matchService.createMatch(request).enqueue(new Callback<CreateMatchResponse>() { @Override public void onResponse(@NonNull Call<CreateMatchResponse> call, @NonNull Response<CreateMatchResponse> response) { if (response.isSuccessful() && response.body() != null) { Toast.makeText(getContext(), "Trận đấu đã được tạo thành công!", Toast.LENGTH_SHORT).show(); getParentFragmentManager().popBackStack(); } else { Toast.makeText(getContext(), "Tạo trận đấu thất bại: " + response.code(), Toast.LENGTH_LONG).show(); } } @Override public void onFailure(@NonNull Call<CreateMatchResponse> call, @NonNull Throwable t) { Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_LONG).show(); } }); }
+
 }

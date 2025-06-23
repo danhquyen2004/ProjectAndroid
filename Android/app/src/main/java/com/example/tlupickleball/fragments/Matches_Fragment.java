@@ -4,6 +4,7 @@ import android.animation.LayoutTransition;
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +76,27 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         if (savedInstanceState != null) {
             currentSelectedDateKey = savedInstanceState.getString(KEY_CURRENT_DATE);
         }
+
+        getParentFragmentManager().setFragmentResultListener("requestKey", this, (requestKey, bundle) -> {
+            // Lắng nghe tín hiệu từ AddMatch_Fragment
+            boolean needsRefresh = bundle.getBoolean("needsRefresh");
+            if (needsRefresh) {
+                // Log để kiểm tra
+                Log.d("Matches_Fragment", "Nhận được tín hiệu cần refresh, đang tải lại dữ liệu...");
+
+                // Hiển thị lại nút AddMatch
+                if (btnAddMatch != null) {
+                    btnAddMatch.setVisibility(View.VISIBLE);
+                }
+
+                // Thực hiện lại logic làm mới y hệt như trong onResume
+                if (currentSelectedDateKey != null) {
+                    String compositeKey = currentSelectedDateKey + "_" + currentViewType;
+                    allMatchesData.remove(compositeKey);
+                    loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
+                }
+            }
+        });
     }
 
     @Nullable
