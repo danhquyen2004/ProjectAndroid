@@ -2,9 +2,11 @@ package com.example.tlupickleball.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +26,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AuthActivity {
+    private CheckBox rememberMeCheckbox;
+
     private EditText emailEditText, passwordEditText;
     private Button loginButton;
     private TextView goToRegisterText;
@@ -33,13 +37,17 @@ public class LoginActivity extends AuthActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+
+
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
         goToRegisterText = findViewById(R.id.goToRegisterText);
+        rememberMeCheckbox = findViewById(R.id.cb_remember_me);
+
+        loadLoginInfo();
 
         loginButton.setOnClickListener(v -> {
-            showLoading();
             String email = emailEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
             loginUser(email, password);
@@ -50,6 +58,7 @@ public class LoginActivity extends AuthActivity {
         });
     }
     private void loginUser(String email, String password) {
+        showLoading();
         Account account = new Account(email, password);
         authService.login(account).enqueue(new Callback<LoginResponse>() {
             @Override
@@ -57,6 +66,7 @@ public class LoginActivity extends AuthActivity {
                 if (response.isSuccessful()) {
                     LoginResponse body = response.body();
                     SessionManager.saveTokens(LoginActivity.this, body.getIdToken(), body.getRefreshToken(), body.getUid());
+                    saveLoginInfo(email, password, rememberMeCheckbox.isChecked());
                     if(body.isDisabled())
                     {
                         Toast.makeText(LoginActivity.this, "Tài khoản đã bị vô hiệu hóa", Toast.LENGTH_SHORT).show();
@@ -68,7 +78,7 @@ public class LoginActivity extends AuthActivity {
                     else
                     {
                         Log.d("TOKEN", "TOKEN : " + body.getIdToken());
-                        Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
                         checkUserProfileAndRedirect(LoginActivity.this, body.getUid(), userService);
                     }
 
@@ -110,5 +120,28 @@ public class LoginActivity extends AuthActivity {
             }
         });
     }
-
+    private void loadLoginInfo() {
+        String email = sharedPreferences.getString(KEY_EMAIL, "");
+        String password = sharedPreferences.getString(KEY_PASSWORD, "");
+        emailEditText.setText(email);
+        passwordEditText.setText(password);
+        boolean remember = sharedPreferences.getBoolean(KEY_REMEMBER, false);
+        if(remember) {
+            rememberMeCheckbox.setChecked(true);
+            // Tự động đăng nhập
+            loginUser(email, password);
+        }
+    }
+    private void saveLoginInfo(String email, String password, boolean remember) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if(remember) {
+            editor.putString(KEY_EMAIL, email);
+            editor.putString(KEY_PASSWORD, password);
+        } else {
+            editor.remove(KEY_EMAIL);
+            editor.remove(KEY_PASSWORD);
+        }
+        editor.putBoolean(KEY_REMEMBER, remember);
+        editor.apply();
+    }
 }

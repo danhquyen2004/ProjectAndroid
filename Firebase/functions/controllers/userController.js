@@ -231,11 +231,41 @@ exports.rejectUser = async (req, res) => {
 exports.approveUser = async (req, res) => {
   try {
     const targetUid = req.params.uid;
-
+    // Cập nhật trạng thái approved
     await admin.firestore().collection("users").doc(targetUid).set({
       approvalStatus: "approved",
       createdAt: admin.firestore.Timestamp.now()
     }, { merge: true });
+
+    // === Kiểm tra và tạo paymentRequest quỹ tháng nếu chưa có ===
+    const now = new Date();
+    const month = now.getMonth() + 1; // JS: 0-11
+    const year = now.getFullYear();
+    const paymentRequestsRef = admin.firestore().collection("users").doc(targetUid).collection("paymentRequests");
+    const existingSnap = await paymentRequestsRef
+      .where("type", "==", "fixed")
+      .where("forMonth", ">=", new Date(Date.UTC(year, month - 1, 1, 0, 0, 0)))
+      .where("forMonth", "<=", new Date(Date.UTC(year, month - 1, 1, 23, 59, 59, 999)))
+      .limit(1)
+      .get();
+    if (existingSnap.empty) {
+      // Tạo mới paymentRequest quỹ tháng
+      const amount = 100000;
+      const forMonthVN = new Date(year, month - 1, 1, 7, 0, 0); // 7h sáng ngày 1 tháng đó, giờ VN
+      const forMonthUTC = new Date(forMonthVN.getTime() - 7 * 60 * 60 * 1000); // convert sang UTC
+      const requestId = require('crypto').randomUUID();
+      await paymentRequestsRef.doc(requestId).set({
+        amount,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        forMonth: forMonthUTC,
+        paidAt: null,
+        requestId,
+        status: "unpaid",
+        type: "fixed",
+        userId: targetUid
+      });
+    }
+    // === END ===
 
     return res.status(200).send("User has been approved.");
   } catch (e) {
@@ -312,12 +342,13 @@ exports.getPendingUsers = async (req, res) => {
     const snapshot = await query.get();
 
     // Lấy dữ liệu profile tương ứng
-    const users = await Promise.all(snapshot.docs.map(async doc => {
+    const users = [];
+    for (const doc of snapshot.docs) {
       const uid = doc.id;
       const data = doc.data();
-
       let fullName = null;
       let avatarUrl = null;
+      let hasProfile = false;
       try {
         const profileSnap = await admin.firestore()
           .collection("users")
@@ -325,22 +356,22 @@ exports.getPendingUsers = async (req, res) => {
           .collection("profile")
           .doc("info")
           .get();
-
         if (profileSnap.exists) {
           fullName = profileSnap.data().fullName || null;
           avatarUrl = profileSnap.data().avatarUrl || null;
+          hasProfile = true;
         }
       } catch (_) { }
-
-      return {
+      if (!hasProfile) continue; // Bỏ qua user thiếu info
+      users.push({
         uid,
         email: data.email || null,
         createdAt: data.createdAt?.toDate().toISOString() || null,
         fullName,
         avatarUrl,
         approvalStatus: data.approvalStatus || null
-      };
-    }));
+      });
+    }
 
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
     const nextPageToken = lastDoc ? lastDoc.id : null;
@@ -377,12 +408,14 @@ exports.getApprovedUsers = async (req, res) => {
 
     const snapshot = await query.get();
 
-    const users = await Promise.all(snapshot.docs.map(async doc => {
+    // Lấy dữ liệu profile tương ứng
+    const users = [];
+    for (const doc of snapshot.docs) {
       const uid = doc.id;
       const data = doc.data();
-
       let fullName = null;
       let avatarUrl = null;
+      let hasProfile = false;
       try {
         const profileSnap = await admin.firestore()
           .collection("users")
@@ -390,22 +423,22 @@ exports.getApprovedUsers = async (req, res) => {
           .collection("profile")
           .doc("info")
           .get();
-
         if (profileSnap.exists) {
           fullName = profileSnap.data().fullName || null;
           avatarUrl = profileSnap.data().avatarUrl || null;
+          hasProfile = true;
         }
       } catch (_) { }
-
-      return {
+      if (!hasProfile) continue; // Bỏ qua user thiếu info
+      users.push({
         uid,
         email: data.email || null,
         createdAt: data.createdAt?.toDate().toISOString() || null,
         fullName,
         avatarUrl,
         approvalStatus: data.approvalStatus || null
-      };
-    }));
+      });
+    }
 
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
     const nextPageToken = lastDoc ? lastDoc.id : null;

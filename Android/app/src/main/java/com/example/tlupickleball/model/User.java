@@ -30,7 +30,7 @@ public class User {
         return currentSingleScore;
     }
 
-    public void setCurrentSingleScore(int currentSingleScore) {
+    public void setCurrentSingleScore(float currentSingleScore) {
         this.currentSingleScore = currentSingleScore;
     }
 
@@ -38,7 +38,7 @@ public class User {
         return currentDoubleScore;
     }
 
-    public void setCurrentDoubleScore(int currentDoubleScore) {
+    public void setCurrentDoubleScore(float currentDoubleScore) {
         this.currentDoubleScore = currentDoubleScore;
     }
 

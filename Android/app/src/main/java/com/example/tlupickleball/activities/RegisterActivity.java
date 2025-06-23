@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +25,7 @@ import retrofit2.Response;
 public class RegisterActivity extends AuthActivity {
     private EditText emailEditText, passwordEditText, confirmPasswordEditText;
     private Button registerButton;
+    private TextView goToLoginText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public class RegisterActivity extends AuthActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText);
         registerButton = findViewById(R.id.registerButton);
+        goToLoginText = findViewById(R.id.goToLoginText);
 
         registerButton.setOnClickListener(v -> {
             showLoading();
@@ -48,6 +51,9 @@ public class RegisterActivity extends AuthActivity {
 
             registerUser(email, password);
 
+        });
+        goToLoginText.setOnClickListener(v -> {
+            startActivity(new Intent(this, LoginActivity.class));
         });
     }
     private void registerUser(String email, String password) {
