@@ -46,6 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Caitlyn"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textSize="14sp" />
 
@@ -102,6 +103,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="A"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textSize="16sp" />
 
@@ -158,6 +160,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Caitlyn"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textSize="14sp" />
 

@@ -23,13 +23,13 @@ public interface UserService {
     Call<User> getUserProfileById(@Path("uid") String uid);
 
     // Lấy danh sách phê duyệt user
-    @GET("user/pending-users?limit=20")
+    @GET("user/pending-users?limit=0")
     Call<UserListResponse> getPendingUsers();
     // Lấy danh sách vo hieu hoa
-    @GET("user/disabled-users?limit=20")
+    @GET("user/disabled-users?limit=0")
     Call<UserListResponse> getDisableUsers();
     // Lấy danh sách toàn bộ user
-    @GET("user/approved-users?limit=20")
+    @GET("user/approved-users?limit=0")
     Call<UserListResponse> getAllUsers();
     // Phê duyệt user
     @POST("user/{uid}/approve")
