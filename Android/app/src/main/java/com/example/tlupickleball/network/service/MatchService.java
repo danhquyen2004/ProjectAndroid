@@ -3,7 +3,7 @@ package com.example.tlupickleball.network.service;
 import com.example.tlupickleball.model.Matches;
 import com.example.tlupickleball.network.api_model.match.MatchResponse;
 import com.example.tlupickleball.network.api_model.match.CreateMatchRequest;
-import com.example.tlupickleball.network.api_model.match.CreateMatchResponse; // Thêm import này
+import com.example.tlupickleball.network.api_model.match.CreateMatchResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -31,10 +31,13 @@ public interface MatchService {
             @Query("pageSize") int pageSize
     );
 
+    // Endpoint để tạo trận đấu
     @POST("matches")
     Call<CreateMatchResponse> createMatch(@Body CreateMatchRequest request);
+
     @PUT("matches/{matchId}/scores")
     Call<Void> updateMatchScores(@Path("matchId") String matchId, Matches match);
+
     @DELETE("matches/{matchId}")
     Call<Void> deleteMatch(@Path("matchId") String matchId);
 }
