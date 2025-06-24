@@ -39,18 +39,19 @@ public class MemberFundAdapter extends RecyclerView.Adapter<MemberFundAdapter.Vi
         notifyDataSetChanged();
     }
 
-    private User getUserById(String userId) {
-        for (User user : userList) {
-            if (user.getUid().equals(userId)) return user;
-        }
-        return null;
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_member_fund, parent, false);
         return new ViewHolder(view);
+    }
+
+    private User getUserById(String userId) {
+        for (User user : userList) {
+            if (user.getUid().equals(userId)) return user;
+        }
+
+        return null;
     }
 
     @Override
@@ -64,6 +65,7 @@ public class MemberFundAdapter extends RecyclerView.Adapter<MemberFundAdapter.Vi
                     .placeholder(R.drawable.avatar_1)
                     .into(holder.ivAvatar);
         } else {
+
             holder.tvName.setText(item.getUserId());
             holder.ivAvatar.setImageResource(R.drawable.avatar_1);
         }
