@@ -8,6 +8,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,23 +18,37 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.base.BaseActivity;
 import com.example.tlupickleball.adapters.MemberFundAdapter;
+import com.example.tlupickleball.model.FundStatusAll;
 import com.example.tlupickleball.model.MemberFund;
+import com.example.tlupickleball.model.User;
+import com.example.tlupickleball.network.api_model.finance.FinanceUserFundStatus;
+import com.example.tlupickleball.network.api_model.user.UserListResponse;
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.service.FinanceService;
+import com.example.tlupickleball.network.service.UserService;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class member_fund_manager extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class member_fund_manager extends BaseActivity {
     private ImageButton btnBack;
     private ConstraintLayout CtLMemberFund;
     private RecyclerView rvMemberFund;
     private Spinner spinnerMonth;
     private MemberFundAdapter adapter;
-    private List<MemberFund> memberList = new ArrayList<>();
+    private List<FundStatusAll> fundStatusList = new ArrayList<>();
+    private List<User> userList = new ArrayList<>();
     private List<String> monthList = new ArrayList<>();
     private int selectedMonthNumber;
     private final int year = Calendar.getInstance().get(Calendar.YEAR);
+    private FinanceService financeService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +57,10 @@ public class member_fund_manager extends AppCompatActivity {
         setContentView(R.layout.activity_member_fund_manager);
 
         initViews();
-        setupClickListeners();
         setupMonthSpinner();
         setupRecyclerView();
+        setupClickListeners();
+        fetchUserListAndUpdate(); // Lấy danh sách người dùng từ server
     }
 
     private void initViews() {
@@ -55,7 +72,11 @@ public class member_fund_manager extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
-
+        adapter.setOnUserClickListener(user -> {
+            Intent intent = new Intent(member_fund_manager.this, member_fundpersonal.class);
+            intent.putExtra("USER_ID", user.getUid());
+            startActivity(intent);
+        });
     }
 
     private void setupMonthSpinner() {
@@ -93,26 +114,62 @@ public class member_fund_manager extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new MemberFundAdapter(this, new ArrayList<>());
+        adapter = new MemberFundAdapter(this, new ArrayList<>(), userList);
         rvMemberFund.setLayoutManager(new LinearLayoutManager(this));
         rvMemberFund.setAdapter(adapter);
 
-        updateDataForMonth(Calendar.getInstance().get(Calendar.MONTH) + 1); // Load mặc định
+        updateDataForMonth(Calendar.getInstance().get(Calendar.MONTH) + 1);
     }
 
     private void updateDataForMonth(int month) {
-        memberList = generateSampleData(month);
-        adapter.setData(memberList);
+        financeService = ApiClient.getClient(this).create(FinanceService.class);
+        Call<FinanceUserFundStatus> call = financeService.financeStatusAll(month, year);
+        call.enqueue(new Callback<FinanceUserFundStatus>() {
+            @Override
+            public void onResponse(Call<FinanceUserFundStatus> call, Response<FinanceUserFundStatus> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    fundStatusList = response.body().getResults();
+                    adapter.setData(fundStatusList);
+                    hideLoading();
+                }
+            }
+            @Override
+            public void onFailure(Call<FinanceUserFundStatus> call, Throwable t) {
+                Toast.makeText(member_fund_manager.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                hideLoading();
+            }
+        });
     }
 
-    private List<MemberFund> generateSampleData(int month) {
-        List<MemberFund> list = new ArrayList<>();
-        list.add(new MemberFund("Nguyễn Văn A", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Nguyễn Giang Đông", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Nguyễn Danh Quyền", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Chu Mạnh Hữu", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Phạm Đỗ Anh", 100_000, 50_000, 100_000));
-        list.add(new MemberFund("Trần Thị B", 0, 0, 100_000)); // Chưa đóng
-        return list;
+    // Thêm hàm lấy userList từ server
+    private void fetchUserListAndUpdate() {
+        showLoading();
+        // Giả sử có UserService và ApiClient đã setup
+        UserService userService = ApiClient.getClient(this).create(UserService.class);
+        Call<UserListResponse> call = userService.getAllUsers();
+        call.enqueue(new Callback<UserListResponse>() {
+            @Override
+            public void onResponse(Call<UserListResponse> call, Response<UserListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    userList.clear();
+                    List<User> allUsers = response.body().getUsers();
+                    if (allUsers != null) {
+                        for (User user : allUsers) {
+                            if (user.getFullName() != null && !user.getFullName().trim().isEmpty()) {
+                                userList.add(user);
+                            }
+                        }
+                    }
+                    // Sau khi có userList, cập nhật lại dữ liệu quỹ
+                    updateDataForMonth(selectedMonthNumber);
+                }
+            }
+            @Override
+            public void onFailure(Call<UserListResponse> call, Throwable t) {
+                Toast.makeText(member_fund_manager.this, "Lỗi tải user: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
+
 }

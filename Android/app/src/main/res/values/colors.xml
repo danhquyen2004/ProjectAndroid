@@ -10,4 +10,9 @@
     <color name="transparent">#00000000</color>
     <color name="gray">#40625E5E</color>
     <color name="green_Huuwx">#00FF00</color>
+
+    // Màu sắc cho phần finance
+    <color name="red_Dong">#CF0000</color>
+    <color name="green_Dong">#126C35</color>
+    <color name="yellow_Dong">#FFB120</color>
 </resources>

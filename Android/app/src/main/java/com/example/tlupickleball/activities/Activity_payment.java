@@ -21,7 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.adapters.Transaction_PersonalAdapter;
-import com.example.tlupickleball.model.Transaction_Personal;
+import com.example.tlupickleball.model.logs;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,12 +38,9 @@ public class Activity_payment extends AppCompatActivity {
     private final List<String> monthList = new ArrayList<>();
     private final int year = Calendar.getInstance().get(Calendar.YEAR);
 
-    private List<Transaction_Personal> transactionPersonalList = new ArrayList<>();
+    private List<logs> logList = new ArrayList<>();
     private Transaction_PersonalAdapter transactionPersonalAdapter;
     ImageView imageQr;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +51,9 @@ public class Activity_payment extends AppCompatActivity {
         initViews();
         setupClickListeners();
         setupMonthSpinner();
+
     }
 
-    // Khởi tạo các View trong layout
     private void initViews() {
         btnBack = findViewById(R.id.id_back);
         spinnerMonth = findViewById(R.id.spinnerMonth);
@@ -67,7 +64,6 @@ public class Activity_payment extends AppCompatActivity {
         btnDonate = findViewById(R.id.btnDonate);
     }
 
-    // Thiết lập các sự kiện click
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
 
@@ -96,12 +92,10 @@ public class Activity_payment extends AppCompatActivity {
         });
     }
 
-    // Hiển thị Toast tiện dụng
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    // Tạo danh sách các tháng trong năm hiện tại
     private void populateMonthList() {
         monthList.clear();
         for (int i = 1; i <= 12; i++) {
@@ -109,7 +103,6 @@ public class Activity_payment extends AppCompatActivity {
         }
     }
 
-    // Cài đặt Spinner để chọn tháng
     private void setupMonthSpinner() {
         populateMonthList();
 
@@ -121,8 +114,7 @@ public class Activity_payment extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonth.setAdapter(adapter);
 
-        // Thiết lập tháng hiện tại
-        int currentMonth = Calendar.getInstance().get(Calendar.MONTH); // 0-11
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
         spinnerMonth.setSelection(currentMonth);
 
         spinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -138,7 +130,6 @@ public class Activity_payment extends AppCompatActivity {
         });
     }
 
-    // Tách số tháng từ chuỗi dạng "Tháng x/yyyy"
     private int parseMonthFromString(String monthText) {
         try {
             return Integer.parseInt(monthText.split(" ")[1].split("/")[0]);
@@ -147,17 +138,16 @@ public class Activity_payment extends AppCompatActivity {
         }
     }
 
-    // Lọc danh sách giao dịch theo tháng
     private void filterTransactionsByMonth(int month) {
-        List<Transaction_Personal> filteredList = new ArrayList<>();
+        List<logs> filteredList = new ArrayList<>();
 
-        for (Transaction_Personal transactionPersonal : transactionPersonalList) {
+        for (logs log : logList) {
             // Giả sử định dạng ngày là "dd/MM/yyyy"
-            String[] parts = transactionPersonal.getTime().split("/");
+            String[] parts = log.getCreatedAt().split("/");
             if (parts.length >= 2) {
                 int transactionMonth = Integer.parseInt(parts[1]);
                 if (transactionMonth == month) {
-                    filteredList.add(transactionPersonal);
+                    filteredList.add(log);
                 }
             }
         }
@@ -167,14 +157,13 @@ public class Activity_payment extends AppCompatActivity {
         }
     }
 
-    // tạo qr code
     private void showQrPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.qr_finance, null);
 
         imageQr = dialogView.findViewById(R.id.image_qr);
-        imageQr.setImageResource(R.drawable.qr_code); // đặt QR mẫu ở drawable
+        imageQr.setImageResource(R.drawable.qr_code);
 
         tvContentQr = dialogView.findViewById(R.id.txtContent_Donate);
         tvContentQr.setText("CHÚ Ý:\nNội dung chuyển khoản: Họ Tên + Đã đóng");
@@ -183,7 +172,6 @@ public class Activity_payment extends AppCompatActivity {
         builder.setView(dialogView);
         AlertDialog dialog = builder.create();
 
-        // Làm trong suốt background nếu cần
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
