@@ -1,5 +1,6 @@
 package com.example.tlupickleball.activities;
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -11,22 +12,30 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.base.BaseMember;
 import com.example.tlupickleball.adapters.DisableMemberListAdapter;
-import com.example.tlupickleball.adapters.MemberListAdapter;
 import com.example.tlupickleball.model.Player;
+import com.example.tlupickleball.model.User;
+import com.example.tlupickleball.network.api_model.user.UserListResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DisableMemberList extends AppCompatActivity {
+import retrofit2.Call;
+
+public class DisableMemberList extends BaseMember {
     private RecyclerView recyclerView;
     private DisableMemberListAdapter adapter;
-    private List<Player> lstPlayer;
+    private List<User> lstUser;
     ImageButton btnBack;
     private static final float ACTION_BUTTON_WIDTH = 200;
     private final float buttonTotalWidth = ACTION_BUTTON_WIDTH * 2;
+    private static final int REQUEST_CODE_MEMBER_DETAIL = 1001;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private boolean isSwipeEnabled = false; // Biến để kiểm soát việc vuốt
 
@@ -35,12 +44,16 @@ public class DisableMemberList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_disable_member_list);
+        lstUser = new ArrayList<>();
 
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> onBackPressed());
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
-        initData();
+        fetchMembers();
         setupRecyclerView();
+
+        swipeRefreshLayout.setOnRefreshListener(this::fetchMembers);
 
 //        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,
 //                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -173,37 +186,58 @@ public class DisableMemberList extends AppCompatActivity {
 //        });
     }
 
-    private void drawText(Canvas canvas, String text, RectF button, int color) {
-        Paint textPaint = new Paint();
-        textPaint.setColor(color);
-        textPaint.setTextSize(40);
-        textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setAntiAlias(true);
-
-        float textX = button.centerX();
-        float textY = button.centerY() - ((textPaint.descent() + textPaint.ascent()) / 2);
-        canvas.drawText(text, textX, textY, textPaint);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_MEMBER_DETAIL && resultCode == RESULT_OK) {
+            fetchMembers(); // Chỉ load lại khi có RESULT_OK
+        }
     }
 
-    private void initData() {
-        lstPlayer = new ArrayList<>();
-        lstPlayer.add(new Player("Kayn", "hihihaha@gmail.com", R.drawable.avatar_1));
-        lstPlayer.add(new Player("Katalina", "hihehh@gmail.com", R.drawable.avatar_1));
-        lstPlayer.add(new Player("Jinx", "hiha@gmail.com", R.drawable.avatar_1));
-        lstPlayer.add(new Player("Vi", "hihaha@gmail.com", R.drawable.avatar_1));
-        lstPlayer.add(new Player("Zed", "hihoha@gmail.com", R.drawable.avatar_1));
+    private void fetchMembers() {
+        if (!swipeRefreshLayout.isRefreshing()) {
+            showLoading();
+        }
+        userService.getDisableUsers().enqueue(new retrofit2.Callback<UserListResponse>() {
+            @Override
+            public void onResponse(Call<UserListResponse> call, retrofit2.Response<UserListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<User> users = response.body().getUsers();
+                    lstUser.clear();
+                    lstUser.addAll(users);
+                    adapter.notifyDataSetChanged();
+                    hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
+                } else {
+                    Toast.makeText(DisableMemberList.this, "Failed to load members", Toast.LENGTH_SHORT).show();
+                    hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
+            @Override
+            public void onFailure(Call<UserListResponse> call, Throwable t) {
+                Toast.makeText(DisableMemberList.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                hideLoading();
+                swipeRefreshLayout.setRefreshing(false);
+                fetchMembers();
+            }
+        });
     }
 
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.playerList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new DisableMemberListAdapter(this, lstPlayer);
+        adapter = new DisableMemberListAdapter(this, lstUser, user -> {
+            Intent intent = new Intent(this, DisableMemberInfor.class);
+            intent.putExtra("uid", user.getUid());
+            startActivityForResult(intent, REQUEST_CODE_MEMBER_DETAIL);
+        });
         recyclerView.setAdapter(adapter);
     }
 
     private void tuChoiThanhVien(int position) {
-        if (position >= 0 && position < lstPlayer.size()) {
-            lstPlayer.remove(position);
+        if (position >= 0 && position < lstUser.size()) {
+            lstUser.remove(position);
             adapter.notifyItemRemoved(position);
             Toast.makeText(this, "Từ chối thành viên: " + position, Toast.LENGTH_SHORT).show();
         }
@@ -214,7 +248,7 @@ public class DisableMemberList extends AppCompatActivity {
         Toast.makeText(this, "Phê duyệt thành viên: " + position, Toast.LENGTH_SHORT).show();
 
         // Ví dụ: Cập nhật trạng thái
-        lstPlayer.remove(position);
+        lstUser.remove(position);
         adapter.notifyItemRemoved(position);
     }
 

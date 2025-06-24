@@ -65,7 +65,7 @@ public class LoginActivity extends AuthActivity {
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
                     LoginResponse body = response.body();
-                    SessionManager.saveTokens(LoginActivity.this, body.getIdToken(), body.getRefreshToken(), body.getUid());
+                    SessionManager.saveTokens(LoginActivity.this, body.getIdToken(), body.getRefreshToken(), body.getUid(), body.getRole());
                     saveLoginInfo(email, password, rememberMeCheckbox.isChecked());
                     if(body.isDisabled())
                     {

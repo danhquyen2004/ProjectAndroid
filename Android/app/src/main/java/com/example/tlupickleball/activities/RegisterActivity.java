@@ -65,7 +65,7 @@ public class RegisterActivity extends AuthActivity {
                 if(response.isSuccessful())
                 {
                     hideLoading();
-                    SessionManager.saveTokens(RegisterActivity.this, response.body().getIdToken(), response.body().getRefreshToken(), response.body().getUid());
+                    SessionManager.saveTokens(RegisterActivity.this, response.body().getIdToken(), response.body().getRefreshToken(), response.body().getUid(), response.body().getRole());
                     Intent intent = new Intent(RegisterActivity.this, EmailVerificationActivity.class);
                     intent.putExtra("uid", response.body().getUid());
                     RegisterActivity.this.startActivity(intent);

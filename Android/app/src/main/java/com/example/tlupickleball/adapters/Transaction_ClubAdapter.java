@@ -1,5 +1,6 @@
 package com.example.tlupickleball.adapters;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,15 +12,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.model.Transaction_Club;
+import com.example.tlupickleball.model.logClub;
+import com.example.tlupickleball.model.logs;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Transaction_ClubAdapter extends RecyclerView.Adapter<Transaction_ClubAdapter.HistoryViewHolder> {
 
-    private List<Transaction_Club> transactionClub;
+    private final Context context;
+    private List<logClub> logClubList = new ArrayList<>();
 
-    public Transaction_ClubAdapter(List<Transaction_Club> transactionList) {
-        this.transactionClub = transactionList;
+    public Transaction_ClubAdapter(Context context, List<logClub> logClubList) {
+        this.context = context;
+        if (logClubList != null) this.logClubList = logClubList;
     }
 
     @NonNull
@@ -31,28 +41,40 @@ public class Transaction_ClubAdapter extends RecyclerView.Adapter<Transaction_Cl
 
     @Override
     public void onBindViewHolder(@NonNull HistoryViewHolder holder, int position) {
-        Transaction_Club item = transactionClub.get(position);
-        holder.tvTitle.setText(item.getTitle());
-        holder.tvDescription.setText(item.getDescription());
-        holder.tvDate.setText(item.getDate());
-        holder.tvAmount.setText(item.getAmount());
+        logClub log = logClubList.get(position);
 
-        // Đổi màu cho khoản thu/chi
-        if (item.getAmount().startsWith("-")) {
-            holder.tvAmount.setTextColor(Color.parseColor("#FF0000")); //đỏ
-        } else {
-            holder.tvAmount.setTextColor(Color.parseColor("#009900")); //xanh
-        }
+        holder.tvTitle.setText(log.getReason());
+        holder.tvDescription.setText(log.getReason());
+        holder.tvDate.setText(formatDate(log.getCreatedAt()));
+        holder.tvAmount.setText("-" + formatCurrency(log.getAmount()));
+
+        // Always red for expense (if you have income, add logic here)
+        holder.tvAmount.setTextColor(Color.parseColor("#FF0000"));
     }
 
     @Override
     public int getItemCount() {
-        return transactionClub.size();
+        return logClubList != null ? logClubList.size() : 0;
     }
 
-    public void setData(List<Transaction_Club> newList) {
-        this.transactionClub = newList;
+    public void setData(List<logClub> newList) {
+        this.logClubList = newList != null ? newList : new ArrayList<>();
         notifyDataSetChanged();
+    }
+
+    private String formatDate(String isoDate) {
+        try {
+            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+            SimpleDateFormat outFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            return outFormat.format(isoFormat.parse(isoDate));
+        } catch (ParseException e) {
+            return "";
+        }
+    }
+
+    private String formatCurrency(long amount) {
+        NumberFormat nf = NumberFormat.getInstance(new Locale("vi", "VN"));
+        return nf.format(amount) + "đ";
     }
 
     public static class HistoryViewHolder extends RecyclerView.ViewHolder {

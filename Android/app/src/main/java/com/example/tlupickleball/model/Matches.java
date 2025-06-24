@@ -1,24 +1,38 @@
+// File: com.example.tlupickleball.model.Matches.java
 package com.example.tlupickleball.model;
+
 public class Matches {
+
+    private String matchId;
     private String player1Name;
     private String player2Name;
-    private int player1Avatar; // ID tài nguyên cho ảnh đại diện
-    private int player2Avatar; // ID tài nguyên cho ảnh đại diện
+    private String player1AvatarUrl1;
+    private String player1AvatarUrl2;
+    private String player2AvatarUrl1;
+    private String player2AvatarUrl2;
     private String score;
     private String matchTime;
     private String matchStatus;
+    private boolean isDoublesMatch;
 
-    public Matches(String player1Name, String player2Name, int player1Avatar, int player2Avatar, String score, String matchTime, String matchStatus) {
+    public Matches(String matchId, String player1Name, String player2Name, String player1AvatarUrl1, String player1AvatarUrl2, String player2AvatarUrl1, String player2AvatarUrl2, String score, String matchTime, String matchStatus, boolean isDoublesMatch) {
+        this.matchId = matchId;
         this.player1Name = player1Name;
         this.player2Name = player2Name;
-        this.player1Avatar = player1Avatar;
-        this.player2Avatar = player2Avatar;
+        this.player1AvatarUrl1 = player1AvatarUrl1;
+        this.player1AvatarUrl2 = player1AvatarUrl2;
+        this.player2AvatarUrl1 = player2AvatarUrl1;
+        this.player2AvatarUrl2 = player2AvatarUrl2;
         this.score = score;
         this.matchTime = matchTime;
         this.matchStatus = matchStatus;
+        this.isDoublesMatch = isDoublesMatch;
     }
 
-    // Getters
+    public String getMatchId() {
+        return matchId;
+    }
+
     public String getPlayer1Name() {
         return player1Name;
     }
@@ -27,12 +41,20 @@ public class Matches {
         return player2Name;
     }
 
-    public int getPlayer1Avatar() {
-        return player1Avatar;
+    public String getPlayer1AvatarUrl1() {
+        return player1AvatarUrl1;
     }
 
-    public int getPlayer2Avatar() {
-        return player2Avatar;
+    public String getPlayer1AvatarUrl2() {
+        return player1AvatarUrl2;
+    }
+
+    public String getPlayer2AvatarUrl1() {
+        return player2AvatarUrl1;
+    }
+
+    public String getPlayer2AvatarUrl2() {
+        return player2AvatarUrl2;
     }
 
     public String getScore() {
@@ -47,32 +69,7 @@ public class Matches {
         return matchStatus;
     }
 
-    // Setters (nếu cần, nếu không thì có thể bỏ qua cho lớp dữ liệu bất biến)
-    public void setPlayer1Name(String player1Name) {
-        this.player1Name = player1Name;
-    }
-
-    public void setPlayer2Name(String player2Name) {
-        this.player2Name = player2Name;
-    }
-
-    public void setPlayer1Avatar(int player1Avatar) {
-        this.player1Avatar = player1Avatar;
-    }
-
-    public void setPlayer2Avatar(int player2Avatar) {
-        this.player2Avatar = player2Avatar;
-    }
-
-    public void setScore(String score) {
-        this.score = score;
-    }
-
-    public void setMatchTime(String matchTime) {
-        this.matchTime = matchTime;
-    }
-
-    public void setMatchStatus(String matchStatus) {
-        this.matchStatus = matchStatus;
+    public boolean isDoublesMatch() {
+        return isDoublesMatch;
     }
 }
