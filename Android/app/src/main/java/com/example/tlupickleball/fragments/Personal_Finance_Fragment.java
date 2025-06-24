@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,7 +47,7 @@ public class Personal_Finance_Fragment extends Fragment {
 
     private com.google.android.material.imageview.ShapeableImageView avatar;
     private TextView tvName, tvFund, tvDonate, txTotalPenalty, txTotalPenaltyUnpaid, txTotalPenaltyPaid;
-    private View rootView;
+    private View rootView, contentContainer;
     private LinearLayout btnClick;
     private Spinner spinnerMonth;
     List<String> monthList = new ArrayList<>();
@@ -56,6 +58,8 @@ public class Personal_Finance_Fragment extends Fragment {
     private List<logs> filteredList = new ArrayList<>();
     private RecyclerView rvTransactions_Personal;
     private Transaction_PersonalAdapter transactionPersonalAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,12 +67,19 @@ public class Personal_Finance_Fragment extends Fragment {
         // Inflate the layout for this fragment
         rootView =  inflater.inflate(R.layout.fragment_personal_finance, container, false);
         financeService = ApiClient.getClient(requireContext()).create(FinanceService.class);
+
+        contentContainer = rootView.findViewById(R.id.contentContainerHome);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        progressBar = rootView.findViewById(R.id.progressBarHome);
+
         initViews();
         setupListeners();
         setupMonthSpinner();
         setupRecyclerView();
         loadUserInfo(SessionManager.getUid(requireContext()));
         loadFinanceStatus(SessionManager.getUid(requireContext()), Calendar.getInstance().get(Calendar.MONTH) + 1, year);
+
+        swipeRefreshLayout.setOnRefreshListener(this::loadInfomation);
         return rootView;
     }
 
@@ -155,6 +166,10 @@ public class Personal_Finance_Fragment extends Fragment {
     }
 
     private void loadUserInfo(String userId) {
+        if (!swipeRefreshLayout.isRefreshing()) {
+            if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+            if (contentContainer != null) contentContainer.setVisibility(View.INVISIBLE); // Dùng INVISIBLE để layout không bị giật
+        }
         userService = ApiClient.getClient(requireContext()).create(UserService.class);
         userService.getUserProfileById(userId).enqueue(new Callback<User>() {
             @Override
@@ -166,6 +181,7 @@ public class Personal_Finance_Fragment extends Fragment {
                             .load(user.getAvatarUrl())
                             .placeholder(R.drawable.avatar_1)
                             .into(avatar);
+                    loadFinanceStatus(SessionManager.getUid(requireContext()), Calendar.getInstance().get(Calendar.MONTH) + 1, year);
                 } else {
                     Toast.makeText(requireContext(), "Không thể tải thông tin người dùng", Toast.LENGTH_SHORT).show();
                 }
@@ -242,8 +258,14 @@ public class Personal_Finance_Fragment extends Fragment {
                     txTotalPenaltyPaid.setText("Đã đóng: " + formatCurrency(paid));
 
                     Toast.makeText(requireContext(), "Tải dữ liệu thành công", Toast.LENGTH_SHORT).show();
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
                 } else {
                     Toast.makeText(requireContext(), "Không thể tải dữ liệu tài chính", Toast.LENGTH_SHORT).show();
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
 
@@ -270,6 +292,10 @@ public class Personal_Finance_Fragment extends Fragment {
         });
     }
 
+    private void loadInfomation(){
+        loadUserInfo(SessionManager.getUid(requireContext()));
+        loadFinanceStatus(SessionManager.getUid(requireContext()), Calendar.getInstance().get(Calendar.MONTH) + 1, year);;
+    }
     private String formatCurrency(long amount) {
         return String.format("%,d", amount).replace(',', '.') + "đ";
     }

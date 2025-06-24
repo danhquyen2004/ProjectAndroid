@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,7 +48,7 @@ import retrofit2.Response;
 
 public class Club_Finance_Fragment extends Fragment {
 
-    private View rootView;
+    private View rootView, contentContainer;
     // Biến giao diện
     private Button btnAddExpense;
     private TextView txtFund, txtRevenue, txtExpenses;
@@ -57,21 +59,29 @@ public class Club_Finance_Fragment extends Fragment {
     int year = Calendar.getInstance().get(Calendar.YEAR);
     private FinanceService financeService;
     private List<logClub> logClubList = new ArrayList<>();
-    private List<logClub> filteredClubList = new ArrayList<>();
     private RecyclerView rvTransactions;
     private Transaction_ClubAdapter transactionClubAdapter;
-    private int totalRevenue, totalExpense;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressBar progressBar;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.fragment_club_finance, container, false);
+        contentContainer = rootView.findViewById(R.id.contentContainerHome);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        progressBar = rootView.findViewById(R.id.progressBarHome);
+
         initViews();
         fetchClubFundBalance(); // Lấy số dư quỹ câu lạc bộ từ API
         setupListeners();
         setupMonthSpinner();
         setupRecyclerView();
+        fetchClubFundBalance();
+
+        swipeRefreshLayout.setOnRefreshListener(this::loadData);
         return rootView;
     }
 
@@ -246,7 +256,19 @@ public class Club_Finance_Fragment extends Fragment {
         return String.format("%,d", amount).replace(',', '.') + "đ";
     }
 
+    private void loadData() {
+        // Lấy dữ liệu từ API và cập nhật giao diện
+        fetchClubFundBalance();
+        fetchClubSummary(Calendar.getInstance().get(Calendar.MONTH) + 1, year);
+        fetchClubHistory(Calendar.getInstance().get(Calendar.MONTH) + 1, year);
+    }
+
     private void fetchClubFundBalance() {
+        // Chỉ hiển thị lớp phủ tải khi không phải là hành động "kéo để làm mới"
+        if (!swipeRefreshLayout.isRefreshing()) {
+            if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+            if (contentContainer != null) contentContainer.setVisibility(View.INVISIBLE); // Dùng INVISIBLE để layout không bị giật
+        }
         financeService = ApiClient.getClient(requireContext()).create(FinanceService.class);
         Call<ClubFundBalanceResponse> call = financeService.financeTotal();
         call.enqueue(new Callback<ClubFundBalanceResponse>() {
@@ -255,6 +277,8 @@ public class Club_Finance_Fragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     long fund = response.body().getClubFundBalance();
                     txtFund.setText(formatCurrency(fund));
+                    fetchClubSummary(Calendar.getInstance().get(Calendar.MONTH) + 1, year);
+                    fetchClubHistory(Calendar.getInstance().get(Calendar.MONTH) + 1, year);
                 }
             }
 
@@ -294,8 +318,10 @@ public class Club_Finance_Fragment extends Fragment {
             public void onResponse(Call<FinanceClubListResponse> call, Response<FinanceClubListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     logClubList = response.body().getLogClub();
-
                     transactionClubAdapter.setData(logClubList);
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
 

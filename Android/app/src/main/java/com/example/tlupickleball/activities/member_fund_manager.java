@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.base.BaseActivity;
 import com.example.tlupickleball.adapters.MemberFundAdapter;
 import com.example.tlupickleball.model.FundStatusAll;
 import com.example.tlupickleball.model.MemberFund;
@@ -36,7 +37,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class member_fund_manager extends AppCompatActivity {
+public class member_fund_manager extends BaseActivity {
     private ImageButton btnBack;
     private ConstraintLayout CtLMemberFund;
     private RecyclerView rvMemberFund;
@@ -129,17 +130,20 @@ public class member_fund_manager extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     fundStatusList = response.body().getResults();
                     adapter.setData(fundStatusList);
+                    hideLoading();
                 }
             }
             @Override
             public void onFailure(Call<FinanceUserFundStatus> call, Throwable t) {
                 Toast.makeText(member_fund_manager.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                hideLoading();
             }
         });
     }
 
     // Thêm hàm lấy userList từ server
     private void fetchUserListAndUpdate() {
+        showLoading();
         // Giả sử có UserService và ApiClient đã setup
         UserService userService = ApiClient.getClient(this).create(UserService.class);
         Call<UserListResponse> call = userService.getAllUsers();
@@ -165,6 +169,7 @@ public class member_fund_manager extends AppCompatActivity {
                 Toast.makeText(member_fund_manager.this, "Lỗi tải user: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
 }

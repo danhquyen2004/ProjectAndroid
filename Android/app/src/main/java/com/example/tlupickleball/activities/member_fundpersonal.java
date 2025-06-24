@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.tlupickleball.R;
+import com.example.tlupickleball.activities.base.BaseActivity;
 import com.example.tlupickleball.adapters.Transaction_PersonalAdapter;
 import com.example.tlupickleball.model.MemberFund1;
 import com.example.tlupickleball.model.User;
@@ -36,7 +37,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class member_fundpersonal extends AppCompatActivity {
+public class member_fundpersonal extends BaseActivity {
 
     private String userId; // Thêm biến này
     private TextView tvUserNamePersonal, tvUserFundPersonal, tvUserDonatePersonal, tvUserPenaltyTotalPersonal, tvUserPenaltyPaidPersonal, tvUserPenaltyMissingPersonal;
@@ -160,6 +161,7 @@ public class member_fundpersonal extends AppCompatActivity {
     // Hàm lấy log giao dịch của user từ server
     // Hàm mới để lấy thông tin chi tiết của User (tên, ảnh)
     private void fetchUserDetails(String userId) {
+        showLoading();
         UserService userService = ApiClient.getClient(this).create(UserService.class);
         Call<User> call = userService.getUserProfileById(userId); // Giả sử có API getUserById
         call.enqueue(new Callback<User>() {
@@ -177,6 +179,9 @@ public class member_fundpersonal extends AppCompatActivity {
                     } else {
                         ivUserAvatarPersonal.setImageResource(R.drawable.avatar_1); // Nếu không có avatar
                     }
+                    fetchUserLogs();
+                    fetchUserLogsForMonth(Calendar.getInstance().get(Calendar.MONTH) + 1, Calendar.getInstance().get(Calendar.YEAR));
+                    fetchUserFundStatus(userId, Calendar.getInstance().get(Calendar.MONTH) + 1, Calendar.getInstance().get(Calendar.YEAR));
                 } else {
                     Toast.makeText(member_fundpersonal.this, "Không thể tải thông tin người dùng", Toast.LENGTH_SHORT).show();
                 }
@@ -256,8 +261,10 @@ public class member_fundpersonal extends AppCompatActivity {
                     tvUserPenaltyPaidPersonal.setText("Đã đóng: " + formatCurrency(paid));
 
                     Toast.makeText(member_fundpersonal.this, "Tải dữ liệu thành công", Toast.LENGTH_SHORT).show();
+                    hideLoading();
                 } else {
                     Toast.makeText(member_fundpersonal.this, "Không thể tải dữ liệu tài chính", Toast.LENGTH_SHORT).show();
+                    hideLoading();
                 }
             }
 
