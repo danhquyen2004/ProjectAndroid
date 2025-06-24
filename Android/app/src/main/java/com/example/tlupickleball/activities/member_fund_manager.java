@@ -129,7 +129,13 @@ public class member_fund_manager extends BaseActivity {
             public void onResponse(Call<FinanceUserFundStatus> call, Response<FinanceUserFundStatus> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     fundStatusList = response.body().getResults();
-                    adapter.setData(fundStatusList);
+                    List<FundStatusAll> filteredList = new ArrayList<>();
+                    for (FundStatusAll item : fundStatusList) {
+                        if (getUserById(item.getUserId()) != null) {
+                            filteredList.add(item);
+                        }
+                    }
+                    adapter.setData(filteredList);
                     hideLoading();
                 }
             }
@@ -139,6 +145,15 @@ public class member_fund_manager extends BaseActivity {
                 hideLoading();
             }
         });
+    }
+
+    private User getUserById(String userId) {
+        for (User user : userList) {
+            if (user.getUid().equals(userId)) {
+                return user;
+            }
+        }
+        return null;
     }
 
     // Thêm hàm lấy userList từ server
