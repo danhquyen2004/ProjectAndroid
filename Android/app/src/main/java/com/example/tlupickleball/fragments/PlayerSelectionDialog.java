@@ -41,6 +41,7 @@ public class PlayerSelectionDialog extends DialogFragment implements PlayerSelec
     private List<User> allUsers = new ArrayList<>(); // To store all users fetched from API
     private OnPlayerSelectedInDialogListener listener;
     private int playerSlot;
+    private ArrayList<String> excludedPlayerIds;
 
     // Interface để gửi kết quả về Fragment cha
     public interface OnPlayerSelectedInDialogListener {
@@ -54,9 +55,12 @@ public class PlayerSelectionDialog extends DialogFragment implements PlayerSelec
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Lấy playerSlot từ arguments
         if (getArguments() != null) {
             playerSlot = getArguments().getInt("playerSlot", -1);
+            excludedPlayerIds = getArguments().getStringArrayList("excludedPlayerIds");
+        }
+        if (excludedPlayerIds == null) {
+            excludedPlayerIds = new ArrayList<>();
         }
     }
 
@@ -101,21 +105,32 @@ public class PlayerSelectionDialog extends DialogFragment implements PlayerSelec
     }
 
     private void fetchPlayers() {
-        // Đảm bảo getContext() không null trước khi gọi
         if (getContext() == null) {
             Log.e("PlayerSelectionDialog", "Context is null, cannot fetch players.");
             return;
         }
 
-        // Đã sửa lỗi: Sử dụng getClient(getContext()) thay vì getRetrofitInstance()
         UserService userService = ApiClient.getClient(getContext()).create(UserService.class);
         userService.getAllUsers().enqueue(new Callback<UserListResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserListResponse> call, @NonNull Response<UserListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+
+
+                    List<User> availablePlayers = new ArrayList<>();
+                    for (User user : response.body().getUsers()) {
+                        if (!excludedPlayerIds.contains(user.getUid())) {
+                            availablePlayers.add(user);
+                        }
+                    }
+
                     allUsers.clear();
-                    allUsers.addAll(response.body().getUsers());
-                    playerSelectionAdapter.updateList(allUsers); // Cập nhật adapter với danh sách đầy đủ
+                    allUsers.addAll(availablePlayers);
+                    playerSelectionAdapter.updateList(allUsers);
+
+                    if (playerSearchEditText != null) {
+                        playerSelectionAdapter.filter(playerSearchEditText.getText().toString());
+                    }
                 } else {
                     // Xử lý lỗi API, ví dụ: hiển thị Toast hoặc Log
                     String errorBody = "Không có chi tiết lỗi.";

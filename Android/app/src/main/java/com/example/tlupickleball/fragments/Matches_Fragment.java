@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.adapters.DateAdapter;
@@ -42,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -68,6 +71,10 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
     private MatchService matchService;
     private String currentUserId;
 
+    private ProgressBar progressBar;
+    private View contentContainer;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     private static final String KEY_CURRENT_DATE = "current_date_key";
 
     @Override
@@ -78,22 +85,25 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         }
 
         getParentFragmentManager().setFragmentResultListener("requestKey", this, (requestKey, bundle) -> {
-            // Lắng nghe tín hiệu từ AddMatch_Fragment
-            boolean needsRefresh = bundle.getBoolean("needsRefresh");
-            if (needsRefresh) {
-                // Log để kiểm tra
-                Log.d("Matches_Fragment", "Nhận được tín hiệu cần refresh, đang tải lại dữ liệu...");
 
-                // Hiển thị lại nút AddMatch
+            if (bundle.getBoolean("didReturnFromDetail")) {
                 if (btnAddMatch != null) {
                     btnAddMatch.setVisibility(View.VISIBLE);
                 }
+            }
 
-                // Thực hiện lại logic làm mới y hệt như trong onResume
-                if (currentSelectedDateKey != null) {
-                    String compositeKey = currentSelectedDateKey + "_" + currentViewType;
-                    allMatchesData.remove(compositeKey);
-                    loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
+            if (bundle.getBoolean("needsRefresh")) {
+                String modifiedDateKey = bundle.getString("modifiedDateKey");
+                if (modifiedDateKey != null) {
+                    Log.d("Matches_Fragment", "Nhận được yêu cầu refresh cho ngày: " + modifiedDateKey);
+                    String compositeKeyIndividual = modifiedDateKey + "_individual";
+                    String compositeKeyClubWide = modifiedDateKey + "_club_wide";
+                    allMatchesData.remove(compositeKeyIndividual);
+                    allMatchesData.remove(compositeKeyClubWide);
+                    if (modifiedDateKey.equals(currentSelectedDateKey)) {
+                        Log.d("Matches_Fragment", "Ngày bị thay đổi là ngày đang xem, tải lại ngay lập tức.");
+                        loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
+                    }
                 }
             }
         });
@@ -114,6 +124,20 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         item2 = root.findViewById(R.id.item2);
         select = root.findViewById(R.id.select);
         tabContentFrame = root.findViewById(R.id.tab_content_frame);
+        progressBar = root.findViewById(R.id.progressBar);
+        contentContainer = root.findViewById(R.id.contentContainer);
+        swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            Log.d("Matches_Fragment", "Kéo để làm mới...");
+            if (currentSelectedDateKey != null) {
+                String compositeKeyIndividual = currentSelectedDateKey + "_individual";
+                String compositeKeyClubWide = currentSelectedDateKey + "_club_wide";
+                allMatchesData.remove(compositeKeyIndividual);
+                allMatchesData.remove(compositeKeyClubWide);
+            }
+            loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
+        });
 
         textFilter.setText(currentSelectedFilter);
 
@@ -173,18 +197,16 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         outState.putString(KEY_CURRENT_DATE, currentSelectedDateKey);
     }
 
+    // Trong file Matches_Fragment.java
+
     @Override
     public void onResume() {
         super.onResume();
+
         if (btnAddMatch != null) {
             btnAddMatch.setVisibility(View.VISIBLE);
         }
         updateTabSelection(currentViewType);
-        if (currentSelectedDateKey != null) {
-            String compositeKey = currentSelectedDateKey + "_" + currentViewType;
-            allMatchesData.remove(compositeKey);
-            loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
-        }
     }
 
     @Override
@@ -228,9 +250,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
                 if (!currentViewType.equals("individual")) {
                     currentViewType = "individual";
                     updateTabSelection(currentViewType);
-                    if (currentSelectedDateKey != null) {
-                        loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
-                    }
+                    renderMatchesForCurrentState();
                 }
             });
         }
@@ -240,9 +260,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
                 if (!currentViewType.equals("club_wide")) {
                     currentViewType = "club_wide";
                     updateTabSelection(currentViewType);
-                    if (currentSelectedDateKey != null) {
-                        loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
-                    }
+                    renderMatchesForCurrentState();
                 }
             });
         }
@@ -311,9 +329,9 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
             selectedCal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
             currentSelectedDateKey = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(selectedCal.getTime());
         } catch (Exception e) {
-            // Log error if needed
+            Log.e("DateSelection", "Lỗi khi parse ngày tháng", e);
         }
-        loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
+        renderMatchesForCurrentState();
     }
 
     private void showStatusFilterDialog() {
@@ -328,32 +346,76 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
                 .show();
     }
 
-    private void loadMatchesForSelectedDate(String dateKey, String viewType) {
-        if (dateKey == null || viewType == null) return;
-        String compositeKey = dateKey + "_" + viewType;
+    private void renderMatchesForCurrentState() {
+        if (currentSelectedDateKey == null || currentViewType == null) {
+            return;
+        }
+        String compositeKey = currentSelectedDateKey + "_" + currentViewType;
         if (allMatchesData.containsKey(compositeKey)) {
+            Log.d("Matches_Fragment", "Dữ liệu đã có trong cache, hiển thị ngay.");
             convertAndDisplayMatches(allMatchesData.get(compositeKey));
         } else {
+            Log.d("Matches_Fragment", "Dữ liệu chưa có trong cache, bắt đầu tải mới.");
+            loadMatchesForSelectedDate(currentSelectedDateKey, currentViewType);
+        }
+    }
+
+    private void loadMatchesForSelectedDate(String dateKey, String viewType) {
+        if (dateKey == null || viewType == null) {
+            if (swipeRefreshLayout.isRefreshing()) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+            return;
+        }
+
+        String compositeKey = dateKey + "_" + viewType;
+
+        if (allMatchesData.containsKey(compositeKey)) {
+            convertAndDisplayMatches(allMatchesData.get(compositeKey));
+            if (swipeRefreshLayout.isRefreshing()) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        } else {
+            if (!swipeRefreshLayout.isRefreshing()) {
+                progressBar.setVisibility(View.VISIBLE);
+                contentContainer.setVisibility(View.INVISIBLE);
+                btnAddMatch.setVisibility(View.GONE);
+            }
+
             Call<MatchResponse> call = viewType.equals("individual")
                     ? matchService.getMatchesByDayAndUser(dateKey, currentUserId, 1, 50)
                     : matchService.getMatchesByDay(dateKey, 1, 50);
+
             call.enqueue(new Callback<MatchResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<MatchResponse> call, @NonNull Response<MatchResponse> response) {
+                    progressBar.setVisibility(View.GONE);
+                    if (swipeRefreshLayout.isRefreshing()) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                    contentContainer.setVisibility(View.VISIBLE);
+                    btnAddMatch.setVisibility(View.VISIBLE);
+
                     if (response.isSuccessful() && response.body() != null) {
                         List<Match> fetchedMatches = response.body().getMatches();
                         allMatchesData.put(compositeKey, fetchedMatches);
                         convertAndDisplayMatches(fetchedMatches);
+                        startBackgroundPrefetching();
                     } else {
                         Toast.makeText(getContext(), "Không thể tải trận đấu", Toast.LENGTH_SHORT).show();
-                        displayedMatchesList.clear();
                         if (matchAdapter != null) matchAdapter.updateMatches(new ArrayList<>());
                     }
                 }
                 @Override
                 public void onFailure(@NonNull Call<MatchResponse> call, @NonNull Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                    if (swipeRefreshLayout.isRefreshing()) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                    contentContainer.setVisibility(View.VISIBLE);
+                    btnAddMatch.setVisibility(View.VISIBLE);
+
                     Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
-                    displayedMatchesList.clear();
                     if (matchAdapter != null) matchAdapter.updateMatches(new ArrayList<>());
                 }
             });
@@ -364,7 +426,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         List<Matches> convertedMatches = new ArrayList<>();
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
         SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+//        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
         for (Match rawMatch : rawMatches) {
             List<Participant> team1 = new ArrayList<>();
@@ -380,21 +442,20 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
 
             String p1Name = !team1.isEmpty() ? team1.get(0).getFullName() : "";
             if (team1.size() > 1) p1Name += " & " + team1.get(1).getFullName();
-
             String p2Name = !team2.isEmpty() ? team2.get(0).getFullName() : "";
             if (team2.size() > 1) p2Name += " & " + team2.get(1).getFullName();
-
             String p1Avatar1 = !team1.isEmpty() ? team1.get(0).getAvatarUrl() : null;
             String p1Avatar2 = team1.size() > 1 ? team1.get(1).getAvatarUrl() : null;
             String p2Avatar1 = !team2.isEmpty() ? team2.get(0).getAvatarUrl() : null;
             String p2Avatar2 = team2.size() > 1 ? team2.get(1).getAvatarUrl() : null;
-
             String time = "N/A";
             if (rawMatch.getStartTime() != null) {
                 try {
                     time = timeFormat.format(apiDateFormat.parse(rawMatch.getStartTime()));
                 } catch (Exception e) { /* ignore */ }
             }
+
+            boolean isDoubles = rawMatch.getParticipants() != null && rawMatch.getParticipants().size() > 2;
 
             convertedMatches.add(new Matches(
                     rawMatch.getMatchId(),
@@ -403,8 +464,9 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
                     rawMatch.getTeam1Wins() + "-" + rawMatch.getTeam2Wins(),
                     time,
                     mapApiStatusToDisplayStatus(rawMatch.getStatus()),
-                    "DOUBLES".equalsIgnoreCase(rawMatch.getType())
+                    isDoubles
             ));
+
         }
         this.displayedMatchesList.clear();
         this.displayedMatchesList.addAll(convertedMatches);
@@ -423,17 +485,81 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         }
     }
 
+    private void prefetchDataForDate(String dateKey) {
+        if (dateKey == null || getContext() == null) return;
+
+        String[] viewTypes = {"individual", "club_wide"};
+
+        for (String viewType : viewTypes) {
+            String compositeKey = dateKey + "_" + viewType;
+            if (!allMatchesData.containsKey(compositeKey)) {
+                Log.d("Matches_Prefetch", "Bắt đầu tải ngầm cho key: " + compositeKey);
+
+                Call<MatchResponse> call = viewType.equals("individual")
+                        ? matchService.getMatchesByDayAndUser(dateKey, currentUserId, 1, 50)
+                        : matchService.getMatchesByDay(dateKey, 1, 50);
+
+                call.enqueue(new Callback<MatchResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<MatchResponse> call, @NonNull Response<MatchResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            Log.d("Matches_Prefetch", "Tải ngầm thành công cho key: " + compositeKey);
+                            allMatchesData.put(compositeKey, response.body().getMatches());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<MatchResponse> call, @NonNull Throwable t) {
+                        Log.e("Matches_Prefetch", "Tải ngầm thất bại cho key: " + compositeKey, t);
+                    }
+                });
+            }
+        }
+    }
+
+    private void startBackgroundPrefetching() {
+        if (currentSelectedDateKey == null) return;
+
+        SimpleDateFormat ymdFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        try {
+            Date currentDate = ymdFormat.parse(currentSelectedDateKey);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(currentDate);
+
+            // Tải trước 2 ngày tiếp theo
+            for (int i = 1; i <= 2; i++) {
+                calendar.add(Calendar.DAY_OF_MONTH, 1);
+                prefetchDataForDate(ymdFormat.format(calendar.getTime()));
+            }
+
+            // Reset lại calendar về ngày hiện tại và tải trước 2 ngày trước đó
+            calendar.setTime(currentDate);
+            for (int i = 1; i <= 2; i++) {
+                calendar.add(Calendar.DAY_OF_MONTH, -1);
+                prefetchDataForDate(ymdFormat.format(calendar.getTime()));
+            }
+
+        } catch (Exception e) {
+            Log.e("Matches_Prefetch", "Lỗi khi bắt đầu tải ngầm", e);
+        }
+    }
+
     private void filterMatchesByStatus() {
-        if ("Tất cả".equals(currentSelectedFilter)) {
-            if (matchAdapter != null) matchAdapter.updateMatches(new ArrayList<>(displayedMatchesList));
+        // Nếu adapter chưa tồn tại, không làm gì cả.
+        if (matchAdapter == null) {
             return;
         }
         List<Matches> filteredList = new ArrayList<>();
-        for (Matches match : displayedMatchesList) {
-            if (match.getMatchStatus().equals(currentSelectedFilter)) {
-                filteredList.add(match);
+
+        if ("Tất cả".equals(currentSelectedFilter)) {
+            filteredList.addAll(displayedMatchesList);
+        } else {
+            for (Matches match : displayedMatchesList) {
+                if (match.getMatchStatus().trim().equals(currentSelectedFilter.trim())) {
+                    filteredList.add(match);
+                }
             }
         }
-        if (matchAdapter != null) matchAdapter.updateMatches(filteredList);
+        matchAdapter.updateMatches(filteredList);
     }
 }

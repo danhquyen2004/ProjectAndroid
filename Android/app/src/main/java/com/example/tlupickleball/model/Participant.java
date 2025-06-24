@@ -3,21 +3,20 @@ package com.example.tlupickleball.model; // Đảm bảo đúng package của b�
 import com.google.gson.annotations.SerializedName;
 
 public class Participant {
-    @SerializedName("participantId")
+    @SerializedName("userId")
     private String participantId;
     @SerializedName("fullName")
     private String fullName;
-    @SerializedName("avatarUrl") // THÊM DÒNG NÀY NẾU CHƯA CÓ
+    @SerializedName("avatarUrl")
     private String avatarUrl;
     @SerializedName("team")
     private int team;
-    // Thêm các trường khác nếu có
 
     // Constructor của bạn
-    public Participant(String participantId, String fullName, String avatarUrl, int team) { // CẬP NHẬT CONSTRUCTOR
+    public Participant(String participantId, String fullName, String avatarUrl, int team) {
         this.participantId = participantId;
         this.fullName = fullName;
-        this.avatarUrl = avatarUrl; // GÁN GIÁ TRỊ
+        this.avatarUrl = avatarUrl;
         this.team = team;
     }
 
@@ -38,7 +37,6 @@ public class Participant {
         return avatarUrl;
     }
 
-    // Setters (tùy chọn, nếu cần)
     public void setParticipantId(String participantId) {
         this.participantId = participantId;
     }
