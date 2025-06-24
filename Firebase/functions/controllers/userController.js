@@ -613,43 +613,53 @@ exports.getUserRankAndFundStatus = async (req, res) => {
     if (!uid) {
       return res.status(400).json({ error: "Missing uid" });
     }
-    // 1. Lấy điểm đơn và đôi mới nhất
-    const singleScoreSnap = await admin.firestore()
-      .collection("users").doc(uid)
-      .collection("scoreHistories")
-      .where("scoreType", "==", "single")
-      .orderBy("createdAt", "desc")
-      .limit(1)
-      .get();
+    // 1. Lấy điểm đơn và đôi mới nhất của user
+    const [singleScoreSnap, doubleScoreSnap] = await Promise.all([
+      admin.firestore()
+        .collection("users").doc(uid)
+        .collection("scoreHistories")
+        .where("scoreType", "==", "single")
+        .orderBy("createdAt", "desc")
+        .limit(1)
+        .get(),
+      admin.firestore()
+        .collection("users").doc(uid)
+        .collection("scoreHistories")
+        .where("scoreType", "==", "double")
+        .orderBy("createdAt", "desc")
+        .limit(1)
+        .get()
+    ]);
 
-    // 2. Tính rank đơn, bỏ qua user bị vô hiệu hóa
+    // 2. Tính rank đơn và đôi, bỏ qua user bị vô hiệu hóa
     const usersSnap = await admin.firestore().collection("users").get();
-    let singleRank = null, doubleRank = null;
-    const singleScores = [];
-    const doubleScores = [];
-    for (const userDoc of usersSnap.docs) {
+    // Lấy điểm đơn và đôi của tất cả user song song
+    const scoreResults = await Promise.all(usersSnap.docs.map(async userDoc => {
       const id = userDoc.id;
       const userData = userDoc.data();
-      if (userData.isDisabled === true) continue; // Bỏ qua user bị vô hiệu hóa
-      // Đơn
-      const sSnap = await admin.firestore().collection("users").doc(id).collection("scoreHistories")
-        .where("scoreType", "==", "single")
-        .orderBy("createdAt", "desc").limit(1).get();
-      if (!sSnap.empty) {
-        singleScores.push({ id, score: sSnap.docs[0].data().newTotalScore || 0 });
-      }
-      // Đôi
-      const dSnap = await admin.firestore().collection("users").doc(id).collection("scoreHistories")
-        .where("scoreType", "==", "double")
-        .orderBy("createdAt", "desc").limit(1).get();
-      if (!dSnap.empty) {
-        doubleScores.push({ id, score: dSnap.docs[0].data().newTotalScore || 0 });
-      }
-    }
-    singleScores.sort((a, b) => b.score - a.score);
-    doubleScores.sort((a, b) => b.score - a.score);
-    singleRank = singleScores.findIndex(u => u.id === uid) + 1;
-    doubleRank = doubleScores.findIndex(u => u.id === uid) + 1;
+      if (userData.isDisabled === true) return null;
+      // Lấy điểm đơn và đôi mới nhất song song
+      const [sSnap, dSnap] = await Promise.all([
+        admin.firestore().collection("users").doc(id).collection("scoreHistories")
+          .where("scoreType", "==", "single")
+          .orderBy("createdAt", "desc").limit(1).get(),
+        admin.firestore().collection("users").doc(id).collection("scoreHistories")
+          .where("scoreType", "==", "double")
+          .orderBy("createdAt", "desc").limit(1).get()
+      ]);
+      return {
+        id,
+        single: !sSnap.empty ? (sSnap.docs[0].data().newTotalScore || 0) : null,
+        double: !dSnap.empty ? (dSnap.docs[0].data().newTotalScore || 0) : null
+      };
+    }));
+    // Lọc null
+    const singleScores = scoreResults.filter(u => u && u.single !== null);
+    const doubleScores = scoreResults.filter(u => u && u.double !== null);
+    singleScores.sort((a, b) => b.single - a.single);
+    doubleScores.sort((a, b) => b.double - a.double);
+    const singleRank = singleScores.findIndex(u => u.id === uid) + 1;
+    const doubleRank = doubleScores.findIndex(u => u.id === uid) + 1;
     // 3. Trạng thái đóng quỹ tháng hiện tại
     const now = new Date();
     const month = now.getMonth() + 1;
