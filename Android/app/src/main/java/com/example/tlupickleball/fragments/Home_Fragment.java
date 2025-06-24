@@ -1,6 +1,7 @@
 package com.example.tlupickleball.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toolbar;
 import android.widget.ProgressBar;
@@ -30,6 +32,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.MainActivity;
+import com.example.tlupickleball.activities.PlayerNotification;
 import com.example.tlupickleball.activities.UserActivity;
 import com.example.tlupickleball.model.User;
 import com.example.tlupickleball.network.api_model.user.UserRankAndStatus;
@@ -66,6 +69,7 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
     private MatchAdapter matchAdapter;
     private List<Matches> todayMatchesList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ImageButton btnNotification;
 
     // Thêm biến cho container và progress bar
     private View contentContainer;
@@ -108,6 +112,7 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         txtDoublePoint = rootView.findViewById(R.id.id_DuoRank);
         txtStatusFund = rootView.findViewById(R.id.id_status_fund);
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        btnNotification = rootView.findViewById(R.id.btnNotification);
 
         swipeRefreshLayout.setOnRefreshListener(this::fetchPlayerInfor);
 
@@ -120,6 +125,12 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
                     drawerLayout.openDrawer(GravityCompat.END);
                 }
             }
+        });
+
+        btnNotification.setOnClickListener(v -> {
+            // Mở Activity thông báo
+            Intent intent = new Intent(getActivity(), PlayerNotification.class);
+            startActivity(intent);
         });
 
         // ===== LOGIC MỚI ĐỂ HIỂN THỊ DANH SÁCH TRẬN ĐẤU =====

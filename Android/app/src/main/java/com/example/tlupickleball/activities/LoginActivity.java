@@ -30,20 +30,19 @@ public class LoginActivity extends AuthActivity {
 
     private EditText emailEditText, passwordEditText;
     private Button loginButton;
-    private TextView goToRegisterText;
+    private TextView goToRegisterText, goToForgotPasswordText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
-
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
         goToRegisterText = findViewById(R.id.goToRegisterText);
         rememberMeCheckbox = findViewById(R.id.cb_remember_me);
+        goToForgotPasswordText = findViewById(R.id.forget_password_text);
 
         loadLoginInfo();
 

@@ -15,8 +15,8 @@ public class User {
     private String email;
     @SerializedName("role")
     private String role;
-    @SerializedName("approved")
-    private boolean approved;
+    @SerializedName("approvalStatus")
+    private String approvalStatus;
     @SerializedName("avatarUrl")
     private String avatarUrl; // Thêm trường ảnh đại diện nếu cần
     @SerializedName("currentSingleScore")
@@ -42,8 +42,8 @@ public class User {
         this.currentDoubleScore = currentDoubleScore;
     }
 
-    public boolean isApproved() {
-        return approved;
+    public String isApproved() {
+        return approvalStatus;
     }
 
     public String getAvatarUrl() {
@@ -54,8 +54,8 @@ public class User {
         this.avatarUrl = avatarUrl;
     }
 
-    public void setApproved(boolean approved) {
-        this.approved = approved;
+    public void setApproved(String approved) {
+        this.approvalStatus = approved;
     }
 
     public String getCreatedAt() {
@@ -123,14 +123,14 @@ public class User {
     public User() {}
 
     public User(String uid, String fullName, String birthDate, String gender, String email,
-                String role, boolean approved, String avatarUrl, float currentSingleScore, float currentDoubleScore, String createdAt) {
+                String role, String approvalStatus, String avatarUrl, float currentSingleScore, float currentDoubleScore, String createdAt) {
         this.uid = uid;
         this.fullName = fullName;
         this.birthDate = birthDate;
         this.gender = gender;
         this.email = email;
         this.role = role;
-        this.approved = approved;
+        this.approvalStatus = approvalStatus;
         this.avatarUrl = avatarUrl;
         this.currentSingleScore = currentSingleScore;
         this.currentDoubleScore = currentDoubleScore;
