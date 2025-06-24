@@ -1,5 +1,6 @@
 package com.example.tlupickleball.activities;
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -8,33 +9,30 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.activities.base.BaseActivity;
-import com.example.tlupickleball.adapters.ApproveMemberAdapter;
+import com.example.tlupickleball.activities.base.BaseMember;
 import com.example.tlupickleball.adapters.MemberListAdapter;
-import com.example.tlupickleball.model.Player;
 import com.example.tlupickleball.model.User;
 import com.example.tlupickleball.network.api_model.user.UserListResponse;
-import com.example.tlupickleball.network.core.ApiClient;
-import com.example.tlupickleball.network.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 
-public class MemberList extends BaseActivity {
+public class MemberList extends BaseMember {
     private RecyclerView recyclerView;
     private MemberListAdapter adapter;
     private List<User> lstUser;
-    private UserService userService;
     ImageButton btnBack;
     private static final float ACTION_BUTTON_WIDTH = 200;
     private final float buttonTotalWidth = ACTION_BUTTON_WIDTH * 2;
+    private static final int REQUEST_CODE_MEMBER_DETAIL = 1001;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private boolean isSwipeEnabled = false; // Biến để kiểm soát việc vuốt
 
@@ -44,14 +42,14 @@ public class MemberList extends BaseActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_member_list);
         lstUser = new ArrayList<>();
-        userService = ApiClient.getClient(this).create(UserService.class);
 
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> onBackPressed());
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
-        showLoading();
         fetchMembers();
         setupRecyclerView();
+        swipeRefreshLayout.setOnRefreshListener(this::fetchMembers);
 
 //        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,
 //                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -184,28 +182,18 @@ public class MemberList extends BaseActivity {
 //        });
     }
 
-    private void drawText(Canvas canvas, String text, RectF button, int color) {
-        Paint textPaint = new Paint();
-        textPaint.setColor(color);
-        textPaint.setTextSize(40);
-        textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setAntiAlias(true);
-
-        float textX = button.centerX();
-        float textY = button.centerY() - ((textPaint.descent() + textPaint.ascent()) / 2);
-        canvas.drawText(text, textX, textY, textPaint);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_MEMBER_DETAIL && resultCode == RESULT_OK) {
+            fetchMembers(); // Chỉ load lại khi có RESULT_OK
+        }
     }
 
-//    private void initData() {
-//        lstPlayer = new ArrayList<>();
-//        lstPlayer.add(new Player("Kayn", "hihihaha@gmail.com", R.drawable.avatar_1));
-//        lstPlayer.add(new Player("Katalina", "hihehh@gmail.com", R.drawable.avatar_1));
-//        lstPlayer.add(new Player("Jinx", "hiha@gmail.com", R.drawable.avatar_1));
-//        lstPlayer.add(new Player("Vi", "hihaha@gmail.com", R.drawable.avatar_1));
-//        lstPlayer.add(new Player("Zed", "hihoha@gmail.com", R.drawable.avatar_1));
-//    }
-
     private void fetchMembers() {
+        if (!swipeRefreshLayout.isRefreshing()) {
+            showLoading();
+        }
         userService.getAllUsers().enqueue(new retrofit2.Callback<UserListResponse>() {
             @Override
             public void onResponse(Call<UserListResponse> call, retrofit2.Response<UserListResponse> response) {
@@ -215,15 +203,19 @@ public class MemberList extends BaseActivity {
                     lstUser.addAll(users);
                     adapter.notifyDataSetChanged();
                     hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 } else {
                     Toast.makeText(MemberList.this, "Failed to load members", Toast.LENGTH_SHORT).show();
                     hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
             @Override
             public void onFailure(Call<UserListResponse> call, Throwable t) {
                 Toast.makeText(MemberList.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 hideLoading();
+                swipeRefreshLayout.setRefreshing(false);
+                fetchMembers();
             }
         });
     }
@@ -231,9 +223,12 @@ public class MemberList extends BaseActivity {
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.playerList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MemberListAdapter(this, lstUser);
+        adapter = new MemberListAdapter(this, lstUser, user -> {
+            Intent intent = new Intent(this, MemberControllerInfor.class);
+            intent.putExtra("uid", user.getUid());
+            startActivityForResult(intent, REQUEST_CODE_MEMBER_DETAIL);
+        });
         recyclerView.setAdapter(adapter);
-        //hideLoading();
     }
 
     private void tuChoiThanhVien(int position) {

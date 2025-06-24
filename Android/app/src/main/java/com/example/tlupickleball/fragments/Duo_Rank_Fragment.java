@@ -6,28 +6,43 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.tlupickleball.R;
-import com.example.tlupickleball.adapters.PlayerAdapter;
+import com.example.tlupickleball.activities.base.BaseFragment;
+import com.example.tlupickleball.adapters.UserRankAdapter;
 import com.example.tlupickleball.model.Player;
+import com.example.tlupickleball.model.User;
+import com.example.tlupickleball.model.UserRank;
+import com.example.tlupickleball.network.api_model.user.UserListResponse;
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+
 
 public class Duo_Rank_Fragment extends Fragment {
-
     private RecyclerView recyclerView;
-    private PlayerAdapter adapter;
-    private List<Player> topPlayer;
-    private View rootView;
+    private UserRankAdapter adapter;
+    private List<UserRank> topUser;
+    private View rootView, contentContainer;
     private TopThreeViewHolder topThreeViewHolder;
+    UserService userService;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,34 +50,83 @@ public class Duo_Rank_Fragment extends Fragment {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_player_rank, container, false);
 
-        initData();
+        userService = ApiClient.getClient(requireContext()).create(UserService.class);
+
+        contentContainer = rootView.findViewById(R.id.contentContainerHome);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        progressBar = rootView.findViewById(R.id.progressBarHome);
+
+        if (topUser == null) topUser = new ArrayList<>();
+
+        fetchTopPlayers();
         setupTopThree();
         setupRecyclerView();
 
-        return rootView;
-    }
+        swipeRefreshLayout.setOnRefreshListener(this::fetchTopPlayers);
 
-    private void initData() {
-        topPlayer = new ArrayList<>();
-        topPlayer.add(new Player("Yasuo", 2.1, R.drawable.avatar_1));
-        topPlayer.add(new Player("Yone", 1.9, R.drawable.avatar_1));
-        topPlayer.add(new Player("Jinx", 1.8, R.drawable.avatar_1));
-        topPlayer.add(new Player("Kalista", 1.6, R.drawable.avatar_1));
-        topPlayer.add(new Player("Zoe", 1.5, R.drawable.avatar_1));
+        return rootView;
     }
 
     private void setupTopThree() {
         View top3Layout = rootView.findViewById(R.id.top3Layout);
         topThreeViewHolder = new TopThreeViewHolder(top3Layout);
-        topThreeViewHolder.bind(topPlayer);
+        topThreeViewHolder.bind(topUser);
     }
 
     private void setupRecyclerView() {
         recyclerView = rootView.findViewById(R.id.playerList);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        List<Player> remainingPlayers = new ArrayList<>(topPlayer.subList(3, topPlayer.size()));
-        adapter = new PlayerAdapter(requireContext(), remainingPlayers);
+        List<UserRank> remainingPlayers;
+        if (topUser.size() > 3) {
+            remainingPlayers = new ArrayList<>(topUser.subList(3, topUser.size()));
+        } else {
+            remainingPlayers = new ArrayList<>();
+        }
+        adapter = new UserRankAdapter(requireContext(), remainingPlayers);
         recyclerView.setAdapter(adapter);
+    }
+    // Example in your fragment or activity
+    private void fetchTopPlayers() {
+        if (!swipeRefreshLayout.isRefreshing()) {
+            if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+            if (contentContainer != null) contentContainer.setVisibility(View.INVISIBLE); // Dùng INVISIBLE để layout không bị giật
+        }
+        userService.getTopDuoRank().enqueue(new retrofit2.Callback<List<UserRank>>() {
+            @Override
+            public void onResponse(Call<List<UserRank>> call, retrofit2.Response<List<UserRank>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    topUser = response.body();
+                    if (topUser == null) topUser = new ArrayList<>();
+                    // Update top 3
+                    topThreeViewHolder.bind(topUser);
+                    // Update RecyclerView for remaining players
+                    List<UserRank> remainingPlayers = new ArrayList<>();
+                    if (topUser.size() > 3) {
+                        remainingPlayers = new ArrayList<>(topUser.subList(3, topUser.size()));
+                    }
+                    adapter.setUsers(remainingPlayers);
+                    adapter.notifyDataSetChanged();
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
+                } else {
+                    Toast.makeText(requireContext(), "Không có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<UserRank>> call, Throwable t) {
+                Toast.makeText(requireContext(), "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                t.printStackTrace();
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+                fetchTopPlayers();
+            }
+        });
     }
 
     public static class TopThreeViewHolder extends AppCompatActivity {
@@ -88,7 +152,7 @@ public class Duo_Rank_Fragment extends Fragment {
             top3Img = rootView.findViewById(R.id.top3_img);
         }
 
-        public void bind(List<Player> topPlayers) {
+        public void bind(List<UserRank> topPlayers) {
             if (topPlayers.size() >= 3) {
                 setPlayerData(0, txtName1, txtScore1, top1Img, topPlayers);
                 setPlayerData(1, txtName2, txtScore2, top2Img, topPlayers);
@@ -96,11 +160,17 @@ public class Duo_Rank_Fragment extends Fragment {
             }
         }
 
-        private void setPlayerData(int index, TextView name, TextView score, ImageView image, List<Player> players) {
-            Player player = players.get(index);
-            name.setText(player.getName());
-            score.setText(String.valueOf(player.getSoloPoint()));
-            image.setImageResource(player.getAvatarResourceId());
+        private void setPlayerData(int index, TextView name, TextView score, ImageView image, List<UserRank> users) {
+            UserRank user = users.get(index);
+            name.setText(user.getFullName());
+            score.setText(String.valueOf(user.getPoint()));
+            Glide.with(rootView.getContext())
+                    .load(user.getAvatarUrl())
+                    .placeholder(R.drawable.default_avatar)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE) // Bỏ qua cache trên đĩa
+                    .skipMemoryCache(true) // Bỏ qua cache trong bộ nhớ
+                    .circleCrop()
+                    .into(image);
         }
     }
 }

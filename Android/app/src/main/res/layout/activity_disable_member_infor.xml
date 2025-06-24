@@ -1,181 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:fillViewport="true">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+    android:layout_height="match_parent">
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        tools:context=".activities.ApproveMemberInfor">
-        <ImageButton
-            android:id="@+id/btn_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/white"
-            android:src="@drawable/ic_back"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.033"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Thông tin hội viên"
-            android:textSize="20dp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/imgAvatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/avatar_1"
-            android:layout_marginTop="24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
-
-        <LinearLayout
-            android:id="@+id/infoContainer"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/imgAvatar">
-
-        <TextView
-            android:id="@+id/tvPlayerName"
-            style="@style/LabelInforTextViewStyle"
-            android:text="Họ và tên"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <TextView
-            android:id="@+id/tvPlayerNameInfor"
-            style="@style/InforTextViewStyle"
-            android:text="Nguyen Van A"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerName" />
-
-        <TextView
-            android:id="@+id/tvPlayerGender"
-            style="@style/LabelInforTextViewStyle"
-            android:text="Giới tính"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerNameInfor"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <TextView
-            android:id="@+id/tvGenderInfor"
-            style="@style/InforTextViewStyle"
-            android:text="Nam"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerGender"/>
-
-
-        <TextView
-            android:id="@+id/tvPlayerDob"
-            style="@style/LabelInforTextViewStyle"
-            android:text="Ngày sinh"
-            app:layout_constraintTop_toBottomOf="@+id/tvGenderInfor"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <TextView
-            android:id="@+id/tvDobInfor"
-            style="@style/InforTextViewStyle"
-            android:text="04/03/2004"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerDob"/>
-
-        <TextView
-            android:id="@+id/tvPlayerEmail"
-            style="@style/LabelInforTextViewStyle"
-            android:text="Email"
-            app:layout_constraintTop_toBottomOf="@+id/tvDobInfor"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <TextView
-            android:id="@+id/tvPlayerEmailWData"
-            style="@style/InforTextViewStyle"
-            android:text="gmail"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvPlayerEmail"/>
+            android:padding="16dp"
+            tools:context=".activities.ApproveMemberInfor">
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="@color/white"
+                android:src="@drawable/ic_back"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.033"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/tvSoloPoint"
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Thông tin hội viên"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imgAvatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/default_avatar"
+                android:layout_marginTop="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+            <LinearLayout
+                android:id="@+id/infoContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/imgAvatar">
+
+            <TextView
+                android:id="@+id/tvPlayerName"
                 style="@style/LabelInforTextViewStyle"
-                android:text="Điểm đấu đơn"
-                app:layout_constraintTop_toBottomOf="@+id/tvPlayerEmailWData"
+                android:text="Họ và tên"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView
-                android:id="@+id/tvtvSoloPointWData"
+                android:id="@+id/tvPlayerNameInfor"
                 style="@style/InforTextViewStyle"
-                android:text="2.5"
+                android:text="Nguyen Van A"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvSoloPoint"/>
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerName" />
 
             <TextView
-                android:id="@+id/tvDuoPoint"
+                android:id="@+id/tvPlayerGender"
                 style="@style/LabelInforTextViewStyle"
-                android:text="Điểm đấu đôi"
+                android:text="Giới tính"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerNameInfor"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvGenderInfor"
+                style="@style/InforTextViewStyle"
+                android:text="Nam"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerGender"/>
+
+
+            <TextView
+                android:id="@+id/tvPlayerDob"
+                style="@style/LabelInforTextViewStyle"
+                android:text="Ngày sinh"
+                app:layout_constraintTop_toBottomOf="@+id/tvGenderInfor"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvDobInfor"
+                style="@style/InforTextViewStyle"
+                android:text="04/03/2004"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerDob"/>
+
+            <TextView
+                android:id="@+id/tvPlayerEmail"
+                style="@style/LabelInforTextViewStyle"
+                android:text="Email"
                 app:layout_constraintTop_toBottomOf="@+id/tvDobInfor"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView
-                android:id="@+id/tvtvDuoPointWData"
+                android:id="@+id/tvPlayerEmailWData"
                 style="@style/InforTextViewStyle"
-                android:text="2.6"
+                android:text="gmail"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvDuoPoint"/>
+                app:layout_constraintTop_toBottomOf="@+id/tvPlayerEmail"/>
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tvSoloPoint"
+                    style="@style/LabelInforTextViewStyle"
+                    android:text="Điểm đấu đơn"
+                    app:layout_constraintTop_toBottomOf="@+id/tvPlayerEmailWData"
+                    app:layout_constraintStart_toStartOf="parent"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:layout_marginBottom="5dp"
-            app:layout_constraintBottom_toBottomOf="parent">
+                <TextView
+                    android:id="@+id/tvtvSoloPointWData"
+                    style="@style/InforTextViewStyle"
+                    android:text="2.5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvSoloPoint"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_approve"
-                style="@style/Base.Theme.Button.Green"
-                android:layout_width="230dp"
-                android:layout_height="0dp"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="1"
-                android:backgroundTint="#0CE952"
-                android:text="Kích hoạt" />
+                <TextView
+                    android:id="@+id/tvDuoPoint"
+                    style="@style/LabelInforTextViewStyle"
+                    android:text="Điểm đấu đôi"
+                    app:layout_constraintTop_toBottomOf="@+id/tvDobInfor"
+                    app:layout_constraintStart_toStartOf="parent"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_reject"
-                style="@style/Base.Theme.Button.Red"
-                android:layout_width="230dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="1"
-                android:text="Xóa tài khoản" />
+                <TextView
+                    android:id="@+id/tvtvDuoPointWData"
+                    style="@style/InforTextViewStyle"
+                    android:text="2.6"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvDuoPoint"/>
 
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_approve"
+                    style="@style/Base.Theme.Button.Green"
+                    android:layout_width="230dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#0CE952"
+                    android:text="Kích hoạt" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_reject"
+                    style="@style/Base.Theme.Button.Red"
+                    android:layout_width="230dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="1"
+                    android:text="Xóa tài khoản" />
+
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+    <include layout="@layout/blind_loading_overlay" />
+</FrameLayout>

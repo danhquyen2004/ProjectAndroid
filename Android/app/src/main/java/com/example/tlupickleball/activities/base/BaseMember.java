@@ -9,7 +9,7 @@ import com.example.tlupickleball.network.core.ApiClient;
 import com.example.tlupickleball.network.service.UserService;
 
 public class BaseMember extends BaseActivity{
-    private UserService userService;
+    protected UserService userService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

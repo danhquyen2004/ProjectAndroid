@@ -37,4 +37,5 @@ public class SessionManager {
     public static void clearSession(Context context) {
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().clear().apply();
     }
+
 }

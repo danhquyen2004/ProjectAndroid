@@ -87,12 +87,12 @@
                     <!-- Avatar -->
                     <ImageView
                         android:id="@+id/avatarImage"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@drawable/avatar_1"
-                        android:background="@drawable/bg_avatar_circle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/default_avatar"
+                        android:background="@drawable/bg_circle"
                         android:scaleType="centerCrop"
-                        android:layout_gravity="start" />
+                        android:layout_gravity="center_vertical" />
 
                     <!-- Info -->
                     <LinearLayout
@@ -103,6 +103,7 @@
                         android:layout_marginLeft="10dp">
 
                         <TextView
+                            android:id="@+id/member_name"
                             android:text="Nguyễn Văn A"
                             android:textStyle="bold"
                             android:textSize="25sp"

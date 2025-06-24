@@ -3,10 +3,10 @@ package com.example.tlupickleball.network.api_model.user;
 import com.google.gson.annotations.SerializedName;
 
 public class UserUpdateRequest {
-    @SerializedName("name")
-    private String name;
-    @SerializedName("dob")
-    private String dob;
+    @SerializedName("fullName")
+    private String fullName;
+    @SerializedName("birthdate")
+    private String birthdate;
     @SerializedName("gender")
     private String gender;
     @SerializedName("role")
@@ -22,14 +22,6 @@ public class UserUpdateRequest {
         this.approved = approved;
     }
 
-    public String getDob() {
-        return dob;
-    }
-
-    public void setDob(String dob) {
-        this.dob = dob;
-    }
-
     public String getGender() {
         return gender;
     }
@@ -38,12 +30,20 @@ public class UserUpdateRequest {
         this.gender = gender;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getBirthdate() {
+        return birthdate;
+    }
+
+    public void setBirthdate(String birthdate) {
+        this.birthdate = birthdate;
     }
 
     public String getRole() {
