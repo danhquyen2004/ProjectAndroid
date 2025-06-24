@@ -2,4 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blue">#488DD2</color>
+    <color name="light_blue">#C4D7E8</color>
+    <color name="green">#00A205</color>
+    <color name="orange">#FFA500</color>
+    <color name="red">#FF0000</color>
+    <color name="transparent">#00000000</color>
+    <color name="gray">#40625E5E</color>
+    <color name="green_Huuwx">#00FF00</color>
+
+    // Màu sắc cho phần finance
+    <color name="red_Dong">#CF0000</color>
+    <color name="green_Dong">#126C35</color>
+    <color name="yellow_Dong">#FFB120</color>
 </resources>

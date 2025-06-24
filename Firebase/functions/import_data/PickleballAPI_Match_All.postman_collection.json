@@ -1,0 +1,122 @@
+{
+  "info": {
+    "name": "Pickleball Match API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Monthly Matches",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/matches/monthly?month=6&year=2025&page=1&pageSize=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["matches", "monthly"],
+          "query": [
+            { "key": "month", "value": "6" },
+            { "key": "year", "value": "2025" },
+            { "key": "page", "value": "1" },
+            { "key": "pageSize", "value": "10" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Matches By Day",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/matches/by-day?date=2025-06-21&page=1&pageSize=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["matches", "by-day"],
+          "query": [
+            { "key": "date", "value": "2025-06-21" },
+            { "key": "page", "value": "1" },
+            { "key": "pageSize", "value": "10" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List User Matches By Day",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/matches/by-day/user?date=2025-06-21&userId={{userId}}&page=1&pageSize=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["matches", "by-day", "user"],
+          "query": [
+            { "key": "date", "value": "2025-06-21" },
+            { "key": "userId", "value": "{{userId}}" },
+            { "key": "page", "value": "1" },
+            { "key": "pageSize", "value": "10" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Match",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"startDate\": \"2025-06-21\",\n  \"startTime\": \"09:00\",\n  \"type\": \"single\",\n  \"setCount\": 3,\n  \"teams\": { \"team1\": [\"userId1\"], \"team2\": [\"userId2\"] },\n  \"setResults\": [\n    { \"setNumber\": 1, \"team1Score\": 11, \"team2Score\": 7 },\n    { \"setNumber\": 2, \"team1Score\": 8, \"team2Score\": 11 },\n    { \"setNumber\": 3, \"team1Score\": 11, \"team2Score\": 9 }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/matches",
+          "host": ["{{baseUrl}}"],
+          "path": ["matches"]
+        }
+      }
+    },
+    {
+      "name": "Update Match Scores",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"setResults\": [\n    { \"setNumber\": 1, \"team1Score\": 11, \"team2Score\": 7 },\n    { \"setNumber\": 2, \"team1Score\": 8, \"team2Score\": 11 },\n    { \"setNumber\": 3, \"team1Score\": 11, \"team2Score\": 9 }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/matches/{{matchId}}/scores",
+          "host": ["{{baseUrl}}"],
+          "path": ["matches", "{{matchId}}", "scores"]
+        }
+      }
+    },
+    {
+      "name": "Delete Match",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/matches/{{matchId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["matches", "{{matchId}}"]
+        }
+      }
+    },
+    {
+      "name": "Get Match Detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/matches/detail/{{matchId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["matches", "detail", "{{matchId}}"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5001/your-project-id/asia-southeast1/api" },
+    { "key": "userId", "value": "userId1" },
+    { "key": "matchId", "value": "yourMatchId" }
+  ]
+}

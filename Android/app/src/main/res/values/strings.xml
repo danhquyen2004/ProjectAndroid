@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">TLU Pickleball</string>
+    <string name="home">Trang chủ</string>
+    <string name="match">Trận đấu</string>
+    <string name="finance">Tài chính</string>
+    <string name="rank">Xếp hạng</string>
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="phone_number">Số điện thoại</string>
+    <string name="password">Mật khẩu</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="more">Khác</string>
+    <string-array name="set_count_options">
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+    </string-array>
 </resources>
+
