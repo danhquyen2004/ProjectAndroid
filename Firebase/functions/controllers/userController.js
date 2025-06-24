@@ -490,47 +490,38 @@ exports.getSingleRanking = async (req, res) => {
   try {
     const usersSnapshot = await admin.firestore().collection("users").get();
 
-    const rankingData = [];
-
-    // Loop through users to get their latest single score
-    for (const userDoc of usersSnapshot.docs) {
+    const userPromises = usersSnapshot.docs.map(async (userDoc) => {
       const uid = userDoc.id;
-      const userData = userDoc.data();
 
-      // Lấy profile để lấy fullName
-      const profileDoc = await admin.firestore()
-        .collection("users").doc(uid)
-        .collection("profile").doc("info")
-        .get();
-
-      const fullName = profileDoc.exists ? (profileDoc.data().fullName || "Unknown") : "Unknown";
-      const avatarUrl = profileDoc.exists ? (profileDoc.data().avatarUrl || "") : "";
-      // Lấy điểm đơn mới nhất
-      const scoreSnapshot = await admin.firestore()
-        .collection("users").doc(uid)
-        .collection("scoreHistories")
-        .where("scoreType", "==", "single")
-        .orderBy("createdAt", "desc")
-        .limit(1)
-        .get();
+      // Lấy song song profile + điểm single
+      const [profileDoc, scoreSnapshot] = await Promise.all([
+        admin.firestore().collection("users").doc(uid).collection("profile").doc("info").get(),
+        admin.firestore().collection("users").doc(uid).collection("scoreHistories")
+            .where("scoreType", "==", "single")
+            .orderBy("createdAt", "desc").limit(1).get()
+      ]);
 
       if (!scoreSnapshot.empty) {
         const scoreData = scoreSnapshot.docs[0].data();
-        let point = scoreData.newTotalScore ;
-        point = Math.round(point * 10) / 10; // Làm tròn đến 1 chữ số thập phân
+        let point = Math.round(scoreData.newTotalScore * 10) / 10;
 
-        rankingData.push({
-          fullName,
-          avatarUrl,
-          point
-        });
+        const fullName = profileDoc.exists ? (profileDoc.data().fullName || "Unknown") : "Unknown";
+        const avatarUrl = profileDoc.exists ? (profileDoc.data().avatarUrl || "") : "";  
+
+        return { fullName, avatarUrl, point };
       }
-    }
 
-    // Sort toàn bộ theo point giảm dần
+      return null;
+    });
+
+    // Chạy tất cả cùng lúc
+    const results = await Promise.all(userPromises);
+    const rankingData = results.filter(r => r !== null);
+
+    // Sắp xếp
     rankingData.sort((a, b) => b.point - a.point);
 
-    // Thêm rank
+    // Gắn rank
     const result = rankingData.map((item, index) => ({
       rank: index + 1,
       fullName: item.fullName,
@@ -551,51 +542,43 @@ exports.getDoubleRanking = async (req, res) => {
   try {
     const usersSnapshot = await admin.firestore().collection("users").get();
 
-    const rankingData = [];
-
-    // Loop through users to get their latest double score
-    for (const userDoc of usersSnapshot.docs) {
+    // Chuẩn bị danh sách promises
+    const userPromises = usersSnapshot.docs.map(async (userDoc) => {
       const uid = userDoc.id;
 
-      // Lấy profile để lấy fullName
-      const profileDoc = await admin.firestore()
-        .collection("users").doc(uid)
-        .collection("profile").doc("info")
-        .get();
-
-      const fullName = profileDoc.exists ? (profileDoc.data().fullName || "Unknown") : "Unknown";
-      const avatarUrl = profileDoc.exists ? (profileDoc.data().avatarUrl || "") : "";
-      // Lấy điểm đôi mới nhất
-      const scoreSnapshot = await admin.firestore()
-        .collection("users").doc(uid)
-        .collection("scoreHistories")
-        .where("scoreType", "==", "double")
-        .orderBy("createdAt", "desc")
-        .limit(1)
-        .get();
+      // Lấy song song profile + score
+      const [profileDoc, scoreSnapshot] = await Promise.all([
+        admin.firestore().collection("users").doc(uid).collection("profile").doc("info").get(),
+        admin.firestore().collection("users").doc(uid).collection("scoreHistories")
+            .where("scoreType", "==", "double")
+            .orderBy("createdAt", "desc").limit(1).get()
+      ]);
 
       if (!scoreSnapshot.empty) {
         const scoreData = scoreSnapshot.docs[0].data();
-        let point = scoreData.newTotalScore;
-        point = Math.round(point * 10) / 10; // Làm tròn đến 1 chữ số thập phân
+        let point = Math.round(scoreData.newTotalScore * 10) / 10;
 
-        rankingData.push({
-          fullName,
-          avatarUrl,
-          point
-        });
+        const fullName = profileDoc.exists ? (profileDoc.data().fullName || "Unknown") : "Unknown";
+        const avatarUrl = profileDoc.exists ? (profileDoc.data().avatarUrl || "") : "";  
+
+        return { fullName, avatarUrl, point };
       }
-    }
+      return null;
+    });
 
-    // Sort toàn bộ theo point giảm dần
+    // Chạy tất cả cùng lúc
+    const results = await Promise.all(userPromises);
+    const rankingData = results.filter(r => r !== null);
+
+    // Sắp xếp
     rankingData.sort((a, b) => b.point - a.point);
 
-    // Thêm rank
+    // Gán rank
     const result = rankingData.map((item, index) => ({
       rank: index + 1,
       fullName: item.fullName,
       avatarUrl: item.avatarUrl,
-      point: item.point
+      point: item.point,
     }));
 
     return res.status(200).json(result);
@@ -605,6 +588,7 @@ exports.getDoubleRanking = async (req, res) => {
     return res.status(500).json({ error: "Failed to get double ranking", message: e.message });
   }
 };
+
 
 // [GET] /users/:uid/rank-and-fund-status
 exports.getUserRankAndFundStatus = async (req, res) => {
