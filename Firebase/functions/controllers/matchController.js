@@ -610,7 +610,7 @@ exports.updateMatchScores = async (req, res) => {
             type: "penalty_incurred",
             amount: penaltyAmount,
             matchId,
-            description: `Phạt thua trận ${matchId}`,
+            description: `Phạt thua trận`,
             createdAt: nowTs
           });
         });
