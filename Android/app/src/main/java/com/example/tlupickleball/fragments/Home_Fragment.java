@@ -66,7 +66,6 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
     private MatchAdapter matchAdapter;
     private List<Matches> todayMatchesList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
-    private FragmentLoadingOverlay loadingOverlay;
 
     // Thêm biến cho container và progress bar
     private View contentContainer;
@@ -83,25 +82,15 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
                              Bundle savedInstanceState) {
         // Giữ nguyên việc inflate layout
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
-        loadingOverlay = new FragmentLoadingOverlay(rootView);
-
-        txtName = rootView.findViewById(R.id.id_Name);
-        txtSoloPoint = rootView.findViewById(R.id.id_SingleRank);
-        txtDoublePoint = rootView.findViewById(R.id.id_DuoRank);
-        txtStatusFund = rootView.findViewById(R.id.id_status_fund);
-        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
-
-        swipeRefreshLayout.setOnRefreshListener(this::fetchPlayerInfor);
-
         // Ví dụ: Button mở drawer
-        View btnOpenDrawer = rootView.findViewById(R.id.btnMenu);
-        btnOpenDrawer.setOnClickListener(v -> {
-            // Truy cập Drawer từ MainActivity
-            DrawerLayout drawerLayout = ((UserActivity) requireActivity()).drawerLayout;
-            if (drawerLayout != null) {
-                drawerLayout.openDrawer(GravityCompat.END);
-            }
-        });
+//        View btnOpenDrawer = rootView.findViewById(R.id.btnMenu);
+//        btnOpenDrawer.setOnClickListener(v -> {
+//            // Truy cập Drawer từ MainActivity
+//            DrawerLayout drawerLayout = ((UserActivity) requireActivity()).drawerLayout;
+//            if (drawerLayout != null) {
+//                drawerLayout.openDrawer(GravityCompat.END);
+//            }
+//        });
 
         return rootView;
     }
@@ -113,6 +102,14 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         // Khởi tạo các view mới
         contentContainer = view.findViewById(R.id.contentContainerHome);
         progressBar = view.findViewById(R.id.progressBarHome);
+
+        txtName = rootView.findViewById(R.id.id_Name);
+        txtSoloPoint = rootView.findViewById(R.id.id_SingleRank);
+        txtDoublePoint = rootView.findViewById(R.id.id_DuoRank);
+        txtStatusFund = rootView.findViewById(R.id.id_status_fund);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(this::fetchPlayerInfor);
 
         View btnOpenDrawer = rootView.findViewById(R.id.btnMenu);
         btnOpenDrawer.setOnClickListener(v -> {
@@ -135,12 +132,12 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         fetchPlayerInfor();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Luôn tải lại dữ liệu khi màn hình được hiển thị
-        fetchTodayMatches();
-    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        // Luôn tải lại dữ liệu khi màn hình được hiển thị
+//        // fetchPlayerInfor();
+//    }
 
     // ===== CÁC PHƯƠNG THỨC MỚI ĐƯỢC THÊM VÀO =====
 
@@ -149,14 +146,6 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         matchAdapter = new MatchAdapter(todayMatchesList, this);
         recyclerViewTodayMatches.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewTodayMatches.setAdapter(matchAdapter);
-    }
-
-    public void showLoading() {
-        if (loadingOverlay != null) loadingOverlay.show();
-    }
-
-    public void hideLoading() {
-        if (loadingOverlay != null) loadingOverlay.hide();
     }
 
 //    private void fetchData() {
@@ -170,7 +159,8 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         if (getContext() == null) return;
 
         if (!swipeRefreshLayout.isRefreshing()) {
-            showLoading();
+            if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+            if (contentContainer != null) contentContainer.setVisibility(View.INVISIBLE); // Dùng INVISIBLE để layout không bị giật
         }
 
         // Tạo service và gọi API
@@ -189,7 +179,7 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
 
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Lỗi mạng(User): " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("Home_Fragment_API", "API call failed", t);
             }
         });
@@ -210,8 +200,9 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
 
             @Override
             public void onFailure(@NonNull Call<UserRankAndStatus> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Lỗi mạng(UserRankAndStatus): " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("Home_Fragment_API", "API call failed", t);
+                fetchPlayerInfor(); // Gọi lại để thử tải lại dữ liệu
             }
         });
     }
@@ -220,8 +211,8 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         if (getContext() == null) return;
 
         // BẮT ĐẦU HIỂN THỊ LOADING
-        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
-        if (contentContainer != null) contentContainer.setVisibility(View.INVISIBLE); // Dùng INVISIBLE để layout không bị giật
+//        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+//        if (contentContainer != null) contentContainer.setVisibility(View.INVISIBLE); // Dùng INVISIBLE để layout không bị giật
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String todayDateString = dateFormat.format(new Date());
@@ -240,11 +231,9 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
                 if (response.isSuccessful() && response.body() != null) {
                     List<Matches> convertedMatches = convertApiMatchesToDisplayable(response.body().getMatches());
                     matchAdapter.updateMatches(convertedMatches);
-                    hideLoading();
                     swipeRefreshLayout.setRefreshing(false);
                 } else {
                     Toast.makeText(getContext(), "Không thể tải danh sách trận đấu", Toast.LENGTH_SHORT).show();
-                    hideLoading();
                     swipeRefreshLayout.setRefreshing(false);
                 }
             }
@@ -254,11 +243,12 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
                 // KẾT THÚC LOADING, HIỂN THỊ NỘI DUNG (dù là rỗng)
                 if (progressBar != null) progressBar.setVisibility(View.GONE);
                 if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
-
-                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("Home_Fragment_API", "API call failed", t);
-                hideLoading();
                 swipeRefreshLayout.setRefreshing(false);
+
+                Toast.makeText(getContext(), "Lỗi mạng(Matches): " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("Home_Fragment_API", "API call failed", t);
+
+                fetchTodayMatches(); // Gọi lại để thử tải lại dữ liệu
             }
         });
     }

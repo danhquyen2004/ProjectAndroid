@@ -219,6 +219,7 @@ public class DisableMemberList extends BaseMember {
                 Toast.makeText(DisableMemberList.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 hideLoading();
                 swipeRefreshLayout.setRefreshing(false);
+                fetchMembers();
             }
         });
     }

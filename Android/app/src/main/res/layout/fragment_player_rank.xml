@@ -12,6 +12,7 @@
         android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/contentContainerHome"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#1A8CFC"
@@ -218,18 +219,24 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/playerList"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="top"
                     android:layout_marginTop="0dp"
                     android:layout_marginBottom="0dp"
                     android:paddingLeft="0dp"
                     android:paddingTop="16dp"
                     android:paddingRight="16dp"
-                    android:paddingBottom="16dp" />
+                    android:paddingBottom="0dp" />
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <include layout="@layout/blind_loading_overlay" />
+    <ProgressBar
+        android:id="@+id/progressBarHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </FrameLayout>

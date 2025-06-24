@@ -215,6 +215,7 @@ public class MemberList extends BaseMember {
                 Toast.makeText(MemberList.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 hideLoading();
                 swipeRefreshLayout.setRefreshing(false);
+                fetchMembers();
             }
         });
     }

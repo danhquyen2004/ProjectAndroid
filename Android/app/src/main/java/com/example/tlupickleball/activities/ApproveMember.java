@@ -216,6 +216,7 @@ public class ApproveMember extends BaseMember {
                 Toast.makeText(ApproveMember.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 hideLoading();
                 swipeRefreshLayout.setRefreshing(false);
+                fetchMembers();
             }
         });
     }

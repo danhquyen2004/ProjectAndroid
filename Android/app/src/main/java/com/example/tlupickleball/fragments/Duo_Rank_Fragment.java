@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,22 +38,23 @@ public class Duo_Rank_Fragment extends Fragment {
     private RecyclerView recyclerView;
     private UserRankAdapter adapter;
     private List<UserRank> topUser;
-    private View rootView;
+    private View rootView, contentContainer;
     private TopThreeViewHolder topThreeViewHolder;
     UserService userService;
-    private FragmentLoadingOverlay loadingOverlay;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_player_rank, container, false);
-        loadingOverlay = new FragmentLoadingOverlay(rootView);
 
         userService = ApiClient.getClient(requireContext()).create(UserService.class);
 
+        contentContainer = rootView.findViewById(R.id.contentContainerHome);
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        progressBar = rootView.findViewById(R.id.progressBarHome);
 
         if (topUser == null) topUser = new ArrayList<>();
 
@@ -63,14 +65,6 @@ public class Duo_Rank_Fragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(this::fetchTopPlayers);
 
         return rootView;
-    }
-
-    public void showLoading() {
-        if (loadingOverlay != null) loadingOverlay.show();
-    }
-
-    public void hideLoading() {
-        if (loadingOverlay != null) loadingOverlay.hide();
     }
 
     private void setupTopThree() {
@@ -94,7 +88,8 @@ public class Duo_Rank_Fragment extends Fragment {
     // Example in your fragment or activity
     private void fetchTopPlayers() {
         if (!swipeRefreshLayout.isRefreshing()) {
-            showLoading();
+            if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+            if (contentContainer != null) contentContainer.setVisibility(View.INVISIBLE); // Dùng INVISIBLE để layout không bị giật
         }
         userService.getTopDuoRank().enqueue(new retrofit2.Callback<List<UserRank>>() {
             @Override
@@ -111,11 +106,13 @@ public class Duo_Rank_Fragment extends Fragment {
                     }
                     adapter.setUsers(remainingPlayers);
                     adapter.notifyDataSetChanged();
-                    hideLoading();
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                 } else {
                     Toast.makeText(requireContext(), "Không có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
-                    hideLoading();
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                 }
             }
@@ -124,8 +121,10 @@ public class Duo_Rank_Fragment extends Fragment {
             public void onFailure(Call<List<UserRank>> call, Throwable t) {
                 Toast.makeText(requireContext(), "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 t.printStackTrace();
-                hideLoading();
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
                 swipeRefreshLayout.setRefreshing(false);
+                fetchTopPlayers();
             }
         });
     }

@@ -97,6 +97,7 @@ public class ApproveMemberInfor extends BaseMember {
             public void onFailure(Call<User> call, Throwable t) {
                 Toast.makeText(context, "Không thể truy vấn hồ sơ người dùng", Toast.LENGTH_SHORT).show();
                 hideLoading();
+                LoadUserProfile(context, uid);
             }
         });
     }
