@@ -7,8 +7,18 @@ public class RegisterResponse {
     private String message;
     @SerializedName("idToken")
     private String idToken;
+    @SerializedName("role")
+    private String role;
     @SerializedName("refreshToken")
     private String refreshToken;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public String getIdToken() {
         return idToken;
@@ -34,10 +44,11 @@ public class RegisterResponse {
 
     }
 
-    public RegisterResponse(String message, String uid, String idToken, String refreshToken) {
+    public RegisterResponse(String message, String uid, String idToken, String role,String refreshToken) {
         this.message = message;
         this.uid = uid;
         this.idToken = idToken;
+        this.role = role;
         this.refreshToken = refreshToken;
     }
 

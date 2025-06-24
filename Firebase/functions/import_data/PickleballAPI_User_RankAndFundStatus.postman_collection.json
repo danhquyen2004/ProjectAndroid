@@ -1,0 +1,35 @@
+{
+  "info": {
+    "_postman_id": "b1e1b1e1-1234-5678-9101-abcdefabcdef",
+    "name": "Pickleball User Rank & Fund Status API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API lấy hạng và trạng thái đóng quỹ của user."
+  },
+  "item": [
+    {
+      "name": "Get User Rank and Fund Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/:uid/rank-and-fund-status",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            ":uid",
+            "rank-and-fund-status"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

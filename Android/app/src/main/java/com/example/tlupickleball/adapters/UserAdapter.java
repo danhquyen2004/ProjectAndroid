@@ -1,5 +1,7 @@
 package com.example.tlupickleball.adapters;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -12,10 +14,13 @@ import com.example.tlupickleball.fragments.Home_Fragment;
 import com.example.tlupickleball.fragments.Matches_Fragment;
 import com.example.tlupickleball.fragments.Member_Controller;
 import com.example.tlupickleball.fragments.Rank_Fragment;
+import com.example.tlupickleball.network.core.SessionManager;
 
 public class UserAdapter extends FragmentStateAdapter {
-    public UserAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+    private final String userRole;
+    public UserAdapter(Context context, @NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
         super(fragmentManager, lifecycle);
+        this.userRole = SessionManager.getRole(context);
     }
 
     @NonNull
@@ -36,6 +41,11 @@ public class UserAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 5;
+        // Trả về số lượng tab dựa trên vai trò
+        if ("admin".equals(userRole)) {
+            return 5; // Admin có 5 tab
+        } else {
+            return 4; // Người dùng thường có 4 tab
+        }
     }
 }

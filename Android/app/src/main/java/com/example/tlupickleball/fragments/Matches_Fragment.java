@@ -87,9 +87,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         getParentFragmentManager().setFragmentResultListener("requestKey", this, (requestKey, bundle) -> {
 
             if (bundle.getBoolean("didReturnFromDetail")) {
-                if (btnAddMatch != null) {
-                    btnAddMatch.setVisibility(View.VISIBLE);
-                }
+                updateAddButtonVisibility(); // Cập nhật hiển thị nút
             }
 
             if (bundle.getBoolean("needsRefresh")) {
@@ -172,6 +170,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         });
 
         setupTabLayout();
+        updateAddButtonVisibility(); // Cập nhật hiển thị nút
         return root;
     }
 
@@ -203,9 +202,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
     public void onResume() {
         super.onResume();
 
-        if (btnAddMatch != null) {
-            btnAddMatch.setVisibility(View.VISIBLE);
-        }
+        updateAddButtonVisibility(); // Cập nhật hiển thị nút
         updateTabSelection(currentViewType);
     }
 
@@ -394,7 +391,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
                         swipeRefreshLayout.setRefreshing(false);
                     }
                     contentContainer.setVisibility(View.VISIBLE);
-                    btnAddMatch.setVisibility(View.VISIBLE);
+                    updateAddButtonVisibility(); // Cập nhật hiển thị nút
 
                     if (response.isSuccessful() && response.body() != null) {
                         List<Match> fetchedMatches = response.body().getMatches();
@@ -413,7 +410,7 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
                         swipeRefreshLayout.setRefreshing(false);
                     }
                     contentContainer.setVisibility(View.VISIBLE);
-                    btnAddMatch.setVisibility(View.VISIBLE);
+                    updateAddButtonVisibility(); // Cập nhật hiển thị nút
 
                     Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
                     if (matchAdapter != null) matchAdapter.updateMatches(new ArrayList<>());
@@ -561,5 +558,16 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
             }
         }
         matchAdapter.updateMatches(filteredList);
+    }
+
+    // Phương thức helper mới để quản lý việc ẩn/hiện nút
+    private void updateAddButtonVisibility() {
+        if (btnAddMatch != null) {
+            if ("admin".equals(SessionManager.getRole(getContext()))) {
+                btnAddMatch.setVisibility(View.VISIBLE);
+            } else {
+                btnAddMatch.setVisibility(View.GONE);
+            }
+        }
     }
 }

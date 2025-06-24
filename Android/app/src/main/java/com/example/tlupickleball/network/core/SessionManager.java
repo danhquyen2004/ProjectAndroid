@@ -9,13 +9,15 @@ public class SessionManager {
     private static final String KEY_ID_TOKEN = "id_token";
     private static final String KEY_REFRESH_TOKEN = "refresh_token";
     private static final String KEY_UID = "uid";
+    private static final String KEY_ROLE = "role";
 
-    public static void saveTokens(Context context, String idToken, String refreshToken, String uid) {
+    public static void saveTokens(Context context, String idToken, String refreshToken, String uid, String role) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         prefs.edit()
                 .putString(KEY_ID_TOKEN, idToken)
                 .putString(KEY_REFRESH_TOKEN, refreshToken)
                 .putString(KEY_UID, uid)
+                .putString(KEY_ROLE, role)
                 .apply();
     }
 
@@ -36,6 +38,10 @@ public class SessionManager {
 
     public static void clearSession(Context context) {
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().clear().apply();
+    }
+    public static String getRole(Context context){
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                .getString(KEY_ROLE, null);
     }
 
 }

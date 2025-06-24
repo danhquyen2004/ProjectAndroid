@@ -23,4 +23,5 @@ router.get("/fund-status-all", verifyToken, financeController.getAllUserFundStat
 // Thêm một khoản chi tiêu mới cho CLB (chỉ admin)
 router.post("/club/expense", verifyToken, requireAdmin, financeController.createExpense);
 
+router.get("/now",financeController.getCurrentTime);
 module.exports = router;

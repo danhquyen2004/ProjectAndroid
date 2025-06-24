@@ -30,20 +30,19 @@ public class LoginActivity extends AuthActivity {
 
     private EditText emailEditText, passwordEditText;
     private Button loginButton;
-    private TextView goToRegisterText;
+    private TextView goToRegisterText, goToForgotPasswordText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
-
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
         goToRegisterText = findViewById(R.id.goToRegisterText);
         rememberMeCheckbox = findViewById(R.id.cb_remember_me);
+        goToForgotPasswordText = findViewById(R.id.forget_password_text);
 
         loadLoginInfo();
 
@@ -65,7 +64,7 @@ public class LoginActivity extends AuthActivity {
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
                     LoginResponse body = response.body();
-                    SessionManager.saveTokens(LoginActivity.this, body.getIdToken(), body.getRefreshToken(), body.getUid());
+                    SessionManager.saveTokens(LoginActivity.this, body.getIdToken(), body.getRefreshToken(), body.getUid(), body.getRole());
                     saveLoginInfo(email, password, rememberMeCheckbox.isChecked());
                     if(body.isDisabled())
                     {
