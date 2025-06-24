@@ -61,10 +61,8 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // ===== LOGIC MỞ DRAWER CÓ SẴN CỦA BẠN (được chuyển vào đây cho gọn) =====
         View btnOpenDrawer = rootView.findViewById(R.id.btnMenu);
         btnOpenDrawer.setOnClickListener(v -> {
-            // Truy cập Drawer từ Activity chứa fragment này
             if (getActivity() instanceof UserActivity) {
                 DrawerLayout drawerLayout = ((UserActivity) requireActivity()).drawerLayout;
                 if (drawerLayout != null) {
@@ -73,16 +71,12 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
             }
         });
 
-        // ===== LOGIC MỚI ĐỂ HIỂN THỊ DANH SÁCH TRẬN ĐẤU =====
-        // Khởi tạo RecyclerView và Adapter
         recyclerViewTodayMatches = view.findViewById(R.id.recyclerViewTodayMatches);
         setupRecyclerView();
 
-        // Gọi API để lấy dữ liệu
         fetchTodayMatches();
     }
 
-    // ===== CÁC PHƯƠNG THỨC MỚI ĐƯỢC THÊM VÀO =====
 
     private void setupRecyclerView() {
         // Sử dụng lại MatchAdapter đã có
@@ -94,11 +88,8 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
     private void fetchTodayMatches() {
         if (getContext() == null) return;
 
-        // Lấy ngày hôm nay và định dạng lại thành "yyyy-MM-dd"
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String todayDateString = dateFormat.format(new Date());
-
-        // Tạo service và gọi API
         MatchService matchService = ApiClient.getClient(getContext()).create(MatchService.class);
         Call<MatchResponse> call = matchService.getMatchesByDay(todayDateString, 1, 50);
 
