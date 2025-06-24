@@ -75,7 +75,6 @@ public class Club_Finance_Fragment extends Fragment {
         progressBar = rootView.findViewById(R.id.progressBarHome);
 
         initViews();
-        fetchClubFundBalance(); // Lấy số dư quỹ câu lạc bộ từ API
         setupListeners();
         setupMonthSpinner();
         setupRecyclerView();

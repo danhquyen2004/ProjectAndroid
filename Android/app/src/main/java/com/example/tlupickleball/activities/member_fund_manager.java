@@ -184,7 +184,6 @@ public class member_fund_manager extends BaseActivity {
                 Toast.makeText(member_fund_manager.this, "Lỗi tải user: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
 }
