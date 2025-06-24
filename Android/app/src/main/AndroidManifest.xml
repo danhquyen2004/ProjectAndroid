@@ -2,18 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_ltlu_pickleballl" android:enableOnBackInvokedCallback="true"
+        android:icon="@mipmap/ic_ltlu_pickleballl"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TLUPickleball"
         tools:targetApi="31">
+        <activity
+            android:name=".activities.PlayerNotification"
+            android:exported="false" />
         <activity
             android:name=".activities.Change_Password"
             android:exported="false" />
@@ -22,35 +26,34 @@
             android:exported="false" />
         <activity
             android:name=".activities.ApproveMember"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.MemberList"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.DisableMemberList"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.MemberControllerInfor"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.MemberInfor"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.EditMemberInfor"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.DisableMemberInfor"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.UserActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".activities.EmailVerificationActivity"
             android:exported="false" />
         <activity
             android:name=".activities.notification"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".activities.wait_home"
             android:exported="false" />
