@@ -116,19 +116,32 @@ public class UserActivity extends BaseMember implements TabLayout.OnTabSelectedL
 
         viewPager2 = findViewById(R.id.viewPager2);
         FragmentManager manager = getSupportFragmentManager();
-        UserAdapter userPagerAdapter = new UserAdapter(manager, getLifecycle());
+        UserAdapter userPagerAdapter = new UserAdapter(this, manager, getLifecycle());
         viewPager2.setAdapter(userPagerAdapter);
 
-        tabLayout.addTab(tabLayout.newTab().setText("Trang chủ")
-                .setIcon(R.drawable.ic_home));
-        tabLayout.addTab(tabLayout.newTab().setText("Trận đấu")
-                .setIcon(R.drawable.ic_match));
-        tabLayout.addTab(tabLayout.newTab().setText("Tài chính")
-                .setIcon(R.drawable.ic_finance));
-        tabLayout.addTab(tabLayout.newTab().setText("Xếp hạng")
-                .setIcon(R.drawable.ic_rank));
-        tabLayout.addTab(tabLayout.newTab().setText("Hội viên")
-                .setIcon(R.drawable.ic_membercontroller));
+        String role = SessionManager.getRole(this);
+
+        if("admin".equals(SessionManager.getRole(this))) {
+            tabLayout.addTab(tabLayout.newTab().setText("Trang chủ")
+                    .setIcon(R.drawable.ic_home));
+            tabLayout.addTab(tabLayout.newTab().setText("Trận đấu")
+                    .setIcon(R.drawable.ic_match));
+            tabLayout.addTab(tabLayout.newTab().setText("Tài chính")
+                    .setIcon(R.drawable.ic_finance));
+            tabLayout.addTab(tabLayout.newTab().setText("Xếp hạng")
+                    .setIcon(R.drawable.ic_rank));
+            tabLayout.addTab(tabLayout.newTab().setText("Hội viên")
+                    .setIcon(R.drawable.ic_membercontroller));
+        } else {
+            tabLayout.addTab(tabLayout.newTab().setText("Trang chủ")
+                    .setIcon(R.drawable.ic_home));
+            tabLayout.addTab(tabLayout.newTab().setText("Trận đấu")
+                    .setIcon(R.drawable.ic_match));
+            tabLayout.addTab(tabLayout.newTab().setText("Tài chính")
+                    .setIcon(R.drawable.ic_finance));
+            tabLayout.addTab(tabLayout.newTab().setText("Xếp hạng")
+                    .setIcon(R.drawable.ic_rank));
+        }
 
         tabLayout.addOnTabSelectedListener(this);
 

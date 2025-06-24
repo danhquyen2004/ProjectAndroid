@@ -9,6 +9,17 @@ public class LoginResponse {
     private String refreshToken;
     @SerializedName("uid")
     private String uid;
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    @SerializedName("role")
+    private String role;
     @SerializedName("emailVerified")
     private boolean emailVerified;
     @SerializedName("disabled")
@@ -56,10 +67,11 @@ public class LoginResponse {
     public LoginResponse() {
         // Default constructor
     }
-    public LoginResponse(String idToken, String refreshToken, String uid, boolean emailVerified, boolean disabled) {
+    public LoginResponse(String idToken, String refreshToken, String uid, String role, boolean emailVerified, boolean disabled) {
         this.idToken = idToken;
         this.refreshToken = refreshToken;
         this.uid = uid;
+        this.role = role;
         this.emailVerified = emailVerified;
         this.disabled = disabled;
     }
