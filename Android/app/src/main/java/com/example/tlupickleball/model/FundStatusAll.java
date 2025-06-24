@@ -8,13 +8,13 @@ public class FundStatusAll {
     @SerializedName("userId")
     private String userId;
     @SerializedName("fixedFund")
-    private List<FixedFund> fixedFund;
+    private FixedFund fixedFund;
     @SerializedName("penalty")
-    private List<Penalty> penalty;
+    private Penalty penalty;
     @SerializedName("totalDonation")
     private long totalDonation;
 
-    public FundStatusAll(String userId, List<FixedFund> fixedFund, List<Penalty> penalty, long totalDonation) {
+    public FundStatusAll(String userId, FixedFund fixedFund, Penalty penalty, long totalDonation) {
         this.userId = userId;
         this.fixedFund = fixedFund;
         this.penalty = penalty;
@@ -29,19 +29,19 @@ public class FundStatusAll {
         this.userId = userId;
     }
 
-    public List<FixedFund> getFixedFund() {
+    public FixedFund getFixedFund() {
         return fixedFund;
     }
 
-    public void setFixedFund(List<FixedFund> fixedFund) {
+    public void setFixedFund(FixedFund fixedFund) {
         this.fixedFund = fixedFund;
     }
 
-    public List<Penalty> getPenalty() {
+    public Penalty getPenalty() {
         return penalty;
     }
 
-    public void setPenalty(List<Penalty> penalty) {
+    public void setPenalty(Penalty penalty) {
         this.penalty = penalty;
     }
 

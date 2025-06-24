@@ -21,9 +21,12 @@ import com.example.tlupickleball.R;
 import com.example.tlupickleball.adapters.MemberFundAdapter;
 import com.example.tlupickleball.model.FundStatusAll;
 import com.example.tlupickleball.model.MemberFund;
+import com.example.tlupickleball.model.User;
 import com.example.tlupickleball.network.api_model.finance.FinanceUserFundStatus;
+import com.example.tlupickleball.network.api_model.user.UserListResponse;
 import com.example.tlupickleball.network.core.ApiClient;
 import com.example.tlupickleball.network.service.FinanceService;
+import com.example.tlupickleball.network.service.UserService;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,6 +43,7 @@ public class member_fund_manager extends AppCompatActivity {
     private Spinner spinnerMonth;
     private MemberFundAdapter adapter;
     private List<FundStatusAll> fundStatusList = new ArrayList<>();
+    private List<User> userList = new ArrayList<>();
     private List<String> monthList = new ArrayList<>();
     private int selectedMonthNumber;
     private final int year = Calendar.getInstance().get(Calendar.YEAR);
@@ -52,9 +56,10 @@ public class member_fund_manager extends AppCompatActivity {
         setContentView(R.layout.activity_member_fund_manager);
 
         initViews();
-        setupClickListeners();
         setupMonthSpinner();
         setupRecyclerView();
+        setupClickListeners();
+        fetchUserListAndUpdate(); // Lấy danh sách người dùng từ server
     }
 
     private void initViews() {
@@ -66,7 +71,11 @@ public class member_fund_manager extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
-
+        adapter.setOnUserClickListener(user -> {
+            Intent intent = new Intent(member_fund_manager.this, member_fundpersonal.class);
+            intent.putExtra("USER_ID", user.getUid());
+            startActivity(intent);
+        });
     }
 
     private void setupMonthSpinner() {
@@ -104,7 +113,7 @@ public class member_fund_manager extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        adapter = new MemberFundAdapter(this, new ArrayList<>());
+        adapter = new MemberFundAdapter(this, new ArrayList<>(), userList);
         rvMemberFund.setLayoutManager(new LinearLayoutManager(this));
         rvMemberFund.setAdapter(adapter);
 
@@ -125,6 +134,35 @@ public class member_fund_manager extends AppCompatActivity {
             @Override
             public void onFailure(Call<FinanceUserFundStatus> call, Throwable t) {
                 Toast.makeText(member_fund_manager.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Thêm hàm lấy userList từ server
+    private void fetchUserListAndUpdate() {
+        // Giả sử có UserService và ApiClient đã setup
+        UserService userService = ApiClient.getClient(this).create(UserService.class);
+        Call<UserListResponse> call = userService.getAllUsers();
+        call.enqueue(new Callback<UserListResponse>() {
+            @Override
+            public void onResponse(Call<UserListResponse> call, Response<UserListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    userList.clear();
+                    List<User> allUsers = response.body().getUsers();
+                    if (allUsers != null) {
+                        for (User user : allUsers) {
+                            if (user.getFullName() != null && !user.getFullName().trim().isEmpty()) {
+                                userList.add(user);
+                            }
+                        }
+                    }
+                    // Sau khi có userList, cập nhật lại dữ liệu quỹ
+                    updateDataForMonth(selectedMonthNumber);
+                }
+            }
+            @Override
+            public void onFailure(Call<UserListResponse> call, Throwable t) {
+                Toast.makeText(member_fund_manager.this, "Lỗi tải user: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
