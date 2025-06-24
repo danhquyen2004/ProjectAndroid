@@ -29,5 +29,7 @@ router.patch("/:uid/profile", verifyToken, userController.updateUserProfile);
 router.get("/rankings/single", verifyToken, userController.getSingleRanking);
 router.get("/rankings/double", verifyToken, userController.getDoubleRanking);
 
+// Lấy hạng và trạng thái đóng quỹ của user
+router.get('/:uid/rank-and-fund-status', verifyToken, userController.getUserRankAndFundStatus);
 
 module.exports = router;
