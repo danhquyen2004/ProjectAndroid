@@ -32,6 +32,10 @@ exports.register = async (req, res) => {
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
+    // Lấy role từ Firestore (phòng trường hợp sau này có thể thay đổi role)
+    const userDoc = await admin.firestore().collection("users").doc(uid).get();
+    const role = userDoc.exists && userDoc.data().role ? userDoc.data().role : "member";
+
     // 3. Gửi email xác minh
     await axios.post(
       `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FIREBASE_API_KEY}`,
@@ -45,7 +49,8 @@ exports.register = async (req, res) => {
       message: "User registered successfully. Please verify your email.",
       uid,
       idToken,
-      refreshToken
+      refreshToken,
+      role
     });
 
   } catch (err) {
@@ -72,6 +77,14 @@ exports.login = async (req, res) => {
     const { idToken, refreshToken, localId } = response.data;
 
     const userRecord = await admin.auth().getUser(localId);
+    // Lấy role từ Firestore
+    let role = "member";
+    try {
+      const userDoc = await admin.firestore().collection("users").doc(localId).get();
+      if (userDoc.exists && userDoc.data().role) role = userDoc.data().role;
+    } catch (e) {
+      // Nếu lỗi vẫn trả về member
+    }
 
     // ✅ Gửi email xác minh nếu chưa xác minh
     if (!userRecord.emailVerified) {
@@ -95,7 +108,8 @@ exports.login = async (req, res) => {
       refreshToken,
       uid: localId,
       emailVerified: userRecord.emailVerified,
-      disabled: userRecord.disabled
+      disabled: userRecord.disabled,
+      role
     });
 
   } catch (err) {

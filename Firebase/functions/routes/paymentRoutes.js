@@ -1,13 +1,14 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const paymentController = require("../controllers/paymentController");
+const paymentController = require('../controllers/paymentController');
 
-// [POST] /payment/create-qr - Tạo QR thanh toán mock
-router.post("/create-qr", paymentController.createPaymentQR);
+// Tạo đơn hàng ZaloPay (tạo QR)
+router.post('/zalopay/create-order', paymentController.createZaloPayOrder);
 
-// [POST] /payment/mock-callback - Xác nhận thanh toán mock
-router.post("/mock-callback", paymentController.mockPaymentCallback);
+// Callback từ ZaloPay
+router.post('/zalopay-callback', paymentController.zaloPayCallback);
 
-// (Có thể bổ sung các API khác nếu cần)
+// Lấy trạng thái thanh toán
+router.get('/status', paymentController.getPaymentStatus);
 
 module.exports = router;

@@ -126,23 +126,16 @@ exports.listMonthlyMatches = async (req, res) => {
 // Lấy danh sách các trận đấu theo ngày (YYYY-MM-DD)
 exports.listMatchesByDay = async (req, res) => {
   try {
-    await updatePendingMatchesStatus(); // Cập nhật trạng thái trận đấu
-
+    await updatePendingMatchesStatus();
     const { date, page = 1, pageSize = 10 } = req.query;
     if (!date) {
       return res.status(400).json({ error: "Missing date (YYYY-MM-DD)" });
     }
     const pageInt = parseInt(page);
     const pageSizeInt = parseInt(pageSize);
-
-    // Tính thời gian bắt đầu và kết thúc của ngày
     const [year, month, day] = date.split("-").map(Number);
-    // 00:00:00 VN = 17:00:00 hôm trước UTC
     const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0) - 7 * 60 * 60 * 1000);
-    // 23:59:59.999 VN = 16:59:59.999 cùng ngày UTC
     const endDate = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999) - 7 * 60 * 60 * 1000);
-
-    // Lấy các trận đấu trong ngày
     const matchesSnap = await admin.firestore()
       .collection("matches")
       .where("startTime", ">=", startDate)
@@ -151,11 +144,10 @@ exports.listMatchesByDay = async (req, res) => {
       .offset((pageInt - 1) * pageSizeInt)
       .limit(pageSizeInt)
       .get();
-
+    // Lấy participants và setResults song song cho từng trận
     const matches = await Promise.all(matchesSnap.docs.map(async doc => {
       const match = doc.data();
-      if (match.isDeleted === true) return null; // Bỏ qua trận đã xóa
-      // Lấy startTime chuẩn kiểu Date
+      if (match.isDeleted === true) return null;
       let startTime = null;
       if (match.startTime) {
         if (typeof match.startTime.toDate === "function") {
@@ -164,13 +156,14 @@ exports.listMatchesByDay = async (req, res) => {
           startTime = new Date(match.startTime);
         }
       }
-      // Lấy danh sách người tham gia
-      const participantsSnap = await admin.firestore()
-        .collection("matches").doc(doc.id)
-        .collection("participants").get();
+      // Lấy participants và setResults song song
+      const [participantsSnap, setResultsSnap] = await Promise.all([
+        admin.firestore().collection("matches").doc(doc.id).collection("participants").get(),
+        admin.firestore().collection("matches").doc(doc.id).collection("setResults").get()
+      ]);
+      // Lấy thông tin người tham gia song song
       const participants = await Promise.all(participantsSnap.docs.map(async pDoc => {
         const pData = pDoc.data();
-        // Lấy tên và avatar người chơi
         const profileSnap = await admin.firestore()
           .collection("users").doc(pData.userId)
           .collection("profile").doc("info").get();
@@ -184,10 +177,6 @@ exports.listMatchesByDay = async (req, res) => {
           isConfirmed: pData.isConfirmed
         };
       }));
-      // Lấy kết quả set
-      const setResultsSnap = await admin.firestore()
-        .collection("matches").doc(doc.id)
-        .collection("setResults").get();
       let team1Wins = 0, team2Wins = 0;
       setResultsSnap.docs.forEach(setDoc => {
         const set = setDoc.data();
@@ -203,9 +192,7 @@ exports.listMatchesByDay = async (req, res) => {
         team2Wins
       };
     }));
-    // Lọc null
     const filteredMatches = matches.filter(Boolean);
-
     return res.status(200).json({
       matches: filteredMatches,
       page: pageInt,
@@ -221,101 +208,86 @@ exports.listMatchesByDay = async (req, res) => {
 // Lấy danh sách các trận đấu theo ngày của một user (YYYY-MM-DD, userId)
 exports.listUserMatchesByDay = async (req, res) => {
   try {
-    await updatePendingMatchesStatus(); // Cập nhật trạng thái trận đấu
-
+    await updatePendingMatchesStatus();
     const { date, userId, page = 1, pageSize = 10 } = req.query;
     if (!date || !userId) {
       return res.status(400).json({ error: "Missing date (YYYY-MM-DD) or userId" });
     }
     const pageInt = parseInt(page);
     const pageSizeInt = parseInt(pageSize);
-
-    // Tính thời gian bắt đầu và kết thúc của ngày (theo giờ Việt Nam, convert sang UTC)
     const [year, month, day] = date.split("-").map(Number);
-    // 00:00:00 VN = 17:00:00 hôm trước UTC
     const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0) - 7 * 60 * 60 * 1000);
-    // 23:59:59.999 VN = 16:59:59.999 cùng ngày UTC
     const endDate = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999) - 7 * 60 * 60 * 1000);
-
-    // Lấy các trận đấu trong ngày
     const matchesSnap = await admin.firestore()
       .collection("matches")
       .where("startTime", ">=", startDate)
       .where("startTime", "<=", endDate)
       .orderBy("startTime", "desc")
       .get();
-
-    // Lọc các trận mà user tham gia và chưa bị xóa
-    const userMatches = [];
-    for (const doc of matchesSnap.docs) {
+    // Lọc các trận mà user tham gia và chưa bị xóa, xử lý song song
+    const userMatches = await Promise.all(matchesSnap.docs.map(async doc => {
       const match = doc.data();
-      if (match.isDeleted === true) continue; // Bỏ qua trận đã xóa
+      if (match.isDeleted === true) return null;
       const matchId = doc.id;
       const participantsSnap = await admin.firestore()
         .collection("matches").doc(matchId)
         .collection("participants")
         .where("userId", "==", userId)
         .get();
-      if (!participantsSnap.empty) {
-        // Lấy startTime chuẩn kiểu Date
-        let startTime = null;
-        if (match.startTime) {
-          if (typeof match.startTime.toDate === "function") {
-            startTime = match.startTime.toDate();
-          } else {
-            startTime = new Date(match.startTime);
-          }
+      if (participantsSnap.empty) return null;
+      // Lấy startTime chuẩn kiểu Date
+      let startTime = null;
+      if (match.startTime) {
+        if (typeof match.startTime.toDate === "function") {
+          startTime = match.startTime.toDate();
+        } else {
+          startTime = new Date(match.startTime);
         }
-        // Lấy danh sách người tham gia
-        const allParticipantsSnap = await admin.firestore()
-          .collection("matches").doc(matchId)
-          .collection("participants").get();
-        const participants = await Promise.all(allParticipantsSnap.docs.map(async pDoc => {
-          const pData = pDoc.data();
-          // Lấy tên và avatar người chơi
-          const profileSnap = await admin.firestore()
-            .collection("users").doc(pData.userId)
-            .collection("profile").doc("info").get();
-          const fullName = profileSnap.exists ? (profileSnap.data().fullName || "Unknown") : "Unknown";
-          const avatarUrl = profileSnap.exists ? (profileSnap.data().avatarUrl || "") : "";
-          return {
-            userId: pData.userId,
-            fullName,
-            avatarUrl,
-            team: pData.team,
-            isConfirmed: pData.isConfirmed
-          };
-        }));
-        // Lấy kết quả set
-        const setResultsSnap = await admin.firestore()
-          .collection("matches").doc(matchId)
-          .collection("setResults").get();
-        let team1Wins = 0, team2Wins = 0;
-        setResultsSnap.docs.forEach(setDoc => {
-          const set = setDoc.data();
-          if (set.team1Score > set.team2Score) team1Wins++;
-          else if (set.team2Score > set.team1Score) team2Wins++;
-        });
-        userMatches.push({
-          matchId,
-          status: match.status,
-          startTime: startTime ? toVietnamTime(startTime) : null,
-          participants,
-          team1Wins,
-          team2Wins
-        });
       }
-    }
-
-    // Phân trang
-    const pagedMatches = userMatches.slice((pageInt - 1) * pageSizeInt, pageInt * pageSizeInt);
-
+      // Lấy danh sách người tham gia và setResults song song
+      const [allParticipantsSnap, setResultsSnap] = await Promise.all([
+        admin.firestore().collection("matches").doc(matchId).collection("participants").get(),
+        admin.firestore().collection("matches").doc(matchId).collection("setResults").get()
+      ]);
+      const participants = await Promise.all(allParticipantsSnap.docs.map(async pDoc => {
+        const pData = pDoc.data();
+        const profileSnap = await admin.firestore()
+          .collection("users").doc(pData.userId)
+          .collection("profile").doc("info").get();
+        const fullName = profileSnap.exists ? (profileSnap.data().fullName || "Unknown") : "Unknown";
+        const avatarUrl = profileSnap.exists ? (profileSnap.data().avatarUrl || "") : "";
+        return {
+          userId: pData.userId,
+          fullName,
+          avatarUrl,
+          team: pData.team,
+          isConfirmed: pData.isConfirmed
+        };
+      }));
+      let team1Wins = 0, team2Wins = 0;
+      setResultsSnap.docs.forEach(setDoc => {
+        const set = setDoc.data();
+        if (set.team1Score > set.team2Score) team1Wins++;
+        else if (set.team2Score > set.team1Score) team2Wins++;
+      });
+      return {
+        matchId,
+        status: match.status,
+        startTime: startTime ? toVietnamTime(startTime) : null,
+        participants,
+        team1Wins,
+        team2Wins
+      };
+    }));
+    // Lọc null và phân trang
+    const filteredMatches = userMatches.filter(Boolean);
+    const pagedMatches = filteredMatches.slice((pageInt - 1) * pageSizeInt, pageInt * pageSizeInt);
     return res.status(200).json({
       matches: pagedMatches,
-      total: userMatches.length,
+      total: filteredMatches.length,
       page: pageInt,
       pageSize: pageSizeInt,
-      hasNextPage: pageInt * pageSizeInt < userMatches.length
+      hasNextPage: pageInt * pageSizeInt < filteredMatches.length
     });
   } catch (e) {
     console.error("listUserMatchesByDay error:", e);
