@@ -243,8 +243,8 @@ module.exports = {
       const startDate = new Date(yearInt, monthInt - 1, 1, 0, 0, 0);
       const endDate = new Date(yearInt, monthInt, 0, 23, 59, 59, 999);
       const usersSnap = await admin.firestore().collection("users").get();
-      const results = [];
-      for (const userDoc of usersSnap.docs) {
+      // Xử lý song song cho từng user
+      const results = await Promise.all(usersSnap.docs.map(async userDoc => {
         const userId = userDoc.id;
         // 1. Quỹ cố định tháng đó
         let fixedFund = { amount: 0, status: "unpaid" };
@@ -292,7 +292,7 @@ module.exports = {
         donationSnap.docs.forEach(doc => {
           totalDonation += doc.data().amount || 0;
         });
-        results.push({
+        return {
           userId,
           fixedFund,
           penalty: {
@@ -302,8 +302,8 @@ module.exports = {
             status: penaltyStatus
           },
           totalDonation
-        });
-      }
+        };
+      }));
       return res.status(200).json({ results });
     } catch (e) {
       console.error("getAllUserFundStatusByMonth error:", e);
@@ -369,6 +369,18 @@ module.exports = {
       console.error("createExpense error:", e);
       return res.status(500).json({ error: "Failed to create expense", message: e.message });
     }
+  },
+
+  /**
+   * [GET] /finance/now - Lấy giờ hệ thống hiện tại (UTC và giờ Việt Nam)
+   */
+  getCurrentTime: (req, res) => {
+    const nowUTC = new Date();
+    const nowVN = new Date(nowUTC.getTime() + 7 * 60 * 60 * 1000);
+    return res.status(200).json({
+      utc: nowUTC.toISOString(),
+      vietnam: nowVN.toISOString()
+    });
   },
 
   // Thêm các hàm API khác ở đây, ví dụ:

@@ -231,41 +231,11 @@ exports.rejectUser = async (req, res) => {
 exports.approveUser = async (req, res) => {
   try {
     const targetUid = req.params.uid;
-    // Cập nhật trạng thái approved
+
     await admin.firestore().collection("users").doc(targetUid).set({
       approvalStatus: "approved",
       createdAt: admin.firestore.Timestamp.now()
     }, { merge: true });
-
-    // === Kiểm tra và tạo paymentRequest quỹ tháng nếu chưa có ===
-    const now = new Date();
-    const month = now.getMonth() + 1; // JS: 0-11
-    const year = now.getFullYear();
-    const paymentRequestsRef = admin.firestore().collection("users").doc(targetUid).collection("paymentRequests");
-    const existingSnap = await paymentRequestsRef
-      .where("type", "==", "fixed")
-      .where("forMonth", ">=", new Date(Date.UTC(year, month - 1, 1, 0, 0, 0)))
-      .where("forMonth", "<=", new Date(Date.UTC(year, month - 1, 1, 23, 59, 59, 999)))
-      .limit(1)
-      .get();
-    if (existingSnap.empty) {
-      // Tạo mới paymentRequest quỹ tháng
-      const amount = 100000;
-      const forMonthVN = new Date(year, month - 1, 1, 7, 0, 0); // 7h sáng ngày 1 tháng đó, giờ VN
-      const forMonthUTC = new Date(forMonthVN.getTime() - 7 * 60 * 60 * 1000); // convert sang UTC
-      const requestId = require('crypto').randomUUID();
-      await paymentRequestsRef.doc(requestId).set({
-        amount,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        forMonth: forMonthUTC,
-        paidAt: null,
-        requestId,
-        status: "unpaid",
-        type: "fixed",
-        userId: targetUid
-      });
-    }
-    // === END ===
 
     return res.status(200).send("User has been approved.");
   } catch (e) {
@@ -342,13 +312,12 @@ exports.getPendingUsers = async (req, res) => {
     const snapshot = await query.get();
 
     // Lấy dữ liệu profile tương ứng
-    const users = [];
-    for (const doc of snapshot.docs) {
+    const users = await Promise.all(snapshot.docs.map(async doc => {
       const uid = doc.id;
       const data = doc.data();
+
       let fullName = null;
       let avatarUrl = null;
-      let hasProfile = false;
       try {
         const profileSnap = await admin.firestore()
           .collection("users")
@@ -356,22 +325,22 @@ exports.getPendingUsers = async (req, res) => {
           .collection("profile")
           .doc("info")
           .get();
+
         if (profileSnap.exists) {
           fullName = profileSnap.data().fullName || null;
           avatarUrl = profileSnap.data().avatarUrl || null;
-          hasProfile = true;
         }
       } catch (_) { }
-      if (!hasProfile) continue; // Bỏ qua user thiếu info
-      users.push({
+
+      return {
         uid,
         email: data.email || null,
         createdAt: data.createdAt?.toDate().toISOString() || null,
         fullName,
         avatarUrl,
         approvalStatus: data.approvalStatus || null
-      });
-    }
+      };
+    }));
 
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
     const nextPageToken = lastDoc ? lastDoc.id : null;
@@ -408,14 +377,12 @@ exports.getApprovedUsers = async (req, res) => {
 
     const snapshot = await query.get();
 
-    // Lấy dữ liệu profile tương ứng
-    const users = [];
-    for (const doc of snapshot.docs) {
+    const users = await Promise.all(snapshot.docs.map(async doc => {
       const uid = doc.id;
       const data = doc.data();
+
       let fullName = null;
       let avatarUrl = null;
-      let hasProfile = false;
       try {
         const profileSnap = await admin.firestore()
           .collection("users")
@@ -423,22 +390,22 @@ exports.getApprovedUsers = async (req, res) => {
           .collection("profile")
           .doc("info")
           .get();
+
         if (profileSnap.exists) {
           fullName = profileSnap.data().fullName || null;
           avatarUrl = profileSnap.data().avatarUrl || null;
-          hasProfile = true;
         }
       } catch (_) { }
-      if (!hasProfile) continue; // Bỏ qua user thiếu info
-      users.push({
+
+      return {
         uid,
         email: data.email || null,
         createdAt: data.createdAt?.toDate().toISOString() || null,
         fullName,
         avatarUrl,
         approvalStatus: data.approvalStatus || null
-      });
-    }
+      };
+    }));
 
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
     const nextPageToken = lastDoc ? lastDoc.id : null;
@@ -535,7 +502,7 @@ exports.getSingleRanking = async (req, res) => {
         .get();
 
       const fullName = profileDoc.exists ? (profileDoc.data().fullName || "Unknown") : "Unknown";
-
+      const avatarUrl = profileDoc.exists ? (profileDoc.data().avatarUrl || "") : "";
       // Lấy điểm đơn mới nhất
       const scoreSnapshot = await admin.firestore()
         .collection("users").doc(uid)
@@ -552,6 +519,7 @@ exports.getSingleRanking = async (req, res) => {
 
         rankingData.push({
           fullName,
+          avatarUrl,
           point
         });
       }
@@ -564,6 +532,7 @@ exports.getSingleRanking = async (req, res) => {
     const result = rankingData.map((item, index) => ({
       rank: index + 1,
       fullName: item.fullName,
+      avatarUrl: item.avatarUrl,
       point: item.point
     }));
 
@@ -593,7 +562,7 @@ exports.getDoubleRanking = async (req, res) => {
         .get();
 
       const fullName = profileDoc.exists ? (profileDoc.data().fullName || "Unknown") : "Unknown";
-
+      const avatarUrl = profileDoc.exists ? (profileDoc.data().avatarUrl || "") : "";
       // Lấy điểm đôi mới nhất
       const scoreSnapshot = await admin.firestore()
         .collection("users").doc(uid)
@@ -610,6 +579,7 @@ exports.getDoubleRanking = async (req, res) => {
 
         rankingData.push({
           fullName,
+          avatarUrl,
           point
         });
       }
@@ -622,6 +592,7 @@ exports.getDoubleRanking = async (req, res) => {
     const result = rankingData.map((item, index) => ({
       rank: index + 1,
       fullName: item.fullName,
+      avatarUrl: item.avatarUrl,
       point: item.point
     }));
 
@@ -633,5 +604,86 @@ exports.getDoubleRanking = async (req, res) => {
   }
 };
 
+// [GET] /users/:uid/rank-and-fund-status
+exports.getUserRankAndFundStatus = async (req, res) => {
+  try {
+    const uid = req.params.uid;
+    if (!uid) {
+      return res.status(400).json({ error: "Missing uid" });
+    }
+    // 1. Lấy điểm đơn và đôi mới nhất của user
+    const [singleScoreSnap, doubleScoreSnap] = await Promise.all([
+      admin.firestore()
+        .collection("users").doc(uid)
+        .collection("scoreHistories")
+        .where("scoreType", "==", "single")
+        .orderBy("createdAt", "desc")
+        .limit(1)
+        .get(),
+      admin.firestore()
+        .collection("users").doc(uid)
+        .collection("scoreHistories")
+        .where("scoreType", "==", "double")
+        .orderBy("createdAt", "desc")
+        .limit(1)
+        .get()
+    ]);
+
+    // 2. Tính rank đơn và đôi, bỏ qua user bị vô hiệu hóa
+    const usersSnap = await admin.firestore().collection("users").get();
+    // Lấy điểm đơn và đôi của tất cả user song song
+    const scoreResults = await Promise.all(usersSnap.docs.map(async userDoc => {
+      const id = userDoc.id;
+      const userData = userDoc.data();
+      if (userData.isDisabled === true) return null;
+      // Lấy điểm đơn và đôi mới nhất song song
+      const [sSnap, dSnap] = await Promise.all([
+        admin.firestore().collection("users").doc(id).collection("scoreHistories")
+          .where("scoreType", "==", "single")
+          .orderBy("createdAt", "desc").limit(1).get(),
+        admin.firestore().collection("users").doc(id).collection("scoreHistories")
+          .where("scoreType", "==", "double")
+          .orderBy("createdAt", "desc").limit(1).get()
+      ]);
+      return {
+        id,
+        single: !sSnap.empty ? (sSnap.docs[0].data().newTotalScore || 0) : null,
+        double: !dSnap.empty ? (dSnap.docs[0].data().newTotalScore || 0) : null
+      };
+    }));
+    // Lọc null
+    const singleScores = scoreResults.filter(u => u && u.single !== null);
+    const doubleScores = scoreResults.filter(u => u && u.double !== null);
+    singleScores.sort((a, b) => b.single - a.single);
+    doubleScores.sort((a, b) => b.double - a.double);
+    const singleRank = singleScores.findIndex(u => u.id === uid) + 1;
+    const doubleRank = doubleScores.findIndex(u => u.id === uid) + 1;
+    // 3. Trạng thái đóng quỹ tháng hiện tại
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+    const paymentSnap = await admin.firestore()
+      .collection("users").doc(uid)
+      .collection("paymentRequests")
+      .where("type", "==", "fixed")
+      .where("forMonth", ">=", new Date(year, month - 1, 1))
+      .where("forMonth", "<=", new Date(year, month - 1, 31))
+      .limit(1)
+      .get();
+    let fundStatus = "unpaid";
+    if (!paymentSnap.empty) {
+      const pr = paymentSnap.docs[0].data();
+      if (pr.status === "paid") fundStatus = "paid";
+    }
+    return res.status(200).json({
+      singleRank: singleRank || null,
+      doubleRank: doubleRank || null,
+      fundStatus
+    });
+  } catch (e) {
+    console.error("getUserRankAndFundStatus error:", e);
+    return res.status(500).json({ error: "Failed to get user rank and fund status", message: e.message });
+  }
+};
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------

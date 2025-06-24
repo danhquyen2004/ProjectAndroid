@@ -1,5 +1,5 @@
 const admin = require("../utils/firebase");
-
+const functions = require("firebase-functions");
 
 // Hàm chuyển UTC sang giờ Việt Nam (UTC+7)
 function toVietnamTime(date) {
@@ -49,10 +49,11 @@ exports.listMonthlyMatches = async (req, res) => {
       .orderBy("startTime", "desc")
       .get();
 
-    // Gom nhóm theo ngày
+    // Gom nhóm theo ngày, chỉ lấy trận chưa bị xóa
     const matchesByDay = {};
     matchesSnap.docs.forEach(doc => {
       const data = doc.data();
+      if (data.isDeleted === true) return; // Bỏ qua trận đã xóa
       const matchDate = data.startTime.toDate ? data.startTime.toDate() : data.startTime;
       const dayKey = matchDate.toISOString().slice(0, 10); // yyyy-mm-dd
       if (!matchesByDay[dayKey]) matchesByDay[dayKey] = [];
@@ -153,6 +154,7 @@ exports.listMatchesByDay = async (req, res) => {
 
     const matches = await Promise.all(matchesSnap.docs.map(async doc => {
       const match = doc.data();
+      if (match.isDeleted === true) return null; // Bỏ qua trận đã xóa
       // Lấy startTime chuẩn kiểu Date
       let startTime = null;
       if (match.startTime) {
@@ -201,12 +203,14 @@ exports.listMatchesByDay = async (req, res) => {
         team2Wins
       };
     }));
+    // Lọc null
+    const filteredMatches = matches.filter(Boolean);
 
     return res.status(200).json({
-      matches,
+      matches: filteredMatches,
       page: pageInt,
       pageSize: pageSizeInt,
-      hasNextPage: matches.length === pageSizeInt
+      hasNextPage: filteredMatches.length === pageSizeInt
     });
   } catch (e) {
     console.error("listMatchesByDay error:", e);
@@ -241,9 +245,11 @@ exports.listUserMatchesByDay = async (req, res) => {
       .orderBy("startTime", "desc")
       .get();
 
-    // Lọc các trận mà user tham gia
+    // Lọc các trận mà user tham gia và chưa bị xóa
     const userMatches = [];
     for (const doc of matchesSnap.docs) {
+      const match = doc.data();
+      if (match.isDeleted === true) continue; // Bỏ qua trận đã xóa
       const matchId = doc.id;
       const participantsSnap = await admin.firestore()
         .collection("matches").doc(matchId)
@@ -251,7 +257,6 @@ exports.listUserMatchesByDay = async (req, res) => {
         .where("userId", "==", userId)
         .get();
       if (!participantsSnap.empty) {
-        const match = doc.data();
         // Lấy startTime chuẩn kiểu Date
         let startTime = null;
         if (match.startTime) {
@@ -447,7 +452,8 @@ exports.createMatch = async (req, res) => {
           if (!latestScoreSnap.empty && latestScoreSnap.docs[0].data().newTotalScore !== undefined) {
             currentScore = latestScoreSnap.docs[0].data().newTotalScore;
           }
-          const newTotalScore = +(currentScore + scoreChange).toFixed(2);
+          let newTotalScore = +(currentScore + scoreChange).toFixed(2);
+          if (newTotalScore < 0) newTotalScore = 0;
           // Ghi lịch sử điểm
           const scoreHistoryRef = scoreHistoriesRef.doc();
           scoreBatch.set(scoreHistoryRef, {
@@ -457,7 +463,6 @@ exports.createMatch = async (req, res) => {
             newTotalScore,
             createdAt: admin.firestore.FieldValue.serverTimestamp()
           });
-          // Không cập nhật tổng điểm vào profile nữa
         }
       }
       await scoreBatch.commit();
@@ -597,7 +602,8 @@ exports.updateMatchScores = async (req, res) => {
           if (!latestScoreSnap.empty && latestScoreSnap.docs[0].data().newTotalScore !== undefined) {
             currentScore = latestScoreSnap.docs[0].data().newTotalScore;
           }
-          const newTotalScore = +(currentScore + scoreChange).toFixed(2);
+          let newTotalScore = +(currentScore + scoreChange).toFixed(2);
+          if (newTotalScore < 0) newTotalScore = 0;
           // Ghi lịch sử điểm
           const scoreHistoryRef = scoreHistoriesRef.doc();
           scoreBatch.set(scoreHistoryRef, {
@@ -607,7 +613,6 @@ exports.updateMatchScores = async (req, res) => {
             newTotalScore,
             createdAt: admin.firestore.FieldValue.serverTimestamp()
           });
-          // Không cập nhật tổng điểm vào profile nữa
         }
       }
       await scoreBatch.commit();
@@ -661,40 +666,15 @@ exports.deleteMatch = async (req, res) => {
     if (!matchDoc.exists) {
       return res.status(404).json({ error: "Match not found" });
     }
-    // Xóa các subcollection: participants, setResults
-    const participantsSnap = await matchRef.collection("participants").get();
-    const setResultsSnap = await matchRef.collection("setResults").get();
-    const batch = admin.firestore().batch();
-    participantsSnap.docs.forEach(doc => batch.delete(doc.ref));
-    setResultsSnap.docs.forEach(doc => batch.delete(doc.ref));
-    // Xóa document trận đấu
-    batch.delete(matchRef);
-    await batch.commit();
-
-    // Xóa các bản ghi scoreHistories, paymentRequests, financeLogs liên quan đến matchId ở tất cả user
-    const usersSnap = await admin.firestore().collection("users").get();
-    for (const userDoc of usersSnap.docs) {
-      const userId = userDoc.id;
-      // Xóa scoreHistories
-      const scoreHistoriesSnap = await admin.firestore().collection("users").doc(userId).collection("scoreHistories").where("matchId", "==", matchId).get();
-      const batch1 = admin.firestore().batch();
-      scoreHistoriesSnap.docs.forEach(doc => batch1.delete(doc.ref));
-      await batch1.commit();
-      // Xóa paymentRequests
-      const paymentRequestsSnap = await admin.firestore().collection("users").doc(userId).collection("paymentRequests").where("matchId", "==", matchId).get();
-      const batch2 = admin.firestore().batch();
-      paymentRequestsSnap.docs.forEach(doc => batch2.delete(doc.ref));
-      await batch2.commit();
-      // Xóa financeLogs
-      const financeLogsSnap = await admin.firestore().collection("users").doc(userId).collection("financeLogs").where("matchId", "==", matchId).get();
-      const batch3 = admin.firestore().batch();
-      financeLogsSnap.docs.forEach(doc => batch3.delete(doc.ref));
-      await batch3.commit();
-    }
-    return res.status(200).json({ message: "Match and all related records deleted successfully" });
+    // Đánh dấu xóa mềm (soft delete)
+    await matchRef.update({
+      isDeleted: true,
+      deletedAt: new Date()
+    });
+    return res.status(200).json({ message: "Match marked as deleted. Will be cleaned up in background." });
   } catch (e) {
     console.error("deleteMatch error:", e);
-    return res.status(500).json({ error: "Failed to delete match", message: e.message });
+    return res.status(500).json({ error: "Failed to mark match as deleted", message: e.message });
   }
 };
 
@@ -740,23 +720,15 @@ exports.getMatchDetail = async (req, res) => {
     }));
     // Lấy kết quả set
     const setResultsSnap = await matchRef.collection("setResults").get();
-    const setResults = setResultsSnap.docs.map(doc => doc.data());
-    // Tính số set thắng của mỗi đội
-    let team1Wins = 0, team2Wins = 0;
-    setResults.forEach(set => {
-      if (set.team1Score > set.team2Score) team1Wins++;
-      else if (set.team2Score > set.team1Score) team2Wins++;
-    });
+    const setResults = setResultsSnap.docs.map(setDoc => setDoc.data());
+    // Trả về chi tiết từng set
     return res.status(200).json({
-      matchId: match.matchId,
+      matchId,
       status: match.status,
-      type: match.type,
-      setCount: match.setCount,
       startTime: startTime ? toVietnamTime(startTime) : null,
       participants,
       setResults,
-      team1Wins,
-      team2Wins
+      setCount: match.setCount // Thêm setCount vào response
     });
   } catch (e) {
     console.error("getMatchDetail error:", e);
@@ -764,4 +736,56 @@ exports.getMatchDetail = async (req, res) => {
   }
 };
 
-// ...các hàm khác nếu cần
+
+exports.physicalDeleteMatch = functions.firestore
+  .document("matches/{matchId}")
+  .onUpdate(async (change, context) => {
+    console.log("Physical delete match triggered for:", context.params.matchId);
+    const before = change.before.data();
+    const after = change.after.data();
+    const matchId = context.params.matchId;
+
+    // Chỉ thực hiện khi isDeleted chuyển từ false/undefined sang true
+    if ((!before.isDeleted) && after.isDeleted === true) {
+      const matchRef = admin.firestore().collection("matches").doc(matchId);
+
+      // Xóa subcollection participants
+      const participantsSnap = await matchRef.collection("participants").get();
+      const batch1 = admin.firestore().batch();
+      participantsSnap.docs.forEach(doc => batch1.delete(doc.ref));
+      await batch1.commit();
+
+      // Xóa subcollection setResults
+      const setResultsSnap = await matchRef.collection("setResults").get();
+      const batch2 = admin.firestore().batch();
+      setResultsSnap.docs.forEach(doc => batch2.delete(doc.ref));
+      await batch2.commit();
+
+      // Xóa các bản ghi liên quan ở user
+      const usersSnap = await admin.firestore().collection("users").get();
+      for (const userDoc of usersSnap.docs) {
+        const userId = userDoc.id;
+        // Xóa scoreHistories
+        const scoreHistoriesSnap = await admin.firestore().collection("users").doc(userId).collection("scoreHistories").where("matchId", "==", matchId).get();
+        const batch3 = admin.firestore().batch();
+        scoreHistoriesSnap.docs.forEach(doc => batch3.delete(doc.ref));
+        await batch3.commit();
+        // Xóa paymentRequests
+        const paymentRequestsSnap = await admin.firestore().collection("users").doc(userId).collection("paymentRequests").where("matchId", "==", matchId).get();
+        const batch4 = admin.firestore().batch();
+        paymentRequestsSnap.docs.forEach(doc => batch4.delete(doc.ref));
+        await batch4.commit();
+        // Xóa financeLogs
+        const financeLogsSnap = await admin.firestore().collection("users").doc(userId).collection("financeLogs").where("matchId", "==", matchId).get();
+        const batch5 = admin.firestore().batch();
+        financeLogsSnap.docs.forEach(doc => batch5.delete(doc.ref));
+        await batch5.commit();
+      }
+
+      // Xóa document trận đấu
+      await matchRef.delete();
+
+      console.log(`Physically deleted match ${matchId} and all related data.`);
+    }
+    return null;
+  });
