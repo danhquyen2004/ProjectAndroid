@@ -23,13 +23,25 @@ import android.widget.Toast;
 import com.example.tlupickleball.R;
 import com.example.tlupickleball.activities.member_fund_manager;
 import com.example.tlupickleball.adapters.Transaction_ClubAdapter;
+import com.example.tlupickleball.adapters.Transaction_PersonalAdapter;
+import com.example.tlupickleball.model.ClubFundBalanceResponse;
+import com.example.tlupickleball.model.ClubSummaryResponse;
 import com.example.tlupickleball.model.Transaction_Club;
+import com.example.tlupickleball.model.logClub;
+import com.example.tlupickleball.model.logs;
+import com.example.tlupickleball.network.api_model.finance.FinanceClubListResponse;
+import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.service.FinanceService;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class Club_Finance_Fragment extends Fragment {
@@ -43,9 +55,11 @@ public class Club_Finance_Fragment extends Fragment {
     private int selectedMonthNumber;
     List<String> monthList = new ArrayList<>();
     int year = Calendar.getInstance().get(Calendar.YEAR);
+    private FinanceService financeService;
+    private List<logClub> logClubList = new ArrayList<>();
+    private List<logClub> filteredClubList = new ArrayList<>();
     private RecyclerView rvTransactions;
     private Transaction_ClubAdapter transactionClubAdapter;
-    private List<Transaction_Club> transactionClubList;
     private int totalRevenue, totalExpense;
 
     @Override
@@ -54,12 +68,12 @@ public class Club_Finance_Fragment extends Fragment {
 
         rootView = inflater.inflate(R.layout.fragment_club_finance, container, false);
         initViews();
+        fetchClubFundBalance(); // Lấy số dư quỹ câu lạc bộ từ API
         setupListeners();
         setupMonthSpinner();
         setupRecyclerView();
         return rootView;
     }
-
 
     private void initViews() {
         btnAddExpense = rootView.findViewById(R.id.btnAddExpense);
@@ -78,21 +92,10 @@ public class Club_Finance_Fragment extends Fragment {
         btnAddExpense.setOnClickListener(v -> showAddExpensePopup());
     }
 
-
     private void setupRecyclerView() {
         rvTransactions = rootView.findViewById(R.id.recyclerFundClubHistory);
         rvTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
-
-        transactionClubList = new ArrayList<>();
-
-        transactionClubList.add(new Transaction_Club("Đóng quỹ", "Nguyễn Giang Đông + đã đóng", "18:01 - 10/06/2025", "+100.000đ"));
-        transactionClubList.add(new Transaction_Club("Đóng quỹ", "Nguyễn Giang Đông + đã đóng", "20:01 - 10/05/2025", "+100.000đ"));
-        transactionClubList.add(new Transaction_Club("Đóng quỹ", "Nguyễn Văn A + đã đóng", "20:01 - 10/05/2025", "+100.000đ"));
-        transactionClubList.add(new Transaction_Club( "Đóng sân hàng tháng", "", "20:01 - 10/05/2025", "-2.100.000đ"));
-        transactionClubList.add(new Transaction_Club(  "Mua bóng", "", "20:01 - 10/05/2025", "-350.000đ"));
-        transactionClubList.add(new Transaction_Club("Đóng quỹ", "Nguyễn Giang Đông + đã đóng", "12:00 - 10/04/2025", "+100.000đ"));
-        transactionClubList.add(new Transaction_Club("Đóng quỹ", "Nguyễn Văn A + đã đóng", "21:12 - 09/04/2025", "+100.000đ"));
-        transactionClubAdapter = new Transaction_ClubAdapter(transactionClubList);
+        transactionClubAdapter = new Transaction_ClubAdapter(requireContext(), logClubList);
         rvTransactions.setAdapter(transactionClubAdapter);
     }
 
@@ -120,11 +123,16 @@ public class Club_Finance_Fragment extends Fragment {
         spinnerMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedMonth = parent.getItemAtPosition(position).toString();
-                // Xử lý logic theo tháng được chọn
+                // Lấy tháng được chọn từ Spinner
+                String selectedMonthStr = parent.getItemAtPosition(position).toString();
+                // Tách tháng và năm từ chuỗi "Tháng x/yyyy"
+                int selectedMonthNumber = Integer.parseInt(selectedMonthStr.split(" ")[1].split("/")[0]);
+                int selectedYear = year;
 
-                // Tách tháng từ chuỗi "Tháng x/yyyy"
-                selectedMonthNumber = Integer.parseInt(selectedMonth.split(" ")[1].split("/")[0]);
+
+                fetchClubSummary(selectedMonthNumber, selectedYear); // Lấy tổng thu chi câu lạc bộ từ API
+                fetchClubFundBalance(); // Cập nhật số dư quỹ câu lạc bộ
+                fetchClubHistory(selectedMonthNumber, year);
                 filterTransactionsByMonth(selectedMonthNumber);
             }
 
@@ -136,25 +144,20 @@ public class Club_Finance_Fragment extends Fragment {
     }
 
     private void filterTransactionsByMonth(int month) {
-        List<Transaction_Club> filteredList = new ArrayList<>();
-        for (Transaction_Club transaction : transactionClubList) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(transaction.getDateAsDate());
-            int transactionMonth = calendar.get(Calendar.MONTH) + 1;
-            if (transactionMonth == month) {
-                filteredList.add(transaction);
+        if (logClubList == null) return; // Kiểm tra null
+
+        List<logClub> filteredList = new ArrayList<>();
+        for (logClub logs : logClubList) {
+            // Giả sử createdAt có định dạng dd/MM/yyyy
+            String[] parts = logs.getCreatedAt().split("/");
+            if (parts.length >= 2) {
+                int transactionMonth = Integer.parseInt(parts[1]);
+                if (transactionMonth == month) {
+                    filteredList.add(logs);
+                }
             }
         }
-
         transactionClubAdapter.setData(filteredList); // Cập nhật danh sách đã lọc
-        // Tính và hiển thị các chỉ số
-        int revenue = TotalRevenueForMonth(month);
-        int expense = TotalExpenseForMonth(month);
-        int remainingFund = RemainingFund();
-
-        txtRevenue.setText(formatCurrency(revenue));
-        txtExpenses.setText(formatCurrency(expense));
-        txtFund.setText(formatCurrency(remainingFund));
     }
 
     // Hàm này sẽ được gọi khi người dùng nhấn nút "Thêm giao dịch"
@@ -163,6 +166,7 @@ public class Club_Finance_Fragment extends Fragment {
         View view = getLayoutInflater().inflate(R.layout.dialog_add_expense, null);
         dialog.setContentView(view);
 
+        // Lấy EditText từ view của dialog
         EditText edtDescription = view.findViewById(R.id.edtDescription);
         EditText edtAmount = view.findViewById(R.id.edtAmount);
         EditText edtDate = view.findViewById(R.id.edtDate);
@@ -188,71 +192,117 @@ public class Club_Finance_Fragment extends Fragment {
         });
 
         btnConfirm.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), "Clicked!", Toast.LENGTH_SHORT).show();
             String desc = edtDescription.getText().toString().trim();
-            String amount = edtAmount.getText().toString().trim();
+            String amountStr = edtAmount.getText().toString().trim();
             String date = edtDate.getText().toString();
 
-            if (desc.isEmpty() || amount.isEmpty()) {
+            if (desc.isEmpty() || amountStr.isEmpty()) {
                 Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            String formattedAmount = "-" + amount + "đ"; // Giả sử là chi
-            transactionClubList.add(0, new Transaction_Club(desc, "", "20:00 - " + date, formattedAmount));
-            transactionClubAdapter.setData(transactionClubList);
-            filterTransactionsByMonth(selectedMonthNumber);
-            dialog.dismiss();
+            long amount = Long.parseLong(amountStr.replace(".", "").replace("đ", ""));
+            // Chuyển ngày sang định dạng ISO cho API
+            String isoDate = "";
+            try {
+                isoDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                        .format(new SimpleDateFormat("dd/MM/yyyy").parse(date));
+            } catch (Exception e) {
+                Toast.makeText(requireContext(), "Lỗi định dạng ngày", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            logClub newExpense = new logClub();
+            newExpense.setReason(desc);
+            newExpense.setAmount(amount);
+            newExpense.setCreatedAt(isoDate);
+            // Thêm các trường khác nếu cần
+
+            financeService.financeClubExpense(newExpense).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(requireContext(), "Thêm chi tiêu thành công", Toast.LENGTH_SHORT).show();
+                        fetchClubFundBalance(); // Cập nhật lại số dư quỹ
+                        setupMonthSpinner(); // Cập nhật lại danh sách tháng
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(requireContext(), "Lỗi khi thêm chi tiêu", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
-        dialog.show();
+        dialog.show(); // Make sure to show the dialog
     }
 
 
-    private int TotalRevenueForMonth(int month) {
-        totalRevenue = 0;
-        for (Transaction_Club transaction : transactionClubList) {
-            if (transaction.getType().equals("Thu")) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(transaction.getDateAsDate());
-                int transactionMonth = calendar.get(Calendar.MONTH) + 1;
-                if (transactionMonth == month) {
-                    totalRevenue += transaction.getAmountValue();
-                }
-            }
-        }
-        return totalRevenue;
-    }
-
-    private int TotalExpenseForMonth(int month) {
-        totalExpense = 0;
-        for (Transaction_Club transaction : transactionClubList) {
-            if (transaction.getType().equals("Chi")) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(transaction.getDateAsDate());
-                int transactionMonth = calendar.get(Calendar.MONTH) + 1;
-                if (transactionMonth == month) {
-                    totalExpense += transaction.getAmountValue();
-                }
-            }
-        }
-        return totalExpense;
-    }
-
-    private int RemainingFund() {
-        totalRevenue = 0;
-        totalExpense = 0;
-        for (Transaction_Club transaction : transactionClubList) {
-            if (transaction.getType().equals("Thu")) {
-                totalRevenue += transaction.getAmountValue();
-            } else if (transaction.getType().equals("Chi")) {
-                totalExpense += transaction.getAmountValue();
-            }
-        }
-
-        return Math.max(totalRevenue - totalExpense, 0);
-    }
-
-    private String formatCurrency(int amount) {
+    private String formatCurrency(long amount) {
         return String.format("%,d", amount).replace(',', '.') + "đ";
     }
 
+    private void fetchClubFundBalance() {
+        financeService = ApiClient.getClient(requireContext()).create(FinanceService.class);
+        Call<ClubFundBalanceResponse> call = financeService.financeTotal();
+        call.enqueue(new Callback<ClubFundBalanceResponse>() {
+            @Override
+            public void onResponse(Call<ClubFundBalanceResponse> call, Response<ClubFundBalanceResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    long fund = response.body().getClubFundBalance();
+                    txtFund.setText(formatCurrency(fund));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ClubFundBalanceResponse> call, Throwable t) {
+                Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchClubSummary(int month, int year) {
+        financeService = ApiClient.getClient(requireContext()).create(FinanceService.class);
+        Call<ClubSummaryResponse> call = financeService.financeClubSummary(month, year);
+        call.enqueue(new Callback<ClubSummaryResponse>() {
+            @Override
+            public void onResponse(Call<ClubSummaryResponse> call, Response<ClubSummaryResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    long revenue = response.body().getTotalIncome();
+                    long expense = response.body().getTotalExpense();
+                    txtRevenue.setText(formatCurrency(revenue));
+                    txtExpenses.setText(formatCurrency(expense));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ClubSummaryResponse> call, Throwable t) {
+                Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchClubHistory(int month, int year) {
+        financeService = ApiClient.getClient(requireContext()).create(FinanceService.class);
+        Call<FinanceClubListResponse> call = financeService.financeClubHistory(month, year);
+        call.enqueue(new Callback<FinanceClubListResponse>() {
+            @Override
+            public void onResponse(Call<FinanceClubListResponse> call, Response<FinanceClubListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    logClubList = response.body().getLogClub();
+
+                    transactionClubAdapter.setData(logClubList);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FinanceClubListResponse> call, Throwable t) {
+                Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }
