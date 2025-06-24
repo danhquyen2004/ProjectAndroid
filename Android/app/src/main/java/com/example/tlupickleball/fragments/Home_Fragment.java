@@ -64,12 +64,14 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
     private MatchAdapter matchAdapter;
     private List<Matches> todayMatchesList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
+    private FragmentLoadingOverlay loadingOverlay;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        loadingOverlay = new FragmentLoadingOverlay(rootView);
 
         txtName = rootView.findViewById(R.id.id_Name);
         txtSoloPoint = rootView.findViewById(R.id.id_SingleRank);
@@ -77,7 +79,7 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         txtStatusFund = rootView.findViewById(R.id.id_status_fund);
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
 
-        swipeRefreshLayout.setOnRefreshListener(this::fetchData);
+        swipeRefreshLayout.setOnRefreshListener(this::fetchPlayerInfor);
 
         // Ví dụ: Button mở drawer
         View btnOpenDrawer = rootView.findViewById(R.id.btnMenu);
@@ -115,7 +117,7 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
 
         // Gọi API để lấy dữ liệu
 //        fetchTodayMatches();
-        fetchData();
+        fetchPlayerInfor();
     }
 
     // ===== CÁC PHƯƠNG THỨC MỚI ĐƯỢC THÊM VÀO =====
@@ -127,15 +129,27 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         recyclerViewTodayMatches.setAdapter(matchAdapter);
     }
 
-    private void fetchData() {
-        // Gọi các phương thức để lấy dữ liệu người dùng và trận đấu
-        fetchPlayerInfor();
-        fetchTodayMatches();
-        swipeRefreshLayout.setRefreshing(false);
+    public void showLoading() {
+        if (loadingOverlay != null) loadingOverlay.show();
     }
+
+    public void hideLoading() {
+        if (loadingOverlay != null) loadingOverlay.hide();
+    }
+
+//    private void fetchData() {
+//        // Gọi các phương thức để lấy dữ liệu người dùng và trận đấu
+//        fetchPlayerInfor();
+//        fetchTodayMatches();
+//        swipeRefreshLayout.setRefreshing(false);
+//    }
 
     private void fetchPlayerInfor() {
         if (getContext() == null) return;
+
+        if (!swipeRefreshLayout.isRefreshing()) {
+            showLoading();
+        }
 
         // Tạo service và gọi API
         UserService userService = ApiClient.getClient(getContext()).create(UserService.class);
@@ -166,6 +180,7 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
                     txtSoloPoint.setText(String.valueOf(response.body().getSingleRank()));
                     txtDoublePoint.setText(String.valueOf(response.body().getDoubleRank()));
                     txtStatusFund.setText(response.body().getFundStatus());
+                    fetchTodayMatches();
                 } else {
                     Toast.makeText(getContext(), "Không có dữ liệu người dùng", Toast.LENGTH_SHORT).show();
                 }
@@ -196,8 +211,12 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
                 if (response.isSuccessful() && response.body() != null) {
                     List<Matches> convertedMatches = convertApiMatchesToDisplayable(response.body().getMatches());
                     matchAdapter.updateMatches(convertedMatches);
+                    hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 } else {
                     Toast.makeText(getContext(), "Không thể tải danh sách trận đấu", Toast.LENGTH_SHORT).show();
+                    hideLoading();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
 
@@ -205,6 +224,8 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
             public void onFailure(@NonNull Call<MatchResponse> call, @NonNull Throwable t) {
                 Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("Home_Fragment_API", "API call failed", t);
+                hideLoading();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }

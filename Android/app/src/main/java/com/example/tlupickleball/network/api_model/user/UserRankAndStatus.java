@@ -1,8 +1,13 @@
 package com.example.tlupickleball.network.api_model.user;
 
+import com.google.gson.annotations.SerializedName;
+
 public class UserRankAndStatus {
+    @SerializedName("singleRank")
     private int singleRank;
+    @SerializedName("doubleRank")
     private int doubleRank;
+    @SerializedName("fundStatus")
     private String fundStatus;
 
     public UserRankAndStatus(int singleRank, String fundStatus, int doubleRank) {
