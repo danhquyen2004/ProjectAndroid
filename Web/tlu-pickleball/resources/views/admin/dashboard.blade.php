@@ -22,19 +22,17 @@
     </div>
   </div>
 
-  <div class="content">
-    <div class="card">
+  <div class="card">
       <img src="https://c.animaapp.com/mbunmuejMSouiM/img/user.svg" alt="User" />
       <div class="title">Số hội viên</div>
-      <div class="value">50</div>
+      <div class="value">{{ $memberCount }}</div>
     </div>
 
     <div class="card">
       <img src="https://c.animaapp.com/mbunmuejMSouiM/img/usd-square-1-1.svg" alt="Quỹ" />
       <div class="title">TỔNG QUỸ</div>
-      <div class="value">55,000,000 VND</div>
+      <div class="value">{{ $totalFund }} VND</div>
     </div>
-  </div>
 </div>
 </body>
 </html>

@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -85,7 +84,6 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         recyclerViewTodayMatches = view.findViewById(R.id.recyclerViewTodayMatches);
         setupRecyclerView();
 
-        // Không gọi fetchTodayMatches() ở đây nữa, sẽ gọi trong onResume
     }
 
     @Override
@@ -219,7 +217,6 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         args.putString("match_id", match.getMatchId());
         detailFragment.setArguments(args);
 
-        // Chỗ này bạn cần xem lại R.id.main có đúng là id của container chính trong UserActivity không
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.main, detailFragment)
                 .addToBackStack(null)
