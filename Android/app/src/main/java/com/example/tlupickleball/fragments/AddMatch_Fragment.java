@@ -30,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.tlupickleball.R;
@@ -51,7 +52,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import android.widget.Button;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -82,9 +82,15 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
     private boolean isDetailMode = false;
     private String matchId;
 
+    // Biến mới để lưu trạng thái tỉ số ban đầu
+    private List<MatchSet> initialSetResults = new ArrayList<>();
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Dòng này đã bị comment lại trong file bạn gửi, tôi giữ nguyên
+        // sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         selectedDateTime = Calendar.getInstance();
         if (getArguments() != null) {
             matchId = getArguments().getString("match_id");
@@ -92,7 +98,6 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
                 isDetailMode = true;
             }
         }
-
     }
 
     @Nullable
@@ -104,16 +109,12 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
 
         if (isDetailMode) {
             titleTextView.setText("Chi tiết trận đấu");
-
             contentContainer.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
-
             fetchMatchDetails();
-
         } else {
             contentContainer.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
-
             titleTextView.setText("Ghi nhận trận đấu");
             configureUiForMode(false, null);
             updateDateButton(selectedDateTime.getTime());
@@ -161,24 +162,17 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         player2Team2Avatar = view.findViewById(R.id.player2_team2_avatar);
         player2Team1Avatar = view.findViewById(R.id.player2_team1_avatar);
         player1Team2Avatar = view.findViewById(R.id.player1_team2_avatar);
-
         contentContainer = view.findViewById(R.id.contentContainer);
         progressBar = view.findViewById(R.id.progressBar);
     }
 
-    /**
-     * Phương thức thống nhất để quay lại màn hình danh sách.
-     * Luôn gửi một tín hiệu để báo cho fragment cha biết cần cập nhật lại UI (hiển thị nút FAB).
-     * @param refreshData true nếu cần tải lại dữ liệu từ server (sau khi thêm, sửa, xóa).
-     */
+    // Phương thức navigateBack này là phiên bản cũ, tôi giữ lại theo file bạn gửi
     private void navigateBack(boolean refreshData) {
         if (!isAdded()) return;
 
         Bundle result = new Bundle();
-        // 1. Luôn gửi tín hiệu này để Matches_Fragment biết và hiển thị lại nút "Thêm trận"
         result.putBoolean("didReturnFromDetail", true);
 
-        // 2. Chỉ gửi tín hiệu refresh data nếu thực sự cần
         if (refreshData) {
             result.putBoolean("needsRefresh", true);
             if (selectedDateTime != null) {
@@ -186,7 +180,6 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
                 result.putString("modifiedDateKey", ymdFormat.format(selectedDateTime.getTime()));
             }
         }
-
         getParentFragmentManager().setFragmentResult("requestKey", result);
         getParentFragmentManager().popBackStack();
     }
@@ -196,7 +189,6 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         backButton.setOnClickListener(v -> handleBackPress());
         cancelMatchButton.setOnClickListener(v -> showCancelConfirmationDialog());
         confirmChangesButton.setOnClickListener(v -> saveScoreChanges());
-
         if (!isDetailMode) {
             inputTimeButton.setOnClickListener(v -> showTimePicker());
             selectDateButton.setOnClickListener(v -> showDatePicker());
@@ -223,26 +215,20 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         if (hasUnsavedData()) {
             showExitConfirmationDialog();
         } else {
-            // Quay về mà không cần refresh data
             navigateBack(false);
         }
     }
 
     private void saveScoreChanges() {
         if (getContext() == null || matchId == null) return;
-
         List<CreateMatchRequest.SetResult> setResults = new ArrayList<>();
         int numberOfSets = layoutMatchSetScoresContainer.getChildCount();
-
         for (int i = 0; i < numberOfSets; i++) {
             View setView = layoutMatchSetScoresContainer.getChildAt(i);
             EditText team1ScoreEt = setView.findViewById(R.id.editTextScoreTeam1);
             EditText team2ScoreEt = setView.findViewById(R.id.editTextScoreTeam2);
-
             String score1Str = team1ScoreEt.getText().toString();
             String score2Str = team2ScoreEt.getText().toString();
-
-
             if (!score1Str.isEmpty() && !score2Str.isEmpty()) {
                 try {
                     int team1Score = Integer.parseInt(score1Str);
@@ -253,14 +239,11 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
                     return;
                 }
             }
-            // 2. Bắt lỗi nếu người dùng chỉ điền 1 trong 2 ô
             else if (!score1Str.isEmpty() || !score2Str.isEmpty()) {
                 Toast.makeText(getContext(), "Vui lòng điền đủ cả hai điểm số cho Set " + (i + 1) + ".", Toast.LENGTH_SHORT).show();
-                return; // Dừng lại nếu chỉ điền một nửa
+                return;
             }
-
         }
-
         UpdateScoresRequest request = new UpdateScoresRequest(setResults);
         MatchService service = ApiClient.getClient(getContext()).create(MatchService.class);
         service.updateMatchScores(matchId, request).enqueue(new Callback<Void>() {
@@ -272,12 +255,8 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
                 } else {
                     String errorMsg = "Cập nhật thất bại: " + response.code();
                     try {
-                        if (response.errorBody() != null) {
-                            errorMsg += " - " + response.errorBody().string();
-                        }
-                    } catch (Exception e) {
-                        Log.e("SaveScoreChanges", "Error parsing error body", e);
-                    }
+                        if (response.errorBody() != null) { errorMsg += " - " + response.errorBody().string(); }
+                    } catch (Exception e) { Log.e("SaveScoreChanges", "Error parsing error body", e); }
                     Log.e("SaveScoreChanges", errorMsg);
                     Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
                 }
@@ -314,11 +293,21 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
     }
 
     private void showExitConfirmationDialog() {
-        new AlertDialog.Builder(getContext())
-                .setMessage("Dữ liệu chưa lưu sẽ bị mất. Bạn có chắc chắn muốn thoát?")
-                .setPositiveButton("Xác nhận", (dialog, which) -> navigateBack(false))
-                .setNegativeButton("Quay lại", null)
-                .show();
+        if (getContext() == null) return;
+        final Dialog dialog = new Dialog(requireContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_custom_warning);
+        Button btnConfirmExit = dialog.findViewById(R.id.btn_confirm_exit);
+        Button btnCancelExit = dialog.findViewById(R.id.btn_cancel_exit);
+        btnConfirmExit.setOnClickListener(v -> {
+            dialog.dismiss();
+            navigateBack(false);
+        });
+        btnCancelExit.setOnClickListener(v -> dialog.dismiss());
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+        dialog.show();
     }
 
     private void sendRequestToServer(CreateMatchRequest request) {
@@ -347,28 +336,23 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         setCountSpinner.setEnabled(!forDetails);
         item1.setClickable(!forDetails);
         item2.setClickable(!forDetails);
-
         int addPlayerButtonVisibility = forDetails ? View.INVISIBLE : View.VISIBLE;
         player1Team1AddButton.setVisibility(addPlayerButtonVisibility);
         player2Team1AddButton.setVisibility(addPlayerButtonVisibility);
         player1Team2AddButton.setVisibility(addPlayerButtonVisibility);
         player2Team2AddButton.setVisibility(addPlayerButtonVisibility);
-
         confirmButton.setVisibility(forDetails ? View.GONE : View.VISIBLE);
         confirmChangesButton.setVisibility(View.GONE);
         cancelMatchButton.setVisibility(View.GONE);
-
         boolean canUpdateOrCancel = false;
         if (forDetails && match != null) {
             String status = match.getStatus();
             canUpdateOrCancel = "ongoing".equalsIgnoreCase(status) || "in_progress".equalsIgnoreCase(status) || "upcoming".equalsIgnoreCase(status) || "pending".equalsIgnoreCase(status);
-
             if (canUpdateOrCancel) {
                 confirmChangesButton.setVisibility(View.VISIBLE);
                 cancelMatchButton.setVisibility(View.VISIBLE);
             }
         }
-
         for (int i = 0; i < layoutMatchSetScoresContainer.getChildCount(); i++) {
             View setView = layoutMatchSetScoresContainer.getChildAt(i);
             boolean isEditable = !forDetails || canUpdateOrCancel;
@@ -389,7 +373,6 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
             public void onResponse(@NonNull Call<Match> call, @NonNull Response<Match> response) {
                 progressBar.setVisibility(View.GONE);
                 contentContainer.setVisibility(View.VISIBLE);
-
                 if (response.isSuccessful() && response.body() != null) {
                     populateUiWithMatchDetails(response.body());
                 } else {
@@ -397,12 +380,10 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
                     if (isAdded()) getParentFragmentManager().popBackStack();
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<Match> call, @NonNull Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 contentContainer.setVisibility(View.VISIBLE);
-
                 Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 if (isAdded()) getParentFragmentManager().popBackStack();
             }
@@ -412,8 +393,17 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
     private void populateUiWithMatchDetails(Match match) {
         configureUiForMode(true, match);
 
+        // Lưu lại trạng thái tỉ số ban đầu khi dữ liệu được tải
+        if (match.getSetResults() != null) {
+            this.initialSetResults.clear();
+            for (MatchSet set : match.getSetResults()) {
+                this.initialSetResults.add(new MatchSet(set.getSetNumber(), set.getTeam1Score(), set.getTeam2Score()));
+            }
+        } else {
+            this.initialSetResults.clear();
+        }
+
         SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        apiDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
             if (match.getStartTime() != null) {
                 Date matchDate = apiDateFormat.parse(match.getStartTime());
@@ -424,21 +414,17 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         } catch (ParseException e) {
             android.util.Log.e("AddMatch_Fragment", "Error parsing date", e);
         }
-
         if (match.getParticipants() != null && match.getParticipants().size() > 2) {
             isSinglesMatch = false;
         } else {
             isSinglesMatch = true;
         }
         frameLayoutTabContainer.post(() -> selectTab(isSinglesMatch));
-
         int totalSetCount = match.getSetCount();
         if (totalSetCount <= 0) {
             android.util.Log.w("AddMatch_Fragment", "API did not return a valid setCount for the match.");
         }
-
         updateSetScoreViews(totalSetCount, match.getSetResults());
-
         ArrayAdapter<CharSequence> adapter = (ArrayAdapter<CharSequence>) setCountSpinner.getAdapter();
         if (adapter != null) {
             for (int i = 0; i < adapter.getCount(); i++) {
@@ -448,8 +434,6 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
                 }
             }
         }
-
-        // Tách người chơi ra 2 đội
         List<Participant> team1 = new ArrayList<>();
         List<Participant> team2 = new ArrayList<>();
         if (match.getParticipants() != null) {
@@ -457,18 +441,14 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
                 if (p.getTeam() == 1) team1.add(p); else team2.add(p);
             }
         }
-
         if (!team1.isEmpty()) {
-            // Người chơi 1 của Đội 1 luôn ở vị trí trên-trái
             player1Team1Name.setText(abbreviateName(team1.get(0).getFullName()));
             loadPlayerAvatar(team1.get(0).getAvatarUrl(), player1Team1Avatar);
-            // Nếu là đấu đôi, điền người chơi 2 của Đội 1 vào vị trí dưới-trái
             if (team1.size() > 1) {
                 player2Team1Name.setText(abbreviateName(team1.get(1).getFullName()));
                 loadPlayerAvatar(team1.get(1).getAvatarUrl(), player2Team1Avatar);
             }
         }
-
         if (!team2.isEmpty()) {
             if (isSinglesMatch) {
                 player1Team2Name.setText(abbreviateName(team2.get(0).getFullName()));
@@ -487,12 +467,10 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
     private void updateSetScoreViews(int setCount, List<MatchSet> results) {
         layoutMatchSetScoresContainer.removeAllViews();
         if (getContext() == null) return;
-
         boolean canEditScores = !isDetailMode;
         if(isDetailMode && (confirmChangesButton.getVisibility() == View.VISIBLE)) {
             canEditScores = true;
         }
-
         for (int i = 0; i < setCount; i++) {
             View setScoreView = LayoutInflater.from(getContext()).inflate(R.layout.item_match_set_score, layoutMatchSetScoresContainer, false);
             TextView setNumber = setScoreView.findViewById(R.id.textViewSetLabel);
@@ -514,50 +492,73 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         if (getContext() == null) {
             return;
         }
-
         final Dialog dialog = new Dialog(getContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_match_delete_confirmation);
-
         Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
         Button btnCancel = dialog.findViewById(R.id.btnCancel);
-
         btnConfirm.setOnClickListener(v -> {
             deleteMatch();
             dialog.dismiss();
         });
-
-        btnCancel.setOnClickListener(v -> {
-            dialog.dismiss();
-        });
-
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
-
         dialog.show();
     }
 
     private boolean hasUnsavedData() {
-        // For add mode, check if any player has been selected
-        if (!isDetailMode && (selectedPlayer1Team1 != null || selectedPlayer2Team1 != null || selectedPlayer1Team2 != null || selectedPlayer2Team2 != null)) {
-            return true;
+        // Đối với chế độ thêm mới, chỉ cần kiểm tra có người chơi được chọn không là đủ
+        if (!isDetailMode) {
+            return selectedPlayer1Team1 != null || selectedPlayer2Team1 != null || selectedPlayer1Team2 != null || selectedPlayer2Team2 != null;
         }
 
-        // For both modes, check if any score has been entered
+        // Đối với chế độ chi tiết, so sánh tỉ số hiện tại với tỉ số ban đầu
         if (layoutMatchSetScoresContainer != null) {
-            for (int i = 0; i < layoutMatchSetScoresContainer.getChildCount(); i++) {
+            int numSetViews = layoutMatchSetScoresContainer.getChildCount();
+
+            for (int i = 0; i < numSetViews; i++) {
                 View setView = layoutMatchSetScoresContainer.getChildAt(i);
                 EditText team1ScoreEt = setView.findViewById(R.id.editTextScoreTeam1);
                 EditText team2ScoreEt = setView.findViewById(R.id.editTextScoreTeam2);
-                if (!team1ScoreEt.getText().toString().isEmpty() || !team2ScoreEt.getText().toString().isEmpty()) {
+
+                String currentScore1Str = team1ScoreEt.getText().toString();
+                String currentScore2Str = team2ScoreEt.getText().toString();
+
+                // Lấy tỉ số ban đầu cho set này
+                int initialScore1 = -1; // -1 đại diện cho "chưa có điểm"
+                int initialScore2 = -1;
+                if (i < initialSetResults.size()) {
+                    MatchSet initialSet = initialSetResults.get(i);
+                    if (initialSet != null) {
+                        initialScore1 = initialSet.getTeam1Score();
+                        initialScore2 = initialSet.getTeam2Score();
+                    }
+                }
+
+                // Lấy tỉ số hiện tại, nếu rỗng cũng coi là -1
+                int currentScore1 = -1;
+                int currentScore2 = -1;
+                try {
+                    if (!currentScore1Str.isEmpty()) {
+                        currentScore1 = Integer.parseInt(currentScore1Str);
+                    }
+                    if (!currentScore2Str.isEmpty()) {
+                        currentScore2 = Integer.parseInt(currentScore2Str);
+                    }
+                } catch (NumberFormatException e) {
+                    return true; // Nếu người dùng nhập chữ -> coi như là thay đổi
+                }
+
+                // So sánh, nếu khác nhau -> có thay đổi
+                if (currentScore1 != initialScore1 || currentScore2 != initialScore2) {
                     return true;
                 }
             }
         }
         return false;
     }
-
 
     @Override
     public void onPlayerSelected(User player, int playerSlot) {
@@ -575,22 +576,19 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
     private void loadPlayerAvatar(User player, ImageView imageView) {
         if (player != null && player.getAvatarUrl() != null && !player.getAvatarUrl().isEmpty()) {
             Glide.with(this).load(player.getAvatarUrl()).circleCrop().into(imageView);
-        } else {
-        }
+        } else {}
     }
 
     private void loadPlayerAvatar(String avatarUrl, ImageView imageView) {
         if (avatarUrl != null && !avatarUrl.isEmpty()) {
             Glide.with(this).load(avatarUrl).circleCrop().into(imageView);
-        } else {
-        }
+        } else {}
     }
 
     private String abbreviateName(String fullName) { if (fullName == null || fullName.trim().isEmpty()) return ""; String[] parts = fullName.trim().split("\\s+"); if (parts.length > 0) { StringBuilder abbreviated = new StringBuilder(); for (int i = 0; i < parts.length - 1; i++) { if (!parts[i].isEmpty()) abbreviated.append(parts[i].charAt(0)).append("."); } abbreviated.append(parts[parts.length - 1]); return abbreviated.toString(); } return fullName; }
     private void showTimePicker() { int hour = selectedDateTime.get(Calendar.HOUR_OF_DAY); int minute = selectedDateTime.get(Calendar.MINUTE); new TimePickerDialog(requireContext(), (view, hourOfDay, minuteOfHour) -> { selectedDateTime.set(Calendar.HOUR_OF_DAY, hourOfDay); selectedDateTime.set(Calendar.MINUTE, minuteOfHour); updateTimeButton(selectedDateTime.getTime()); }, hour, minute, true).show(); }
     private void updateTimeButton(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         inputTimeButton.setText(sdf.format(date));
     }
 
@@ -599,33 +597,23 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
     private void selectTab(boolean isSingles) { this.isSinglesMatch = isSingles; if(getContext() == null) return; animateTabIndicator(isSingles); if (isSingles) { item1.setTextColor(ContextCompat.getColor(getContext(), R.color.white)); item2.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); } else { item1.setTextColor(ContextCompat.getColor(getContext(), R.color.black)); item2.setTextColor(ContextCompat.getColor(getContext(), R.color.white)); } updateCourtView(); }
     private void animateTabIndicator(boolean isSingles) { if (frameLayoutTabContainer == null || tabIndicator == null) return; int totalWidth = frameLayoutTabContainer.getWidth(); if (totalWidth == 0) { frameLayoutTabContainer.post(() -> animateTabIndicator(isSingles)); return; } int tabWidth = totalWidth / 2; ViewGroup.LayoutParams params = tabIndicator.getLayoutParams(); params.width = tabWidth; tabIndicator.setLayoutParams(params); float targetX = isSingles ? 0f : tabWidth; tabIndicator.animate().translationX(targetX).setDuration(300).start(); }
     private void updateCourtView() {
-        if (isSinglesMatch) {
+        if (!isAdded()) {
+            return;
+        }
 
+        if (isSinglesMatch) {
             player2Team2Name.setVisibility(View.GONE);
             player2Team2Avatar.setVisibility(View.GONE);
-            if (!isDetailMode) {
-                player2Team2AddButton.setVisibility(View.GONE);
-                player2Team2Name.setText("");
-                selectedPlayer2Team2 = null;
-            }
-
             player2Team1Name.setVisibility(View.GONE);
             player2Team1Avatar.setVisibility(View.GONE);
-            if (!isDetailMode) {
-                player2Team1AddButton.setVisibility(View.GONE);
-                player2Team1Name.setText("");
-                selectedPlayer2Team1 = null;
-            }
-
             player1Team1Name.setVisibility(View.VISIBLE);
             player1Team1Avatar.setVisibility(View.VISIBLE);
-            if (!isDetailMode) {
-                player1Team1AddButton.setVisibility(View.VISIBLE);
-            }
-
             player1Team2Name.setVisibility(View.VISIBLE);
             player1Team2Avatar.setVisibility(View.VISIBLE);
             if (!isDetailMode) {
+                player2Team2AddButton.setVisibility(View.GONE);
+                player2Team1AddButton.setVisibility(View.GONE);
+                player1Team1AddButton.setVisibility(View.VISIBLE);
                 player1Team2AddButton.setVisibility(View.VISIBLE);
             }
 
@@ -638,7 +626,6 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
             player2Team2Avatar.setVisibility(View.VISIBLE);
             player1Team2Name.setVisibility(View.VISIBLE);
             player1Team2Avatar.setVisibility(View.VISIBLE);
-
             if (!isDetailMode) {
                 player1Team1AddButton.setVisibility(View.VISIBLE);
                 player2Team1AddButton.setVisibility(View.VISIBLE);
@@ -651,15 +638,12 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         PlayerSelectionDialog dialog = new PlayerSelectionDialog();
         Bundle args = new Bundle();
         args.putInt("playerSlot", currentSelectedPlayerSlot);
-
         ArrayList<String> excludedPlayerIds = new ArrayList<>();
         if (selectedPlayer1Team1 != null) excludedPlayerIds.add(selectedPlayer1Team1.getUid());
         if (selectedPlayer2Team1 != null) excludedPlayerIds.add(selectedPlayer2Team1.getUid());
         if (selectedPlayer1Team2 != null) excludedPlayerIds.add(selectedPlayer1Team2.getUid());
         if (selectedPlayer2Team2 != null) excludedPlayerIds.add(selectedPlayer2Team2.getUid());
-
         args.putStringArrayList("excludedPlayerIds", excludedPlayerIds);
-
         dialog.setArguments(args);
         dialog.setOnPlayerSelectedInDialogListener(this);
         dialog.show(getParentFragmentManager(), "PlayerSelectionDialog");
@@ -670,16 +654,12 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         int numOfSets = selectedSetCount;
         List<String> team1PlayerIds = new ArrayList<>();
         List<String> team2PlayerIds = new ArrayList<>();
-
         if (selectedPlayer1Team1 != null) {
             team1PlayerIds.add(selectedPlayer1Team1.getUid());
         }
-
         if (!isSinglesMatch && selectedPlayer2Team1 != null) {
             team1PlayerIds.add(selectedPlayer2Team1.getUid());
         }
-
-        // Đội 2
         if (isSinglesMatch) {
             if (selectedPlayer1Team2 != null) {
                 team2PlayerIds.add(selectedPlayer1Team2.getUid());
@@ -692,8 +672,6 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
                 team2PlayerIds.add(selectedPlayer1Team2.getUid());
             }
         }
-
-
         if (isSinglesMatch) {
             if (team1PlayerIds.size() != 1 || team2PlayerIds.size() != 1) {
                 Toast.makeText(requireContext(), "Vui lòng chọn đủ 2 người chơi cho trận đấu đơn.", Toast.LENGTH_SHORT).show();
@@ -741,8 +719,6 @@ public class AddMatch_Fragment extends Fragment implements PlayerSelectionDialog
         }
         sendRequestToServer(request);
     }
-
     private String formatDate(Date date) { SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); return dateFormat.format(date); }
     private String formatTime(Date date) { SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault()); return timeFormat.format(date); }
-
 }

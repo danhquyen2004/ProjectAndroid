@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,19 +42,24 @@ import retrofit2.Response;
 
 public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClickListener {
 
-    // ===== BIẾN CÓ SẴN =====
     private View rootView;
-
-    // ===== BIẾN MỚI ĐƯỢC THÊM VÀO =====
     private RecyclerView recyclerViewTodayMatches;
     private MatchAdapter matchAdapter;
     private List<Matches> todayMatchesList = new ArrayList<>();
 
+    // Thêm biến cho container và progress bar
+    private View contentContainer;
+    private ProgressBar progressBar;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Giữ nguyên việc inflate layout
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
         return rootView;
     }
@@ -60,6 +67,10 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Khởi tạo các view mới
+        contentContainer = view.findViewById(R.id.contentContainerHome);
+        progressBar = view.findViewById(R.id.progressBarHome);
 
         View btnOpenDrawer = rootView.findViewById(R.id.btnMenu);
         btnOpenDrawer.setOnClickListener(v -> {
@@ -74,12 +85,17 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         recyclerViewTodayMatches = view.findViewById(R.id.recyclerViewTodayMatches);
         setupRecyclerView();
 
+        // Không gọi fetchTodayMatches() ở đây nữa, sẽ gọi trong onResume
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Luôn tải lại dữ liệu khi màn hình được hiển thị
         fetchTodayMatches();
     }
 
-
     private void setupRecyclerView() {
-        // Sử dụng lại MatchAdapter đã có
         matchAdapter = new MatchAdapter(todayMatchesList, this);
         recyclerViewTodayMatches.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewTodayMatches.setAdapter(matchAdapter);
@@ -88,14 +104,23 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
     private void fetchTodayMatches() {
         if (getContext() == null) return;
 
+        // BẮT ĐẦU HIỂN THỊ LOADING
+        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+        if (contentContainer != null) contentContainer.setVisibility(View.INVISIBLE); // Dùng INVISIBLE để layout không bị giật
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String todayDateString = dateFormat.format(new Date());
+
         MatchService matchService = ApiClient.getClient(getContext()).create(MatchService.class);
         Call<MatchResponse> call = matchService.getMatchesByDay(todayDateString, 1, 50);
 
         call.enqueue(new Callback<MatchResponse>() {
             @Override
             public void onResponse(@NonNull Call<MatchResponse> call, @NonNull Response<MatchResponse> response) {
+                // KẾT THÚC LOADING, HIỂN THỊ NỘI DUNG
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
+
                 if (response.isSuccessful() && response.body() != null) {
                     List<Matches> convertedMatches = convertApiMatchesToDisplayable(response.body().getMatches());
                     matchAdapter.updateMatches(convertedMatches);
@@ -106,6 +131,10 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
 
             @Override
             public void onFailure(@NonNull Call<MatchResponse> call, @NonNull Throwable t) {
+                // KẾT THÚC LOADING, HIỂN THỊ NỘI DUNG (dù là rỗng)
+                if (progressBar != null) progressBar.setVisibility(View.GONE);
+                if (contentContainer != null) contentContainer.setVisibility(View.VISIBLE);
+
                 Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("Home_Fragment_API", "API call failed", t);
             }
@@ -115,8 +144,9 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
     private List<Matches> convertApiMatchesToDisplayable(List<Match> rawMatches) {
         List<Matches> convertedMatches = new ArrayList<>();
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
         SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+        // Bỏ setTimeZone để dùng giờ địa phương (đã sửa ở các bước trước)
 
         for (Match rawMatch : rawMatches) {
             List<Participant> team1 = new ArrayList<>();
@@ -144,9 +174,18 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
             String time = "N/A";
             if (rawMatch.getStartTime() != null) {
                 try {
-                    time = timeFormat.format(apiDateFormat.parse(rawMatch.getStartTime()));
-                } catch (Exception e) { /* ignore */ }
+                    // Dùng giờ địa phương để hiển thị
+                    Date parsedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault()).parse(rawMatch.getStartTime());
+                    time = timeFormat.format(parsedDate);
+                } catch (Exception e) {
+                    try { // Fallback cho trường hợp có 'Z'
+                        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                        time = timeFormat.format(apiDateFormat.parse(rawMatch.getStartTime()));
+                    } catch(Exception e2) {/* ignore */}
+                }
             }
+
+            boolean isDoubles = rawMatch.getParticipants() != null && rawMatch.getParticipants().size() > 2;
 
             convertedMatches.add(new Matches(
                     rawMatch.getMatchId(),
@@ -155,7 +194,7 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
                     rawMatch.getTeam1Wins() + "-" + rawMatch.getTeam2Wins(),
                     time,
                     mapApiStatusToDisplayStatus(rawMatch.getStatus()),
-                    "DOUBLES".equalsIgnoreCase(rawMatch.getType())
+                    isDoubles
             ));
         }
         return convertedMatches;
@@ -180,8 +219,9 @@ public class Home_Fragment extends Fragment implements MatchAdapter.OnMatchClick
         args.putString("match_id", match.getMatchId());
         detailFragment.setArguments(args);
 
+        // Chỗ này bạn cần xem lại R.id.main có đúng là id của container chính trong UserActivity không
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.main, detailFragment) // R.id.main là id của FrameLayout gốc trong fragment_home.xml
+                .replace(R.id.main, detailFragment)
                 .addToBackStack(null)
                 .commit();
     }

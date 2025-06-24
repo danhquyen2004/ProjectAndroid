@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     tools:context=".activities.Test"
     android:background="@color/white"
     android:id="@+id/main">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contentContainerHome"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -85,5 +85,13 @@
             tools:listitem="@layout/item_match_result"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBarHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </FrameLayout>

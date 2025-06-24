@@ -197,12 +197,15 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
         outState.putString(KEY_CURRENT_DATE, currentSelectedDateKey);
     }
 
+    // Trong file Matches_Fragment.java
+
     @Override
     public void onResume() {
         super.onResume();
-//        if (btnAddMatch != null) {
-//            btnAddMatch.setVisibility(View.VISIBLE);
-//        }
+
+        if (btnAddMatch != null) {
+            btnAddMatch.setVisibility(View.VISIBLE);
+        }
         updateTabSelection(currentViewType);
     }
 
@@ -422,9 +425,8 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
     private void convertAndDisplayMatches(List<Match> rawMatches) {
         List<Matches> convertedMatches = new ArrayList<>();
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        timeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+//        apiDateFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
         for (Match rawMatch : rawMatches) {
             List<Participant> team1 = new ArrayList<>();
@@ -440,21 +442,20 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
 
             String p1Name = !team1.isEmpty() ? team1.get(0).getFullName() : "";
             if (team1.size() > 1) p1Name += " & " + team1.get(1).getFullName();
-
             String p2Name = !team2.isEmpty() ? team2.get(0).getFullName() : "";
             if (team2.size() > 1) p2Name += " & " + team2.get(1).getFullName();
-
             String p1Avatar1 = !team1.isEmpty() ? team1.get(0).getAvatarUrl() : null;
             String p1Avatar2 = team1.size() > 1 ? team1.get(1).getAvatarUrl() : null;
             String p2Avatar1 = !team2.isEmpty() ? team2.get(0).getAvatarUrl() : null;
             String p2Avatar2 = team2.size() > 1 ? team2.get(1).getAvatarUrl() : null;
-
             String time = "N/A";
             if (rawMatch.getStartTime() != null) {
                 try {
                     time = timeFormat.format(apiDateFormat.parse(rawMatch.getStartTime()));
                 } catch (Exception e) { /* ignore */ }
             }
+
+            boolean isDoubles = rawMatch.getParticipants() != null && rawMatch.getParticipants().size() > 2;
 
             convertedMatches.add(new Matches(
                     rawMatch.getMatchId(),
@@ -463,8 +464,9 @@ public class Matches_Fragment extends Fragment implements DateAdapter.OnDateSele
                     rawMatch.getTeam1Wins() + "-" + rawMatch.getTeam2Wins(),
                     time,
                     mapApiStatusToDisplayStatus(rawMatch.getStatus()),
-                    "DOUBLES".equalsIgnoreCase(rawMatch.getType())
+                    isDoubles
             ));
+
         }
         this.displayedMatchesList.clear();
         this.displayedMatchesList.addAll(convertedMatches);
