@@ -33,6 +33,7 @@ import com.example.tlupickleball.model.logClub;
 import com.example.tlupickleball.model.logs;
 import com.example.tlupickleball.network.api_model.finance.FinanceClubListResponse;
 import com.example.tlupickleball.network.core.ApiClient;
+import com.example.tlupickleball.network.core.SessionManager;
 import com.example.tlupickleball.network.service.FinanceService;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -75,6 +76,10 @@ public class Club_Finance_Fragment extends Fragment {
         progressBar = rootView.findViewById(R.id.progressBarHome);
 
         initViews();
+
+        // Cập nhật hiển thị các nút của admin
+        updateAdminControlsVisibility();
+
         fetchClubFundBalance(); // Lấy số dư quỹ câu lạc bộ từ API
         setupListeners();
         setupMonthSpinner();
@@ -83,6 +88,24 @@ public class Club_Finance_Fragment extends Fragment {
 
         swipeRefreshLayout.setOnRefreshListener(this::loadData);
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Đảm bảo trạng thái hiển thị đúng khi fragment được quay lại
+        updateAdminControlsVisibility();
+    }
+
+    private void updateAdminControlsVisibility() {
+        // Kiểm tra vai trò và ẩn/hiện các nút tương ứng
+        if ("admin".equals(SessionManager.getRole(requireContext()))) {
+            btnAddExpense.setVisibility(View.VISIBLE);
+            llDonate.setVisibility(View.VISIBLE);
+        } else {
+            btnAddExpense.setVisibility(View.GONE);
+            llDonate.setVisibility(View.GONE);
+        }
     }
 
     private void initViews() {

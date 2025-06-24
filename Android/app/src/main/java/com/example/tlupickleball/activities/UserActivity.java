@@ -154,6 +154,12 @@ public class UserActivity extends BaseMember implements TabLayout.OnTabSelectedL
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        LoadUserProfile(this, uid);
+    }
+
+    @Override
     public void onTabSelected(TabLayout.Tab tab) {
         viewPager2.setCurrentItem(tab.getPosition());
     }
